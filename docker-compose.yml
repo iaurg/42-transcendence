@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      # Only build the api for the development environment
+      target: development
+    volumes:
+      - ./backend:/usr/src/app    
+    env_file:
+      - ./.env    
+    command: npm run start:dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    restart: always    
+    ports:
+      - "5432:5432"
+    volumes:
+      - transcendence-postgres:/var/lib/postgresql/data    
+    env_file:
+      - ./.env
+volumes:
+  transcendence-postgres: 
+    
