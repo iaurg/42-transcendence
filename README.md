@@ -1,5 +1,5 @@
-<div align="center">
-<img src="https://i.pinimg.com/originals/3b/8b/3a/3b8b3a3d1cd3e2951b014a1c9095aeb9.gif" width="280" style="border-radius:50%" />
+<div id="top" align="center" style="background-color: #000;border-radius: 16px;">
+  <img src="https://i.pinimg.com/originals/3b/8b/3a/3b8b3a3d1cd3e2951b014a1c9095aeb9.gif" width="280" style="border-radius:50%" />
 </div>
 
 # Transcendence
