@@ -28,7 +28,8 @@
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "^4.12.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "bcrypt": "^5.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -52,7 +53,8 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.2.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "@types/bcrypt": "^5.0.0"
   },
   "jest": {
     "moduleFileExtensions": [
