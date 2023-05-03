@@ -37,11 +37,23 @@ export class UsersService {
     });
 
     // check if password is correct
-    const isMatch = await bcrypt.compare(user.password, 'xx');
+    // const isMatch = await bcrypt.compare(user.password, 'xx');
 
     return user;
+  }
 
-    return `This action returns a #${id} user`;
+  async findOneByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
