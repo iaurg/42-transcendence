@@ -25,6 +25,7 @@ model User {
   friendships Friendship[] @relation("FriendshipUser")
   chats       Chat[]       @relation("ChatUser")
   messages    Message[]
+  scores      Score[]
   profile     UserProfile?
 }
 
@@ -78,4 +79,33 @@ model Message {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
   content   String
+}
+
+model Score {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String  @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  score     Int
+  leaderboard Leaderboard? @relation(fields: [leaderboardId], references: [id])
+  leaderboardId String?
+}
+
+model Game {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  score     Score?
+}
+
+model Leaderboard {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  scores    Score[]
 }
