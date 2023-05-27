@@ -8,10 +8,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  ONLINE
+  OFFLINE
+  AWAY
+  BUSY
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
+  id          String       @id @default(uuid())
+  username    String       @unique
+  password    String
+  mfaEnabled  Boolean
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  friendships Friendship[] @relation("FriendshipUser")
+  chats       Chat[]       @relation("ChatUser")
+  messages    Message[]
+  profile     UserProfile?
+}
+
+model Friend {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  friendships Friendship[] @relation("FriendshipFriend")
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Friendship {
+  id       String           @id @default(uuid())
+  user     User             @relation("FriendshipUser", fields: [userId], references: [id])
+  friend   Friend           @relation("FriendshipFriend", fields: [friendId], references: [id])
+  userId   String
+  friendId String
+  status   FriendshipStatus
+
+  @@unique([userId, friendId])
+}
+
+model UserProfile {
+  id     String     @id @default(uuid())
+  user   User       @relation(fields: [userId], references: [id])
+  userId String     @unique
+  bio    String?
+  avatar String?
+  status UserStatus
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     User[]    @relation("ChatUser")
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  chatId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String
 }
