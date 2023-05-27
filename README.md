@@ -8,7 +8,18 @@ No more C! No more C++! This project is about doing something you’ve never don
 
 Remind yourself the beginning of your journey in computer science. Look at you now. Time to shine!
 
-## Conteúdos
+## How to get started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- NodeJS
+- NPM
+- Dev containers extension: VS Code (ms-vscode-remote.remote-containers)
+
+### Running the project
+
+## Materials
 
 #### NodeJS
 
@@ -16,12 +27,12 @@ Remind yourself the beginning of your journey in computer science. Look at you n
 
 #### NestJS
 
-[NestJS docs](https://docs.nestjs.com/)
-[NestJS in 100 Seconds](https://www.youtube.com/watch?v=0M8AYU_hPas)
-[Criando uma aplicação com NestJS e PrismaIO](https://www.youtube.com/watch?v=0Idug0e9tPw)
+- [NestJS docs](https://docs.nestjs.com/)
+- [NestJS in 100 Seconds](https://www.youtube.com/watch?v=0M8AYU_hPas)
+- [Criando uma aplicação com NestJS e PrismaIO](https://www.youtube.com/watch?v=0Idug0e9tPw)
 
 #### Docker
 
 #### React.js
 
-[React.js docs](https://reactjs.org/docs/getting-started.html)
+- [React.js docs](https://reactjs.org/docs/getting-started.html)
