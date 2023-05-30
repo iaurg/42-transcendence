@@ -1,79 +1,29 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-postgres
 {
-  "name": "42 Transcendence",
-  // "dockerComposeFile": "docker-compose.yml",
-  // "service": "app",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  "features": {
-    "ghcr.io/flexwie/devcontainer-features/op:1": {},
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
-      "configureZshAsDefaultShell": true,
-      "installOhMyZsh": true
-    }
-  },
-  // Configure tool-specific properties.
-  "customizations": {
-    // Configure properties specific to VS Code.
-    "vscode": {
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": true
-        },
-        "[typescriptreact]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "workbench.iconTheme": "material-icon-theme",
-        "[typescript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[javascript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[jsonc]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[json]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "editor.fontFamily": "'Fira Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
-        "editor.fontLigatures": true,
-        "editor.cursorWidth": 5,
-        "editor.detectIndentation": false,
-        "editor.formatOnPaste": true
-      },
-      "extensions": [
-        "dracula-theme.theme-dracula",
-        "PKief.material-icon-theme",
-        "naumovs.color-highlight",
-        "ms-azuretools.vscode-docker",
-        "EditorConfig.EditorConfig",
-        "dbaeumer.vscode-eslint",
-        "GitHub.copilot-nightly",
-        "eamodio.gitlens",
-        "esbenp.prettier-vscode",
-        "Prisma.prisma",
-        "Prisma.prisma-insider"
-      ]
-    }
-  },
+	"name": "42 Transcendence",
+	"dockerComposeFile": ["docker-compose.yml"],
+	"service": "transcendence",
+	"workspaceFolder": "/workspaces/transcendence",
+	"postCreateCommand": "./.devcontainer/postCreateCommand.sh",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"naumovs.color-highlight",
+				"ms-azuretools.vscode-docker",
+				"EditorConfig.EditorConfig",
+				"dbaeumer.vscode-eslint",
+				"GitHub.copilot",
+				"eamodio.gitlens",
+				"esbenp.prettier-vscode",
+				"Prisma.prisma",
+				"Prisma.prisma-insider"
+			]
+		}
+	},
 
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // This can be used to network with other containers or with the host.
-  "forwardPorts": [3000, 5432, 8080, 8000]
-
-  // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "yarn install",
-
-  // Configure tool-specific properties.
-  // "customizations": {},
-
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-  // "remoteUser": "root"
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or with the host.
+	"forwardPorts": [3000, 5432, 8080, 8000]
 }
