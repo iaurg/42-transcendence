@@ -1,0 +1,32 @@
+name: push
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Copy repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install npm dependencies 📦
+        run: npm ci
+        working-directory: ./backend
+      - name: Lint code ✨
+        run: npm run lint
+        working-directory: ./backend
+
+      - name: Run tests ✅
+        run: npm run test
+        working-directory: ./backend
+
