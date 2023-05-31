@@ -1,0 +1,29 @@
+{
+	"name": "42 Transcendence",
+	"dockerComposeFile": ["docker-compose.yml"],
+	"service": "transcendence",
+	"workspaceFolder": "/workspaces/transcendence",
+	"postCreateCommand": "./.devcontainer/postCreateCommand.sh",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"naumovs.color-highlight",
+				"ms-azuretools.vscode-docker",
+				"EditorConfig.EditorConfig",
+				"dbaeumer.vscode-eslint",
+				"GitHub.copilot",
+				"eamodio.gitlens",
+				"esbenp.prettier-vscode",
+				"Prisma.prisma",
+				"Prisma.prisma-insider"
+			]
+		}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or with the host.
+	"forwardPorts": [3000, 5432, 8080, 8000]
+}
