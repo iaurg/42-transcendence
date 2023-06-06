@@ -35,14 +35,9 @@ export default function Sidebar() {
             </li>
           </ul>
         </div>
-        <ul className="flex flex-col space-y-2 items-center justify-center">
+        <ul className="flex flex-col space-y-5 items-center justify-center pb-4">
           <li>
-            <a
-              href="/"
-              className="text-white font-bold py-2 px-4 rounded-lg transition-all hover:bg-purple42-200"
-            >
-              Perfil
-            </a>
+            <img src="https://bigheads.io/svg" width={48} height={48} />
           </li>
           <li>
             <a
