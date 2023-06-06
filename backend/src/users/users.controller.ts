@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -6,7 +6,7 @@ export class UsersController {
   constructor(private service: UsersService) {}
 
   @Get('me')
-  findMe() {
-    return this.service.findMe();
+  findMe(@Body() dto: any) {
+    return this.service.findMe(dto);
   }
 }
