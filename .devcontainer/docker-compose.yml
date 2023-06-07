@@ -11,7 +11,7 @@ services:
       - ../.env
     volumes:
       # Map host folder to workspace
-      - ../../42-transcendence:/workspaces/transcendence:cached
+      - ..:/workspaces/transcendence
       # Allow docker socket to use docker CLI inside devcontainer
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
