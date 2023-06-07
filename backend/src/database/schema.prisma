@@ -17,9 +17,8 @@ enum UserStatus {
 
 model User {
   id          String       @id @default(uuid())
-  username    String       @unique
-  password    String
-  mfaEnabled  Boolean
+  login    	  String       @unique
+  displayName String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   friendships Friendship[] @relation("FriendshipUser")
