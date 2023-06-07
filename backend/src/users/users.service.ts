@@ -23,6 +23,7 @@ export class UsersService {
         data: {
           login: user.login,
           displayName: user.displayName,
+          status: 'ONLINE',
         },
       });
       return userInfo;
