@@ -1,6 +1,7 @@
 
 services:
   transcendence:
+    container_name: transcendence_devcontainer
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,9 +16,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - backend
-  # NOTE API não sobe no devcontainer pq o container é a API. Rodamos os comandos do API direto no terminal
 
   postgres:
+    container_name: transcendence_dev_postgres
     image: postgres:latest
     restart: unless-stopped
     ports:
@@ -25,12 +26,12 @@ services:
     networks:
       - backend
     environment:
-      # NOTE parece bruxaria colocar hardcoded mas isso padroniza o env dev. Só prod precisa de configs e dotenv
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "user"
       POSTGRES_PASSWORD: "password"
 
   dbadmin:
+    container_name: transcendence_dev_adminer
     image: adminer
     restart: unless-stopped
     ports:
