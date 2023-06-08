@@ -9,7 +9,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChatService } from './chat.service';
 
 @WebSocketGateway()
 export class ChatGateway
@@ -19,7 +18,6 @@ export class ChatGateway
 
   @WebSocketServer()
   server: Server;
-
   @SubscribeMessage('chat')
   async handleChat(
     @MessageBody() data: any,
@@ -27,8 +25,8 @@ export class ChatGateway
   ) {
     console.log(data);
     const { authorId, chatId, content } = data;
-    // const message = await this.ChatService.createMessage(authorId, chatId, content);
-    this.server.to(chatId).emit('message', content);
+    const message = await this.ChatService.createMessage(authorId, chatId, content);
+    client.socket.emit('message', content);
   }
 
   afterInit(server: Server) {
