@@ -1,8 +1,15 @@
+import { chatType } from '@prisma/client';
 import { IsString } from 'class-validator';
 export class ChatMessageDto {
   @IsString()
-  login: string;
-
+  authorId: string;
   @IsString()
-  displayName: string;
+  chatId: string;
+  @IsString()
+  content: string;
+}
+
+export class NewChatDto {
+  @IsString()
+  chatType: chatType;
 }

@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChatService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async createMessage(
     authorId: string,
@@ -48,12 +48,32 @@ export class ChatService {
     return chats;
   }
 
+  async listChatsByType(chatType: chatType): Promise<Chat[]> {
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        chatType,
+      },
+    });
+
+    return chats;
+  }
+
   async listChatsByUserId(userId: string): Promise<Chat[]> {
     const chats = await this.listChats();
 
     const filteredChats = chats.filter((chat) => chat.users.includes(userId));
 
     return filteredChats;
+  }
+
+  async findChat(chatId: string): Promise<Chat> {
+    const chat = await this.prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+    });
+
+    return chat;
   }
 
   async addUserToChat(userId: string, chatId: string): Promise<Chat> {

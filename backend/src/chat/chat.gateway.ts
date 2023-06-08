@@ -9,34 +9,40 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChatService } from './chat.service';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: '/chat' })
 export class ChatGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
-  constructor(private ChatService: ChatService) {}
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private chatService: ChatService) { }
 
   @WebSocketServer()
   server: Server;
-  @SubscribeMessage('chat')
-  async handleChat(
-    @MessageBody() data: any,
+  @SubscribeMessage('message')
+  async handleMessage(
+    @MessageBody() chatMessage: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(data);
-    const { authorId, chatId, content } = data;
-    const message = await this.ChatService.createMessage(authorId, chatId, content);
-    client.socket.emit('message', content);
+    const authorId = 'a58099a2-f7bc-4725-99aa-5445b50fcaeb';
+    const chatId = '54e7cf6d-6f9e-4ce5-9efd-982f8d5071a5';
+    const createdMessage = await this.chatService.createMessage(
+      authorId,
+      chatId,
+      chatMessage,
+    );
+
+    // this.server.to(chatId).emit('message', createdMessage);
+    this.server.emit('message', { data: createdMessage });
   }
 
   afterInit(server: Server) {
-    // create chatrooms onserver start
-    const chatrooms = ['general', 'random'];
-    for (const room of chatrooms) {
-      server.of('/').adapter.on('create-room', (room) => {
-        console.log(`room ${room} was created`);
-      });
-    }
+    // listen to all chat rooms on the server start
+    // const chatRooms = this.chatService.listChats();
+    // for (chat in chatRooms) {
+    //   server.of(`/chat/${chat.id}`).on('connection', (socket) => {
+    //     socket.join(chat.id);
+    //   });
+    // }
   }
 
   handleDisconnect(client: Socket) {

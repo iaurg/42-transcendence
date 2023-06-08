@@ -15,6 +15,19 @@ export class UsersService {
     return this.create(userDto);
   }
 
+  async listAll() {
+    return await this.prisma.user.findMany();
+  }
+
+  async find({ login }: CreateUserDto) {
+
+    return await this.prisma.user.findUnique({
+      where: {
+        login,
+      },
+    });
+  }
+
   async create(user: CreateUserDto) {
     // GET user info from Intra
     // TODO connect for real
