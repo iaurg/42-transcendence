@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/user.dto';
+import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   findMe(dto: any) {
     const userDto: CreateUserDto = new CreateUserDto();
@@ -23,7 +24,7 @@ export class UsersService {
         data: {
           login: user.login,
           displayName: user.displayName,
-          status: 'ONLINE',
+          status: UserStatus.ONLINE,
         },
       });
       return userInfo;

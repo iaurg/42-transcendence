@@ -19,7 +19,7 @@ model User {
   id          String       @id @default(uuid())
   login       String       @unique
   displayName String
-  status      UserStatus
+  status      UserStatus   @default(ONLINE)
   avatar      String?
   victory     Int          @default(0)
   friendships Friendship[] @relation("FriendshipUser")
