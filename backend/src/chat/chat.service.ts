@@ -7,13 +7,13 @@ export class ChatService {
   constructor(private prisma: PrismaService) { }
 
   async createMessage(
-    authorId: string,
+    login: string,
     chatId: string,
     content: string,
   ): Promise<Message> {
     const createdMessage = await this.prisma.message.create({
       data: {
-        authorId,
+        login,
         chatId,
         content,
       },

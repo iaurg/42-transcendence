@@ -23,10 +23,10 @@ export class ChatGateway
     @MessageBody() chatMessage: string,
     @ConnectedSocket() client: Socket,
   ) {
-    const authorId = 'a58099a2-f7bc-4725-99aa-5445b50fcaeb';
+    const login = 'a58099a2-f7bc-4725-99aa-5445b50fcaeb';
     const chatId = '54e7cf6d-6f9e-4ce5-9efd-982f8d5071a5';
     const createdMessage = await this.chatService.createMessage(
-      authorId,
+      login,
       chatId,
       chatMessage,
     );
