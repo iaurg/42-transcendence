@@ -1,6 +1,5 @@
 import { Controller, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { NewChatDto } from './dto';
 import { chatType } from '@prisma/client';
 
 // create a new chat in the database using post request
