@@ -36,3 +36,7 @@ Remind yourself the beginning of your journey in computer science. Look at you n
 #### React.js
 
 - [React.js docs](https://reactjs.org/docs/getting-started.html)
+
+#### Chatting
+
+- [Creating a web app for chatting](https://progressivecoder.com/building-a-nestjs-chat-app-with-websockets-and-mysql/)
