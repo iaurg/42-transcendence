@@ -5,7 +5,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap');
 
 @layer base {
-    html {
-      font-family: Inter, system-ui, sans-serif;
-    }
+  html {
+    font-family: Inter, system-ui, sans-serif;
+    overflow-y: hidden;
   }
+}
