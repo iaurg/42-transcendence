@@ -1,6 +1,7 @@
 "use client";
 import { Play, SignOut, Trophy } from "@phosphor-icons/react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Sidebar() {
   return (
@@ -16,22 +17,22 @@ export default function Sidebar() {
           />
           <ul className="flex flex-col space-y-6 text-center items-center justify-center">
             <li>
-              <a
+              <Link
                 href="/game/play"
                 className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
               >
                 <Play color="white" size={32} />
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/game"
                 className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
               >
                 <Trophy color="white" size={32} />
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -40,13 +41,13 @@ export default function Sidebar() {
             <img src="https://bigheads.io/svg" width={48} height={48} />
           </li>
           <li>
-            <a
+            <Link
               href="/"
               className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
             >
               <SignOut color="white" size={32} />
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
