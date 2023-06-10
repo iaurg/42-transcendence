@@ -33,7 +33,9 @@ export function LeaderBoardCard({
           <span className="text-xl text-white">{score}</span>
         </div>
         <div>
-          <UserPlus className="text-purple42-200 cursor-pointer" size={24} />
+          {isFriend && (
+            <UserPlus className="text-purple42-200 cursor-pointer" size={24} />
+          )}
         </div>
       </div>
     </div>
