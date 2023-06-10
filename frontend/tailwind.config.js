@@ -29,9 +29,10 @@ module.exports = {
           100: "#27282B",
           200: "#21252B",
           300: "#1F1E21",
+          400: "#16171B",
         },
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
 };
