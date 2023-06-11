@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { IntraUserProfile } from './dto';
+import { IntraUserProfile } from '../dto';
 
 @Injectable()
 export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
@@ -41,8 +41,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       email: user.data.email,
       firstName: user.data.first_name,
       lastName: user.data.last_name,
-      accessToken: accessToken,
-      refreshToken: _refreshToken,
     };
     callback(null, profile);
   }

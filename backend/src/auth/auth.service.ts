@@ -6,5 +6,7 @@ export class AuthService {
   constructor(private usersService: UsersService) {}
   async logout(login: string) {
     // TODO remove jwt refresh token from db
+    // TODO redirect to frontend login page
+    return 'logout';
   }
 }

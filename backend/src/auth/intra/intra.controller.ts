@@ -2,11 +2,15 @@ import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { IntraService } from './intra.service';
 import { IntraOAuthGuard } from './intra.guard';
 import { Request, Response } from 'express';
-import { IntraUserProfile } from './dto';
+import { IntraUserProfile } from '../dto';
+import { JwtAuthService } from '../jwt/jwt.service';
 
 @Controller('auth/intra')
 export class IntraController {
-  constructor(private intraService: IntraService) {}
+  constructor(
+    private intraService: IntraService,
+    private jwtAuthService: JwtAuthService,
+  ) {}
 
   @UseGuards(IntraOAuthGuard)
   @Get()
@@ -21,9 +25,11 @@ export class IntraController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = req.user as IntraUserProfile;
-    const jwt: string = await this.intraService.login(user);
+    const tokens = await this.intraService.login(user);
 
-    // TODO redirect to frontend with jwt in cookie
+    await this.jwtAuthService.storeTokensInCookie(res, tokens);
+
+    // TODO redirect to frontend
 
     // NOTE for now redirecting to show user data
     return user;

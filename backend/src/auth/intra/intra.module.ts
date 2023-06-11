@@ -5,9 +5,10 @@ import { UsersModule } from 'src/users/users.module';
 import { IntraStrategy } from './intra.strategy';
 import { HttpModule } from '@nestjs/axios';
 import { PassportModule } from '@nestjs/passport';
+import { JwtAuthModule } from '../jwt/jwt.module';
 
 @Module({
-  imports: [UsersModule, HttpModule, PassportModule],
+  imports: [UsersModule, HttpModule, PassportModule, JwtAuthModule],
   providers: [IntraService, IntraStrategy],
   controllers: [IntraController],
   exports: [],
