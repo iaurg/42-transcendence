@@ -4,6 +4,4 @@ export type IntraUserProfile = {
   lastName: string;
   email: string;
   avatar: string;
-  accessToken?: string;
-  refreshToken?: string;
 };

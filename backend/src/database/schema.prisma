@@ -18,6 +18,8 @@ enum UserStatus {
 model User {
   id          String       @id @default(uuid())
   login    	  String       @unique
+  email       String
+  refreshToken String?
   displayName String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
