@@ -21,6 +21,7 @@ model User {
   displayName String
   status      UserStatus   @default(ONLINE)
   avatar      String?
+  email       String
   victory     Int          @default(0)
   friendships Friendship[] @relation("FriendshipUser")
   createdAt   DateTime     @default(now())
