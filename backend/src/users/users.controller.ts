@@ -42,6 +42,6 @@ export class UsersController {
 
   @Delete(':login')
   remove(@Param('login') login: string) {
-	return this.service.remove(login);
+    return this.service.remove(login);
   }
 }

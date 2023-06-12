@@ -55,7 +55,7 @@ model Friendship {
 
 model Message {
   id        String   @id @default(uuid())
-  authorId  String
+  login     String
   createdAt DateTime @default(now())
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    String
@@ -74,6 +74,6 @@ model Chat {
   updatedAt DateTime  @updatedAt
   messages  Message[]
   users     String[]
-  chatType  chatType
+  chatType  chatType @default(PUBLIC)
   password  String?
 }
