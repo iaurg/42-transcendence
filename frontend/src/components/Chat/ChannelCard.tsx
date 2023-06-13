@@ -1,12 +1,13 @@
 import { ArrowRight, Crown, Lock, TrashSimple } from "@phosphor-icons/react";
+import { use, useEffect } from "react";
 
 type ChannelCardProps = {
   name: string;
 };
 
 export default function ChannelCard({ name }: ChannelCardProps) {
-  const isPrivate = Math.random() < 0.5;
-  const isOwner = Math.random() < 0.5;
+  const isPrivate = true;
+  const isOwner = true;
 
   const handleDeleteChannel = () => {
     console.log("deletando canal");
