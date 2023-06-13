@@ -15,7 +15,7 @@ export class IntraController {
   @UseGuards(IntraOAuthGuard)
   @Get()
   async intraOAuth() {
-    // NOTE this route is just for redirecting to intra oauth
+    // this route is just for redirecting to intra oauth
   }
 
   @UseGuards(IntraOAuthGuard)

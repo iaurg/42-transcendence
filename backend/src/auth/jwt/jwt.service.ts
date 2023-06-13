@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { User } from '@prisma/client';
 import { AuthTokens, JwtPayload } from '../dto/jwt.dto';
 import ms from 'ms';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class JwtAuthService {
@@ -15,9 +16,15 @@ export class JwtAuthService {
     private configService: ConfigService,
   ) {}
 
-  // TODO remove hardcoded expiration times and use config
-  private accessTokenExpiration = '1h';
-  private refreshTokenExpiration = '1d';
+  private accessTokenExpiration: string = this.configService.get(
+    'ACCESS_TOKEN_EXPIRATION',
+    '1h',
+  );
+
+  private refreshTokenExpiration: string = this.configService.get(
+    'REFRESH_TOKEN_EXPIRATION',
+    '1d',
+  );
 
   private generatePayload(user: User) {
     return {
@@ -27,8 +34,13 @@ export class JwtAuthService {
   }
 
   private async updateRefreshToken(user: User, refreshToken: string) {
-    // TODO hash refresh token
-    // TODO store refresh token in database with usersService
+    const hash = await argon2.hash(refreshToken, {
+      secret: Buffer.from(this.configService.get('HASH_PEPPER')),
+    });
+
+    await this.usersService.update(user.login, {
+      refreshToken: hash,
+    });
   }
 
   async generateJwt(user: User) {
@@ -51,8 +63,9 @@ export class JwtAuthService {
   }
 
   private generateCookieOptions(): CookieOptions {
-    // NOTE is there a better way to do this?
-    const domain = process.env.NODE_ENV === 'production' ? '' : 'localhost';
+    // TODO retrieve domain from config later on
+    const domain =
+      this.configService.get('NODE_ENV') !== 'production' ? 'localhost' : '';
     const cookieOptions = {
       domain: domain,
       httpOnly: true,
@@ -81,23 +94,13 @@ export class JwtAuthService {
   }
 
   async refreshJwt(login: string) {
-    // TODO retrieve user from database
-    // const user = await this.usersService.findOne(login);
-    // TODO validate user and refresh token
-    // if (!user || !user.refreshToken) {
-    //   throw new ForbiddenException('User not found');
-    // }
-
-    // TODO generate new access token
-    // return await this.generateJwt(user);
-    // NOTE using a mock user for now
-    return await this.generateJwt({
-      id: '1',
-      login: login,
-      displayName: 'Test User',
-      email: 'test@email.com',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as User);
+    const user = await this.usersService.findOne(login);
+    if (!user) {
+      throw new ForbiddenException('User not found');
+    }
+    if (!user.refreshToken) {
+      throw new ForbiddenException('Session expired, please log in again.');
+    }
+    return await this.generateJwt(user);
   }
 }

@@ -17,6 +17,6 @@ export class JwtAuthController {
     const user = req.user as IntraUserProfile;
     const tokens = await this.jwtAuthService.refreshJwt(user.login);
     await this.jwtAuthService.storeTokensInCookie(res, tokens);
-    return user;
+    return 'tokens refreshed';
   }
 }

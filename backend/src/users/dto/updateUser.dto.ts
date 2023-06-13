@@ -1,18 +1,18 @@
-import { Friendship, UserStatus } from '@prisma/client';
+import { UserStatus } from '@prisma/client';
 import { IsInt, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
-  login: string;
+  displayName?: string;
+
+  status?: UserStatus;
 
   @IsString()
-  displayName: string;
-
-  status: UserStatus;
-
-  @IsString()
-  avatar: string;
+  avatar?: string;
 
   @IsInt()
-  victory: number;
+  victory?: number;
+
+  @IsString()
+  refreshToken?: string;
 }

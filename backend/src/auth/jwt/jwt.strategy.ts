@@ -28,10 +28,11 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload) {
-    // TODO retrieve user from database
-    // const user = await this.userService.findOne(payload.sub);
-    // if (!user) {throw new UnauthorizedException('Please log in to continue');}
-    return true;
+    const user = await this.userService.findOne(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('Please log in to continue');
+    }
+    return user;
   }
 }
 
@@ -64,11 +65,11 @@ export class RefreshJwtStrategy extends PassportStrategy(
       throw new UnauthorizedException('JWT refresh token not found');
     }
 
-    // TODO retrieve user from database
-    // const user = await this.usersService.findOne(payload.sub);
-    // if (!user) {throw new UnauthorizedException('Please log in to continue');}
-    // return user;
-    return true;
+    const user = await this.usersService.findOne(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('Please log in to continue');
+    }
+    return user;
   }
 
   private static extractRefreshJwtFromBearer(req: Request): string | null {
