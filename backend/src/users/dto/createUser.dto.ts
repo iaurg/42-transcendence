@@ -4,7 +4,7 @@ export class CreateUserDto {
   login: string;
 
   @IsString()
-  displayName: string;
+  displayname: string;
 
   @IsEmail()
   email: string;

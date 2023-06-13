@@ -18,13 +18,15 @@ enum UserStatus {
 model User {
   id          String       @id @default(uuid())
   login    	  String       @unique
-  email       String
   refreshToken String?
   displayName String
+  status      UserStatus   @default(ONLINE)
+  avatar      String?
+  email       String
+  victory     Int          @default(0)
+  friendships Friendship[] @relation("FriendshipUser")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  friendships Friendship[] @relation("FriendshipUser")
-  profile     UserProfile?
 }
 
 model Friend {
@@ -52,18 +54,9 @@ model Friendship {
   @@unique([userId, friendId])
 }
 
-model UserProfile {
-  id     String     @id @default(uuid())
-  user   User       @relation(fields: [userId], references: [id])
-  userId String     @unique
-  bio    String?
-  avatar String?
-  status UserStatus
-}
-
 model Message {
   id        String   @id @default(uuid())
-  authorId  String
+  login     String
   createdAt DateTime @default(now())
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    String
@@ -82,22 +75,6 @@ model Chat {
   updatedAt DateTime  @updatedAt
   messages  Message[]
   users     String[]
-  chatType  chatType
+  chatType  chatType @default(PUBLIC)
   password  String?
-}
-
-model Game {
-  id         String      @id @default(uuid())
-  createdAt  DateTime    @default(now())
-  scoreTable ScoreTable?
-}
-
-model ScoreTable {
-  id         String @id @default(uuid())
-  game       Game   @relation(fields: [gameId], references: [id])
-  gameId     String @unique
-  userId     String
-  otherId    String
-  userScore  Int
-  otherScore Int
 }
