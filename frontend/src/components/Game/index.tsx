@@ -1,8 +1,14 @@
+"use client";
 import Konva from "konva";
-import { useEffect, useState } from "react";
-import { Stage, Layer, Rect, Text, Circle } from "react-konva";
+import { useState } from "react";
+import { Stage, Layer, Rect, Circle } from "react-konva";
 
-const ColoredRect = () => {
+type ColoredPaddleProps = {
+  x: number;
+  y: number;
+};
+
+const ColoredRect = ({ x, y }: ColoredPaddleProps) => {
   const [color, setColor] = useState("green");
 
   const handleClick = () => {
@@ -11,9 +17,9 @@ const ColoredRect = () => {
 
   return (
     <Rect
-      x={Math.random() * 800}
-      y={Math.random() * 670}
-      width={5}
+      x={x}
+      y={y}
+      width={15}
       height={80}
       fill={color}
       shadowBlur={5}
@@ -22,75 +28,46 @@ const ColoredRect = () => {
   );
 };
 
-export default function Game() {
-  const [canvas, setCanvas] = useState<HTMLElement | null>(null);
-  const [sizes, setSizes] = useState({
-    width: 800,
-    height: 600,
-  });
+type GameProps = {
+  data: {
+    players: any;
+    ball: {
+      x: number;
+      y: number;
+      radius: number;
+      dx: number; // velocity in the x-axis
+      dy: number; // velocity in the y-axis
+    };
+    canvas: {
+      width: number;
+      height: number;
+    };
+  };
+};
 
-  useEffect(() => {
-    setCanvas(document.getElementById("game-canvas"));
-
-    if (canvas) {
-      setSizes({
-        width: canvas.offsetWidth,
-        height: canvas.offsetWidth,
-      });
-    }
-  }, [canvas]);
-
-  /*
-  // redrawing the canvas on every window resize for responsive design
-  useEffect(() => {
-    if (window) {
-      const handleResize = () => {
-        setCanvas(document.getElementById("game-canvas"));
-        if (canvas) {
-          setSizes({
-            width: canvas.offsetWidth,
-            height: canvas.offsetWidth,
-          });
-          console.log(
-            "resized",
-            "width",
-            canvas ? canvas.offsetWidth : 0,
-            "height",
-            canvas ? canvas.offsetHeight : 0
-          );
-        }
-      };
-
-      window.addEventListener("resize", handleResize);
-    }
-  }, [canvas]);
-    */
-
-  if (typeof window === "undefined") {
-    return <></>;
-  } else {
-    return (
-      <div className="bg-red-600 w-fit h-3/4">
-        <div id="game-canvas">
-          <Stage
-            width={sizes.width}
-            height={sizes.height}
-            style={{ backgroundColor: "black" }}
-          >
-            <Layer>
-              <ColoredRect />
-              <ColoredRect />
-              <Circle
-                x={Math.random() * sizes.width}
-                y={Math.random() * sizes.height}
-                radius={10}
-                fill="red"
-                shadowBlur={5}
-              />
-            </Layer>
-          </Stage>
-        </div>
-      </div>
-    );
-  }
+export default function Game({ data }: GameProps) {
+  return (
+    <Stage
+      width={data.canvas.width}
+      height={data.canvas.height}
+      style={{
+        backgroundColor: "black",
+        borderRadius: "10px",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <Layer>
+        <ColoredRect x={data.players[0].x} y={data.players[0].y} />
+        <Circle
+          x={data.ball.x}
+          y={data.ball.y}
+          radius={data.ball.radius}
+          fill="red"
+          shadowBlur={5}
+        />
+        <ColoredRect x={data.players[1].x} y={data.players[1].y} />
+      </Layer>
+    </Stage>
+  );
 }
