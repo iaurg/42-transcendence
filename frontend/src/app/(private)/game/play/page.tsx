@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
@@ -13,10 +13,16 @@ export default function PlayPage() {
       {
         x: 10,
         y: 10,
+        width: 15,
+        height: 80,
+        speed: 5,
       },
       {
         x: 780,
         y: 10,
+        width: 15,
+        height: 80,
+        speed: 1,
       },
     ],
     ball: {
@@ -30,9 +36,46 @@ export default function PlayPage() {
       width: 800,
       height: 600,
     },
+    score: {
+      player1: 0,
+      player2: 0,
+    },
   });
 
   useEffect(() => {
+    const handleKeyPress = (e) => {
+      const canvas = canvasRef.current;
+      const { players } = gameData;
+
+      if (canvas) {
+        if (e.key === "ArrowUp" && players[0].y > 0) {
+          setGameData((prevGameData) => ({
+            ...prevGameData,
+            players: [
+              {
+                ...prevGameData.players[0],
+                y: prevGameData.players[0].y - prevGameData.players[0].speed,
+              },
+              prevGameData.players[1],
+            ],
+          }));
+          e.preventDefault();
+        } else if (e.key === "ArrowDown") {
+          setGameData((prevGameData) => ({
+            ...prevGameData,
+            players: [
+              {
+                ...prevGameData.players[0],
+                y: prevGameData.players[0].y + prevGameData.players[0].speed,
+              },
+              prevGameData.players[1],
+            ],
+          }));
+          e.preventDefault();
+        }
+      }
+    };
+
     const canvas = canvasRef.current;
     const updateCanvasSize = () => {
       setGameData((prevGameData) => ({
@@ -41,6 +84,7 @@ export default function PlayPage() {
           width: canvas ? canvas.clientWidth : 0,
           height: canvas ? canvas.clientHeight : 0,
         },
+        // put the ball in the center of the canvas
         ball: {
           ...prevGameData.ball,
           x: canvas ? canvas.clientWidth / 2 : 0,
@@ -49,10 +93,12 @@ export default function PlayPage() {
         players: [
           // position the players on the left and right sides of the canvas
           {
+            ...prevGameData.players[0],
             x: 15,
             y: canvas ? canvas.clientHeight / 2 - 40 : 0,
           },
           {
+            ...prevGameData.players[1],
             x: canvas ? canvas.clientWidth - 30 : 0,
             y: canvas ? canvas.clientHeight / 2 - 40 : 0,
           },
@@ -62,48 +108,50 @@ export default function PlayPage() {
 
     updateCanvasSize();
     window.addEventListener("resize", updateCanvasSize);
+    window.addEventListener("keydown", handleKeyPress);
 
     return () => {
       window.removeEventListener("resize", updateCanvasSize);
+      window.removeEventListener("keydown", handleKeyPress);
     };
   }, [canvasRef]);
 
+  const moveBall = () => {
+    setGameData((prevGameData) => {
+      const { x, y, radius, dx, dy } = prevGameData.ball;
+
+      const updatedBall = {
+        ...prevGameData.ball,
+        x: x + dx,
+        y: y + dy,
+      };
+
+      // Reverse direction if ball hits the canvas edges
+      if (
+        updatedBall.x + radius > prevGameData.canvas.width ||
+        updatedBall.x - radius < 0
+      ) {
+        updatedBall.dx = -dx;
+      }
+
+      if (
+        updatedBall.y + radius > prevGameData.canvas.height ||
+        updatedBall.y - radius < 0
+      ) {
+        updatedBall.dy = -dy;
+      }
+
+      return {
+        ...prevGameData,
+        ball: updatedBall,
+      };
+    });
+  };
+
   useEffect(() => {
-    const updateBall = () => {
-      setGameData((prevGameData) => {
-        const { x, y, radius, dx, dy } = prevGameData.ball;
-
-        const updatedBall = {
-          ...prevGameData.ball,
-          x: x + dx,
-          y: y + dy,
-        };
-
-        // Reverse direction if ball hits the canvas edges
-        if (
-          updatedBall.x + radius > prevGameData.canvas.width ||
-          updatedBall.x - radius < 0
-        ) {
-          updatedBall.dx = -dx;
-        }
-
-        if (
-          updatedBall.y + radius > prevGameData.canvas.height ||
-          updatedBall.y - radius < 0
-        ) {
-          updatedBall.dy = -dy;
-        }
-
-        return {
-          ...prevGameData,
-          ball: updatedBall,
-        };
-      });
-    };
-
     // Function for the game loop
     const gameLoop = () => {
-      updateBall();
+      moveBall();
       setTimeout(gameLoop, 1000 / 60); // Run at approximately 60 FPS
     };
 
