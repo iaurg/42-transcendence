@@ -1,38 +1,58 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  findMe(dto: any) {
-    const userDto: CreateUserDto = new CreateUserDto();
-
-    userDto.login = dto.login;
-    userDto.displayName = dto.displayname;
-    return this.create(userDto);
+  async findAll() {
+    return await this.prisma.user.findMany();
   }
 
-  async create(user: CreateUserDto) {
-    // GET user info from Intra
-    // TODO connect for real
-    try {
-      // Create user in DB
-      const userInfo = await this.prisma.user.create({
-        data: {
-          login: user.login,
-          displayName: user.displayName,
-        },
-      });
-      return userInfo;
-    } catch (e) {
-      if (e.code === 'P2002') {
-        throw new ForbiddenException(
-          'There is already a user with that username, please use another one.',
-        );
-      }
-      throw e;
-    }
+  async findOne(login: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        login: login,
+      },
+    });
+  }
+
+  async create(createUserDto: CreateUserDto) {
+    return await this.prisma.user.create({
+      data: {
+        login: createUserDto.login,
+        displayName: createUserDto.displayname,
+        email: createUserDto.email,
+        avatar: createUserDto.avatar,
+      },
+    });
+  }
+
+  async update(login: string, updateUserDto: UpdateUserDto) {
+    return await this.prisma.user.update({
+      where: { login: login },
+      data: {
+        displayName: updateUserDto.displayName,
+        avatar: updateUserDto.avatar,
+        status: updateUserDto.status,
+        victory: updateUserDto.victory,
+        updatedAt: new Date(),
+        refreshToken: updateUserDto.refreshToken,
+      },
+    });
+  }
+
+  async remove(login: string) {
+    return await this.prisma.user.delete({
+      where: {
+        login: login,
+      },
+    });
+  }
+
+  async findMe(dto: any) {
+    return 'null';
   }
 }
