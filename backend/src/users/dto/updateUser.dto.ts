@@ -1,4 +1,4 @@
-import { Friendship, UserStatus } from '@prisma/client';
+import { UserStatus } from '@prisma/client';
 import { IsInt, IsString } from 'class-validator';
 
 export class UpdateUserDto {

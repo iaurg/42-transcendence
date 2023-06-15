@@ -14,9 +14,9 @@
 				"ms-azuretools.vscode-docker",
 				"EditorConfig.EditorConfig",
 				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
 				"GitHub.copilot",
 				"eamodio.gitlens",
-				"esbenp.prettier-vscode",
 				"Prisma.prisma",
 				"Prisma.prisma-insider"
 			]
