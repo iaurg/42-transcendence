@@ -1,11 +1,14 @@
 import { Plus } from "@phosphor-icons/react";
 import ChannelCard from "./ChannelCard";
+import { useGetUser } from "@/services/queries/user/getUser";
 
 type ListChannelsProps = {
   handleShowCreateChannel: () => void;
 };
 
 export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
+  const { data, isLoading, isError } = useGetUser();
+
   return (
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-9">
@@ -18,14 +21,27 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
           onClick={handleShowCreateChannel}
         />
       </div>
-      <div
-        className="flex flex-col flex-1 max-h-[80vh] bg-black42-300 overflow-y-scroll overscroll-contain my-4
-            scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
-      >
-        <ChannelCard name="#1 - Canale grande" />
-        <ChannelCard name="#2 - Grande" />
-        <ChannelCard name="#3 - Can grande" />
-      </div>
+      {isLoading ? (
+        <div className="flex flex-col flex-1 justify-center items-center">
+          <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
+          <span className="text-white text-lg mt-4">Carregando...</span>
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col flex-1 justify-center items-center">
+          <span className="text-white text-lg mt-4">
+            Erro ao carregar os canais
+          </span>
+        </div>
+      ) : (
+        <div
+          className="flex flex-col flex-1 max-h-[80vh] bg-black42-300 overflow-y-scroll overscroll-contain my-4
+                        scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
+        >
+          {data?.map((channel: any) => (
+            <ChannelCard key={channel.id} name={channel.full_name} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import "../../styles/globals.css";
 import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import Header from "@/components/Header";
+import Providers from "../login/providers";
 
 export const metadata: Metadata = {
   title: "Game | 42 Transcendence",
@@ -19,16 +20,18 @@ export default function RootPrivateLayout({
   return (
     <html lang="en">
       <body className="bg-black42-100 flex">
-        <div className="flex flex-col md:flex-row">
-          <Sidebar />
-        </div>
-        <div className="flex flex-col flex-1 py-4 mx-4">
-          <Header />
-          {children}
-        </div>
-        <div className="flex flex-col">
-          <Chat />
-        </div>
+        <Providers>
+          <div className="flex flex-col md:flex-row">
+            <Sidebar />
+          </div>
+          <div className="flex flex-col flex-1 py-4 mx-4">
+            <Header />
+            {children}
+          </div>
+          <div className="flex flex-col">
+            <Chat />
+          </div>
+        </Providers>
       </body>
     </html>
   );
