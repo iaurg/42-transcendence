@@ -14,9 +14,13 @@ export class JwtAuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = req.user as IntraUserProfile;
-    const tokens = await this.jwtAuthService.refreshJwt(user.login);
-    await this.jwtAuthService.storeTokensInCookie(res, tokens);
-    return 'tokens refreshed';
+    try {
+      const user = req.user as IntraUserProfile;
+      const tokens = await this.jwtAuthService.refreshJwt(user.login);
+      await this.jwtAuthService.storeTokensInCookie(res, tokens);
+      return 'tokens refreshed';
+    } catch (error) {
+      return error;
+    }
   }
 }

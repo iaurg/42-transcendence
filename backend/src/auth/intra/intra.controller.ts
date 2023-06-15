@@ -24,14 +24,16 @@ export class IntraController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = req.user as IntraUserProfile;
-    const tokens = await this.intraService.login(user);
+    try {
+      const user = req.user as IntraUserProfile;
+      const tokens = await this.intraService.login(user);
 
-    await this.jwtAuthService.storeTokensInCookie(res, tokens);
-
-    // TODO redirect to frontend
-
-    // NOTE for now redirecting to show user data
-    return user;
+      await this.jwtAuthService.storeTokensInCookie(res, tokens);
+      // TODO redirect to frontend
+      // NOTE for now redirecting to show user data
+      return user;
+    } catch (error) {
+      return error;
+    }
   }
 }

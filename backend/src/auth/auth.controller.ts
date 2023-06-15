@@ -14,7 +14,11 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @Get('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    await this.jwtAuthService.removeTokensFromCookie(res);
-    return await this.authService.logout(req.user['login']);
+    try {
+      await this.jwtAuthService.removeTokensFromCookie(res);
+      return await this.authService.logout(req.user['login']);
+    } catch (error) {
+      return error;
+    }
   }
 }
