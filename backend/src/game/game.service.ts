@@ -12,10 +12,10 @@ export class GameService {
       },
       player2: undefined,
       ball: {
-        x: undefined,
-        y: undefined,
-        dx: undefined,
-        dy: undefined,
+        x: 400,
+        y: 300,
+        dx: 4,
+        dy: 4,
         radius: 0,
       },
       canvas: {
@@ -35,11 +35,26 @@ export class GameService {
   }
 
   updateGame(GameDto: GameDto) {
-    // Lógica da game
+    this.updateBallPosition(GameDto);
   }
 
-  updateBallPosition(GameDto: GameDto) {
-    // Lógica da bola
+  updateBallPosition(gameDto: GameDto) {
+    gameDto.ball.x += gameDto.ball.dx;
+    gameDto.ball.y += gameDto.ball.dy;
+
+    // Collision detection with walls
+    if (
+      gameDto.ball.y + gameDto.ball.radius > gameDto.canvas.height ||
+      gameDto.ball.y - gameDto.ball.radius < 0
+    ) {
+      gameDto.ball.dy *= -1;
+    }
+    if (
+      gameDto.ball.x + gameDto.ball.radius > gameDto.canvas.width ||
+      gameDto.ball.x - gameDto.ball.radius < 0
+    ) {
+      gameDto.ball.dx *= -1;
+    }
   }
 
   updatePlayerPosition(playerId: string, GameDto: GameDto) {

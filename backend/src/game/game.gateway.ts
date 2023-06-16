@@ -52,10 +52,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('startGame')
   run(client: any, gameId: string) {
     setTimeout(() => {
-      this.gameServer.to(gameId).emit('updateGame');
-      console.log(`gameUpdate sent to ${gameId}`);
+      // console.log(`gameUpdate sent to ${gameId}`);
       this.gameService.updateGame(this.gamesPlaying[gameId]);
       if (this.gameStatus) this.run(client, gameId);
+      this.gameServer.to(gameId).emit('updatedGame', this.gamesPlaying[gameId]);
     }, 1000);
   }
 
