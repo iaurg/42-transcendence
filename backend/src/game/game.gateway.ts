@@ -54,8 +54,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     setTimeout(() => {
       // console.log(`gameUpdate sent to ${gameId}`);
       this.gameService.updateGame(this.gamesPlaying[gameId]);
+      client.emit('updatedGame', this.gamesPlaying[`game_${client.id}`]);
+      // this.gameServer.to(gameId).emit('updatedGame', this.gamesPlaying[gameId]);
       if (this.gameStatus) this.run(client, gameId);
-      this.gameServer.to(gameId).emit('updatedGame', this.gamesPlaying[gameId]);
     }, 1000);
   }
 
