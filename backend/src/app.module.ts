@@ -4,6 +4,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
+import { GameModule } from './game/game.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -15,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     AuthModule,
     ChatModule,
+    GameModule,
   ],
   providers: [PrismaService],
 })
