@@ -25,6 +25,7 @@ export class UsersService {
         login: createUserDto.login,
         displayName: createUserDto.displayname,
         email: createUserDto.email,
+        avatar: createUserDto.avatar,
       },
     });
   }
@@ -38,6 +39,7 @@ export class UsersService {
         status: updateUserDto.status,
         victory: updateUserDto.victory,
         updatedAt: new Date(),
+        refreshToken: updateUserDto.refreshToken,
       },
     });
   }

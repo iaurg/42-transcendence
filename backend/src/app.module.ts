@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,9 +14,10 @@ import { GameModule } from './game/game.module';
     }),
     UsersModule,
     PrismaModule,
+    AuthModule,
     ChatModule,
-		GameModule
+    GameModule,
   ],
   providers: [PrismaService],
 })
-export class AppModule { }
+export class AppModule {}
