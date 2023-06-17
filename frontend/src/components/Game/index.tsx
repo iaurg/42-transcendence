@@ -1,7 +1,7 @@
 "use client";
 import Konva from "konva";
 import { useState } from "react";
-import { Stage, Layer, Rect, Circle } from "react-konva";
+import { Stage, Layer, Rect, Circle, Line } from "react-konva";
 
 type ColoredPaddleProps = {
   x: number;
@@ -9,23 +9,7 @@ type ColoredPaddleProps = {
 };
 
 const ColoredRect = ({ x, y }: ColoredPaddleProps) => {
-  const [color, setColor] = useState("green");
-
-  const handleClick = () => {
-    setColor(Konva.Util.getRandomColor());
-  };
-
-  return (
-    <Rect
-      x={x}
-      y={y}
-      width={15}
-      height={80}
-      fill={color}
-      shadowBlur={5}
-      onClick={handleClick}
-    />
-  );
+  return <Rect x={x} y={y} width={15} height={80} fill={"#9D4EDD"} />;
 };
 
 type GameProps = {
@@ -51,7 +35,7 @@ export default function Game({ data }: GameProps) {
       width={data.canvas.width}
       height={data.canvas.height}
       style={{
-        backgroundColor: "black",
+        backgroundColor: "#1F173D",
         borderRadius: "10px",
         width: "100%",
         height: "100%",
@@ -63,8 +47,18 @@ export default function Game({ data }: GameProps) {
           x={data.ball.x}
           y={data.ball.y}
           radius={data.ball.radius}
-          fill="red"
+          fill="#FF9E00"
           shadowBlur={5}
+          zIndex={3}
+        />
+        <Line
+          x={data.canvas.width / 2}
+          y={0}
+          points={[0, 0, 0, data.canvas.height]}
+          stroke="#9D4EDD"
+          strokeWidth={2}
+          dash={[15, 10]}
+          zIndex={2}
         />
         <ColoredRect x={data.players[1].x} y={data.players[1].y} />
       </Layer>

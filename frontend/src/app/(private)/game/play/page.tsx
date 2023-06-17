@@ -120,18 +120,45 @@ export default function PlayPage() {
   return (
     <>
       <div
-        id="game-canvas"
-        style={{
-          width: "90%",
-          height: "90%",
-          margin: "0 auto",
-          borderRadius: "10px",
-          marginTop: "10px",
-          aspectRatio: "16/9",
-        }}
-        ref={canvasRef}
+        className="
+        bg-black42-300
+        rounded-lg
+        w-full
+        mt-4
+      "
       >
-        <Game data={gameData} />
+        <div
+          className="
+            flex
+            flex-row
+            justify-between
+            items-center
+            px-4
+            py-2
+            text-white
+            font-bold
+            text-5xl
+            w-[80%]
+            mx-auto
+          "
+        >
+          <div>32</div>
+          <div>42</div>
+        </div>
+        <div
+          id="game-canvas"
+          style={{
+            width: "80%",
+            height: "80%",
+            margin: "0 auto",
+            borderRadius: "10px",
+            marginTop: "10px",
+            aspectRatio: "16/9",
+          }}
+          ref={canvasRef}
+        >
+          <Game data={gameData} />
+        </div>
       </div>
     </>
   );
