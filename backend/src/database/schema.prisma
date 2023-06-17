@@ -17,23 +17,22 @@ enum UserStatus {
 
 model User {
   id          String       @id @default(uuid())
-  login    	  String       @unique
-  refreshToken String?
+  login       String       @unique
   displayName String
-  status      UserStatus   @default(ONLINE)
-  avatar      String?
   email       String
+  avatar      String?
+  status      UserStatus   @default(ONLINE)
   victory     Int          @default(0)
-  friendships Friendship[] @relation("FriendshipUser")
+  friends     Friend[]     @relation("Friendship")
+	refreshToken String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
 
 model Friend {
   id          String       @id @default(uuid())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  friendships Friendship[] @relation("FriendshipFriend")
+  status   FriendshipStatus
+  users    User[] @relation("Friendship")
 }
 
 enum FriendshipStatus {
@@ -42,18 +41,6 @@ enum FriendshipStatus {
   DECLINED
   BLOCKED
 }
-
-model Friendship {
-  id       String           @id @default(uuid())
-  user     User             @relation("FriendshipUser", fields: [userId], references: [id])
-  friend   Friend           @relation("FriendshipFriend", fields: [friendId], references: [id])
-  userId   String
-  friendId String
-  status   FriendshipStatus
-
-  @@unique([userId, friendId])
-}
-
 model Message {
   id        String   @id @default(uuid())
   login     String
