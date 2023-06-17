@@ -24,6 +24,7 @@
     "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.44.3",
     "react-konva": "^18.2.9",
     "react-popper": "^2.3.0",
     "socket.io-client": "^4.6.2",
