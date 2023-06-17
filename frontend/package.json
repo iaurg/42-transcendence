@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 9090",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -19,11 +19,12 @@
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "konva": "^9.2.0",
-    "next": "^13.4.4",
+    "next": "^13.4.6",
     "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.9",
+    "socket.io-client": "^4.6.2",
     "typescript": "5.0.4"
   },
   "devDependencies": {

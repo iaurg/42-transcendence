@@ -1,6 +1,8 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
+let socket;
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
@@ -8,6 +10,26 @@ const Game = dynamic(() => import("../../../../components/Game"), {
 
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
+  useEffect(() => {
+    // Connect to the Socket.IO server
+    const socket = io("http://localhost:3000/game"); // Replace with your server URL
+
+    // Event handlers
+    socket.on("connect", () => {
+      console.log("Connected to the WebSocket server");
+    });
+
+    socket.on("createGame", (data) => {
+      console.log("Received game:", data);
+    });
+
+    // Clean up the connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  return <>Teste</>;
   const [gameData, setGameData] = useState({
     players: [
       {
@@ -43,7 +65,7 @@ export default function PlayPage() {
   });
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: any) => {
       const canvas = canvasRef.current;
       const { players } = gameData;
 
