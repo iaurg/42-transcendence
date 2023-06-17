@@ -2,7 +2,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-let socket;
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
@@ -10,26 +9,6 @@ const Game = dynamic(() => import("../../../../components/Game"), {
 
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
-  useEffect(() => {
-    // Connect to the Socket.IO server
-    const socket = io("http://localhost:3000/game"); // Replace with your server URL
-
-    // Event handlers
-    socket.on("connect", () => {
-      console.log("Connected to the WebSocket server");
-    });
-
-    socket.on("createGame", (data) => {
-      console.log("Received game:", data);
-    });
-
-    // Clean up the connection on component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  return <>Teste</>;
   const [gameData, setGameData] = useState({
     players: [
       {
@@ -65,39 +44,41 @@ export default function PlayPage() {
   });
 
   useEffect(() => {
-    const handleKeyPress = (e: any) => {
-      const canvas = canvasRef.current;
-      const { players } = gameData;
-
-      if (canvas) {
-        if (e.key === "ArrowUp" && players[0].y > 0) {
-          setGameData((prevGameData) => ({
-            ...prevGameData,
-            players: [
-              {
-                ...prevGameData.players[0],
-                y: prevGameData.players[0].y - prevGameData.players[0].speed,
-              },
-              prevGameData.players[1],
-            ],
-          }));
-          e.preventDefault();
-        } else if (e.key === "ArrowDown") {
-          setGameData((prevGameData) => ({
-            ...prevGameData,
-            players: [
-              {
-                ...prevGameData.players[0],
-                y: prevGameData.players[0].y + prevGameData.players[0].speed,
-              },
-              prevGameData.players[1],
-            ],
-          }));
-          e.preventDefault();
-        }
-      }
+    const handleRequest = async () => {
+      const response = await fetch("http://localhost:3000/users/test");
+      const data = await response.json();
+      console.log(data);
     };
+    handleRequest();
 
+    // Connect to the Socket.IO server
+    const socket = io("http://localhost:3000/game", {
+      transports: ["websocket", "polling", "flashsocket"],
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from the WebSocket server");
+    });
+
+    socket.emit("createGame");
+
+    socket.emit("startGame");
+
+    // listen event from server called updatedGame
+    socket.on("updatedGame", (data: any) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        ball: data.ball,
+      }));
+    });
+
+    // Clean up the connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     const updateCanvasSize = () => {
       setGameData((prevGameData) => ({
@@ -130,55 +111,11 @@ export default function PlayPage() {
 
     updateCanvasSize();
     window.addEventListener("resize", updateCanvasSize);
-    window.addEventListener("keydown", handleKeyPress);
 
     return () => {
       window.removeEventListener("resize", updateCanvasSize);
-      window.removeEventListener("keydown", handleKeyPress);
     };
   }, [canvasRef]);
-
-  const moveBall = () => {
-    setGameData((prevGameData) => {
-      const { x, y, radius, dx, dy } = prevGameData.ball;
-
-      const updatedBall = {
-        ...prevGameData.ball,
-        x: x + dx,
-        y: y + dy,
-      };
-
-      // Reverse direction if ball hits the canvas edges
-      if (
-        updatedBall.x + radius > prevGameData.canvas.width ||
-        updatedBall.x - radius < 0
-      ) {
-        updatedBall.dx = -dx;
-      }
-
-      if (
-        updatedBall.y + radius > prevGameData.canvas.height ||
-        updatedBall.y - radius < 0
-      ) {
-        updatedBall.dy = -dy;
-      }
-
-      return {
-        ...prevGameData,
-        ball: updatedBall,
-      };
-    });
-  };
-
-  useEffect(() => {
-    // Function for the game loop
-    const gameLoop = () => {
-      moveBall();
-      setTimeout(gameLoop, 1000 / 60); // Run at approximately 60 FPS
-    };
-
-    gameLoop();
-  }, []);
 
   return (
     <>
