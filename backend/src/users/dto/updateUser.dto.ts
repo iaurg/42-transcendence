@@ -1,5 +1,5 @@
 import { UserStatus } from '@prisma/client';
-import { IsInt, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -15,4 +15,10 @@ export class UpdateUserDto {
 
   @IsString()
   refreshToken?: string;
+
+  @IsString()
+  mfaSecret?: string;
+
+  @IsBoolean()
+  mfaEnabled?: boolean;
 }

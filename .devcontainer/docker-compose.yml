@@ -7,8 +7,6 @@ services:
       dockerfile: Dockerfile
     working_dir: /workspaces/transcendence
     entrypoint: /bin/sh -c 'tail --follow /dev/null'
-    env_file:
-      - ../.env
     volumes:
       # Map host folder to workspace
       - ..:/workspaces/transcendence
@@ -41,8 +39,6 @@ services:
     depends_on:
       - postgres
 
-volumes:
-  transcendence-postgres:
 networks:
   backend:
     driver: bridge
