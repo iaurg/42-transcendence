@@ -8,7 +8,6 @@ import { UsersService } from 'src/users/users.service';
 export class AuthService {
   constructor(private usersService: UsersService, private configService: ConfigService) {}
   async logout(user: User, res: Response) {
-    console.log('logout'); // NOTE remove
     await this.usersService.update(user.login, { refreshToken: null });
     res.redirect(`${this.configService.get('FRONTEND_URL')}/login`);
   }

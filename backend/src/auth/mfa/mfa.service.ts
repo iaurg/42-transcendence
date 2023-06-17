@@ -16,7 +16,7 @@ export class MultiFactorAuthService {
   ) {}
 
   async generateQRCode(user: User) {
-    console.log('generateQRCode'); // NOTE remove
+    console.log('generateQRCode');
     console.log(user);
     const login = user.login;
     const secret = authenticator.generateSecret();
@@ -33,12 +33,12 @@ export class MultiFactorAuthService {
   }
 
   async streamQRCode(res: Response, otpauthUrl: string) {
-    console.log('streamQRCode'); // NOTE remove
+    console.log('streamQRCode');
     return toFileStream(res, otpauthUrl);
   }
 
   async isCodeValid(user: User, code: string): Promise<boolean> {
-    console.log('isCodeValid'); // NOTE remove
+    console.log('isCodeValid');
     return authenticator.verify({
       token: code,
       secret: user.mfaSecret,
@@ -46,7 +46,7 @@ export class MultiFactorAuthService {
   }
 
   async disableMfa(user: User, res: Response) {
-    console.log('disableMfa'); // NOTE remove
+    console.log('disableMfa');
     const updated_user = await this.usersService.update(user.login, {
       mfaEnabled: false,
       mfaSecret: null,
@@ -58,7 +58,7 @@ export class MultiFactorAuthService {
   }
 
   async enableMfa(user: User, res: Response) {
-    console.log('enableMfa'); // NOTE remove
+    console.log('enableMfa');
     const updated_user = await this.usersService.update(user.login, { mfaEnabled: true });
     const tokens = await this.jwtAuthService.generateJwt(updated_user, true);
     await this.jwtAuthService.storeTokensInCookie(res, tokens);
@@ -67,7 +67,7 @@ export class MultiFactorAuthService {
   }
 
   async authenticate(user: User, res: Response) {
-    console.log('authenticate'); // NOTE remove
+    console.log('authenticate');
     const tokens = await this.jwtAuthService.generateJwt(user, true);
     await this.jwtAuthService.storeTokensInCookie(res, tokens);
     console.log('post-authenticate tokens', tokens);

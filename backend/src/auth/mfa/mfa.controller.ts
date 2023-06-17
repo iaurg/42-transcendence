@@ -27,9 +27,13 @@ export class MultiFactorAuthController {
   async generateQRCode(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User;
 
-    const otpauthUrl = await this.mfaService.generateQRCode(user);
-    res.setHeader('content-type', 'image/png');
-    return await this.mfaService.streamQRCode(res, otpauthUrl);
+    try {
+      const otpauthUrl = await this.mfaService.generateQRCode(user);
+      res.setHeader('content-type', 'image/png');
+      return await this.mfaService.streamQRCode(res, otpauthUrl);
+    } catch (error) {
+      return error;
+    }
   }
 
   @UseGuards(AccessTokenGuard)
@@ -43,7 +47,6 @@ export class MultiFactorAuthController {
     try {
       return await this.mfaService.disableMfa(user, res);
     } catch (error) {
-      // TODO: handle error
       return error;
     }
   }
@@ -67,7 +70,6 @@ export class MultiFactorAuthController {
     try {
       return await this.mfaService.enableMfa(user, res);
     } catch (error) {
-      // TODO: handle error
       return error;
     }
   }
