@@ -8,6 +8,7 @@ import {
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
+import { GameLobbyService } from './lobby/game.lobby.service';
 
 interface GamesPlaying {
   [id: string]: GameDto;
@@ -15,7 +16,10 @@ interface GamesPlaying {
 
 @WebSocketGateway({ cors: '*' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private gameService: GameService) {}
+  constructor(
+    private gameService: GameService,
+    private gameLobby: GameLobbyService,
+  ) {}
 
   @WebSocketServer()
   gameServer: Server;
@@ -35,18 +39,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('createGame')
   createGame(client: any) {
     client.join(`game_${client.id}`);
-    this.gamesPlaying[`game_${client.id}`] = this.gameService.initGame(
-      client.id,
-    );
+    this.gamesPlaying[`game_${client.id}`] = this.gameLobby.initGame(client.id);
     console.log(`New game created: game_${client.id}`);
   }
 
   @SubscribeMessage('joinGame')
-  joinGame(client: any, gameId: string) {
-    client.join(`${gameId}`);
-    this.gameService.joinPlayer2(this.gamesPlaying[gameId], client.id);
-    console.log(`Client ${client.id} joined game ${gameId}`);
-    this.gameServer.to(gameId).emit('updateRoom');
+  joinGame(client: any) {
+    const game = this.gameLobby.joinMatch(client);
+    this.gamesPlaying[game.gameId] = game;
+    this.gameServer
+      .to(game.gameId)
+      .emit('gameCreated', this.gamesPlaying[game.gameId]);
+    console.log(
+      `game ${game.gameId} created, game: ${this.gamesPlaying[game.gameId]}`,
+    );
   }
 
   @SubscribeMessage('startGame')
@@ -61,8 +67,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('updatePlayer')
-  updatePlayer(client: any, gameDto: GameDto) {
-    this.gameService.updatePlayerPosition(client.id, gameDto);
+  updatePlayer(client: any, gameId: string) {
+    this.gameService.updatePlayerPosition(client.id, this.gamesPlaying[gameId]);
     console.log(`Client ${client.id} updated`);
   }
 }

@@ -3,6 +3,7 @@ import { Canvas } from './game.canvas.dto';
 import { Player } from './game.player.dto';
 
 export class GameDto {
+  gameId: string;
   player1: Player;
   player2: Player;
   ball: Ball;
