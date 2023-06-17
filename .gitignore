@@ -105,5 +105,3 @@ dist
 
 # PostgreSQL directory
 postgres/
-
-.vscode
