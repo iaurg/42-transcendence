@@ -24,7 +24,12 @@ export default function ListCreateChannel({
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-9">
         <h3 className="text-white text-lg">Criando novo canal</h3>
-        <XCircle color="white" size={20} onClick={handleHideCreateChannel} />
+        <XCircle
+          className="cursor-pointer"
+          color="white"
+          size={20}
+          onClick={handleHideCreateChannel}
+        />
       </div>
       <div className="flex flex-col flex-1 justify-center bg-black42-300 my-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
