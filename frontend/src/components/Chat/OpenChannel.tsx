@@ -1,7 +1,7 @@
 import { ChatContext } from "@/contexts/ChatContext";
-import { PaperPlaneTilt, XCircle } from "@phosphor-icons/react";
+import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
 import { useContext, useState } from "react";
-import { set } from "react-hook-form";
+import ChatUsersChannelPopOver from "./ChatUsersChannelPopOver";
 
 export function OpenChannel() {
   const { setShowElement, selectedChannelId } = useContext(ChatContext);
@@ -163,7 +163,15 @@ export function OpenChannel() {
 
   return (
     <div className="flex flex-col flex-1 justify-between">
-      <div className="flex flex-row justify-between items-center h-9">
+      <div className="flex flex-row justify-between items-center h-8">
+        <div className="flex items-center">
+          <ChatUsersChannelPopOver>
+            <div className="flex space-x-1 items-center">
+              <span className="text-xs">(12)</span>
+              <UsersThree className="text-white" size={20} />
+            </div>
+          </ChatUsersChannelPopOver>
+        </div>
         <h3 className="text-white text-lg">{selectedChannelId}</h3>
         <XCircle
           className="cursor-pointer"
