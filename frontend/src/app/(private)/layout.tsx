@@ -6,6 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import Header from "@/components/Header";
 import Providers from "../login/providers";
+import { ChatProvider } from "@/contexts/ChatContext";
 
 export const metadata: Metadata = {
   title: "Game | 42 Transcendence",
@@ -29,7 +30,9 @@ export default function RootPrivateLayout({
             {children}
           </div>
           <div className="flex flex-col">
-            <Chat />
+            <ChatProvider>
+              <Chat />
+            </ChatProvider>
           </div>
         </Providers>
       </body>
