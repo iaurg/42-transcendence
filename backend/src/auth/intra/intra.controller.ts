@@ -4,12 +4,14 @@ import { IntraOAuthGuard } from './intra.guard';
 import { Request, Response } from 'express';
 import { IntraUserProfile } from '../dto';
 import { JwtAuthService } from '../jwt/jwt.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth/intra')
 export class IntraController {
   constructor(
     private intraService: IntraService,
     private jwtAuthService: JwtAuthService,
+    private configService: ConfigService,
   ) {}
 
   @UseGuards(IntraOAuthGuard)
@@ -29,9 +31,8 @@ export class IntraController {
       const tokens = await this.intraService.login(user);
 
       await this.jwtAuthService.storeTokensInCookie(res, tokens);
-      // TODO redirect to frontend
-      // NOTE for now redirecting to show user data
-      return user;
+
+      res.redirect(`${this.configService.get('FRONTEND_URL')}/login/redirect`);
     } catch (error) {
       return error;
     }

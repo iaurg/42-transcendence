@@ -16,23 +16,25 @@ enum UserStatus {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  login       String       @unique
-  displayName String
-  email       String
-  avatar      String?
-  status      UserStatus   @default(ONLINE)
-  victory     Int          @default(0)
-  friends     Friend[]     @relation("Friendship")
-	refreshToken String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id           String     @id @default(uuid())
+  login        String     @unique
+  displayName  String
+  email        String
+  avatar       String?
+  status       UserStatus @default(ONLINE)
+  victory      Int        @default(0)
+  friends      Friend[]   @relation("Friendship")
+  refreshToken String?
+  mfaEnabled   Boolean    @default(false)
+  mfaSecret    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 model Friend {
-  id          String       @id @default(uuid())
-  status   FriendshipStatus
-  users    User[] @relation("Friendship")
+  id     String           @id @default(uuid())
+  status FriendshipStatus
+  users  User[]           @relation("Friendship")
 }
 
 enum FriendshipStatus {
@@ -41,6 +43,7 @@ enum FriendshipStatus {
   DECLINED
   BLOCKED
 }
+
 model Message {
   id        String   @id @default(uuid())
   login     String
@@ -62,6 +65,6 @@ model Chat {
   updatedAt DateTime  @updatedAt
   messages  Message[]
   users     String[]
-  chatType  chatType @default(PUBLIC)
+  chatType  chatType  @default(PUBLIC)
   password  String?
 }

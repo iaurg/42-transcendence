@@ -18,18 +18,20 @@ export class JwtAuthService {
 
   private accessTokenExpiration: string = this.configService.get(
     'ACCESS_TOKEN_EXPIRATION',
-    '1h',
+    '15m',
   );
 
   private refreshTokenExpiration: string = this.configService.get(
     'REFRESH_TOKEN_EXPIRATION',
-    '1d',
+    '7d',
   );
 
-  private generatePayload(user: User) {
+  private generatePayload(user: User, mfaAuthenticated = false) {
     return {
       sub: user.login,
       email: user.email,
+      mfaEnabled: user.mfaEnabled,
+      mfaAuthenticated: mfaAuthenticated,
     } as JwtPayload;
   }
 
@@ -43,8 +45,8 @@ export class JwtAuthService {
     });
   }
 
-  async generateJwt(user: User) {
-    const payload = this.generatePayload(user);
+  async generateJwt(user: User, mfaAuthenticated = false) {
+    const payload = this.generatePayload(user, mfaAuthenticated);
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.accessTokenExpiration,
       secret: this.configService.get('JWT_SECRET'),
@@ -63,9 +65,7 @@ export class JwtAuthService {
   }
 
   private generateCookieOptions(): CookieOptions {
-    // TODO retrieve domain from config later on
-    const domain =
-      this.configService.get('NODE_ENV') !== 'production' ? 'localhost' : '';
+    const domain = this.configService.get('DOMAIN', 'localhost');
     const cookieOptions = {
       domain: domain,
       httpOnly: true,

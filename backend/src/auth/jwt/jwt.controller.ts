@@ -1,8 +1,8 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtAuthService } from './jwt.service';
 import { Request, Response } from 'express';
-import { IntraUserProfile } from '../dto';
 import { RefreshTokenGuard } from './jwt.guard';
+import { User } from '@prisma/client';
 
 @Controller('auth/jwt')
 export class JwtAuthController {
@@ -15,10 +15,11 @@ export class JwtAuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
-      const user = req.user as IntraUserProfile;
+      const user = req.user as User;
+      // NOTE this refreshes the refresh token as well. So the user can stay logged in forever.
       const tokens = await this.jwtAuthService.refreshJwt(user.login);
       await this.jwtAuthService.storeTokensInCookie(res, tokens);
-      return 'tokens refreshed';
+      return tokens;
     } catch (error) {
       return error;
     }
