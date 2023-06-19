@@ -44,13 +44,6 @@ export default function PlayPage() {
   });
 
   useEffect(() => {
-    const handleRequest = async () => {
-      const response = await fetch("http://localhost:3000/users/test");
-      const data = await response.json();
-      console.log(data);
-    };
-    handleRequest();
-
     // Connect to the Socket.IO server
     const socket = io("http://localhost:3000/game", {
       transports: ["websocket", "polling", "flashsocket"],
