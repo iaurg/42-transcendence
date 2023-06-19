@@ -40,6 +40,8 @@ export class UsersService {
         victory: updateUserDto.victory,
         updatedAt: new Date(),
         refreshToken: updateUserDto.refreshToken,
+        mfaSecret: updateUserDto.mfaSecret,
+        mfaEnabled: updateUserDto.mfaEnabled,
       },
     });
   }

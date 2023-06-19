@@ -16,24 +16,25 @@ enum UserStatus {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  login    	  String       @unique
+  id           String     @id @default(uuid())
+  login        String     @unique
+  displayName  String
+  email        String
+  avatar       String?
+  status       UserStatus @default(ONLINE)
+  victory      Int        @default(0)
+  friends      Friend[]   @relation("Friendship")
   refreshToken String?
-  displayName String
-  status      UserStatus   @default(ONLINE)
-  avatar      String?
-  email       String
-  victory     Int          @default(0)
-  friendships Friendship[] @relation("FriendshipUser")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  mfaEnabled   Boolean    @default(false)
+  mfaSecret    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 model Friend {
-  id          String       @id @default(uuid())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  friendships Friendship[] @relation("FriendshipFriend")
+  id     String           @id @default(uuid())
+  status FriendshipStatus
+  users  User[]           @relation("Friendship")
 }
 
 enum FriendshipStatus {
@@ -41,17 +42,6 @@ enum FriendshipStatus {
   ACCEPTED
   DECLINED
   BLOCKED
-}
-
-model Friendship {
-  id       String           @id @default(uuid())
-  user     User             @relation("FriendshipUser", fields: [userId], references: [id])
-  friend   Friend           @relation("FriendshipFriend", fields: [friendId], references: [id])
-  userId   String
-  friendId String
-  status   FriendshipStatus
-
-  @@unique([userId, friendId])
 }
 
 model Message {
@@ -75,6 +65,6 @@ model Chat {
   updatedAt DateTime  @updatedAt
   messages  Message[]
   users     String[]
-  chatType  chatType @default(PUBLIC)
+  chatType  chatType  @default(PUBLIC)
   password  String?
 }
