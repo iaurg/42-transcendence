@@ -105,3 +105,8 @@ dist
 
 # PostgreSQL directory
 postgres/
+
+.vscode
+
+# Migrations
+**/database/migrations/*
