@@ -9,12 +9,13 @@ import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
+import { GameMoveDto } from './dto/game.move';
 
 interface GamesPlaying {
   [id: string]: GameDto;
 }
 
-@WebSocketGateway({ cors: '*' })
+@WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private gameService: GameService,
@@ -58,17 +59,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('startGame')
   run(client: any, gameId: string) {
     setTimeout(() => {
-      // console.log(`gameUpdate sent to ${gameId}`);
-      this.gameService.updateGame(this.gamesPlaying[gameId]);
+      this.gameService.updateBallPosition(this.gamesPlaying[gameId]);
       client.emit('updatedGame', this.gamesPlaying[`game_${client.id}`]);
-      // this.gameServer.to(gameId).emit('updatedGame', this.gamesPlaying[gameId]);
       if (this.gameStatus) this.run(client, gameId);
-    }, 1000);
+    }, 1000 / 60);
   }
 
-  @SubscribeMessage('updatePlayer')
-  updatePlayer(client: any, gameId: string) {
-    this.gameService.updatePlayerPosition(client.id, this.gamesPlaying[gameId]);
-    console.log(`Client ${client.id} updated`);
+  @SubscribeMessage('movePlayer')
+  updatePlayer(client: any, info: GameMoveDto) {
+    this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
   }
 }
