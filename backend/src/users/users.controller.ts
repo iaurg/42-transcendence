@@ -11,9 +11,9 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 
-@Controller('users')
+@Controller('user*')
 export class UsersController {
-  constructor(private service: UsersService) {}
+  constructor(private service: UsersService) { }
 
   @Get('me')
   findMe(@Body() dto: any) {
