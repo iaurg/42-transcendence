@@ -11,10 +11,6 @@ import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
 import { GameMoveDto } from './dto/game.move';
 
-interface GamesPlaying {
-  [id: string]: GameDto;
-}
-
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
@@ -24,17 +20,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
   gameServer: Server;
-  private gameStatus = false;
-  private gamesPlaying: GamesPlaying = {};
+  private gamesPlaying: Map<string, GameDto> = new Map();
 
-  handleConnection(client: any, ...args: any[]) {
-    this.gameStatus = true;
+  handleConnection(client: any) {
     console.log(`Client ${client.id} connected`);
   }
 
   handleDisconnect(client: any) {
-    this.gameStatus = false;
+    this.finishGame(client);
     console.log(`Client ${client.id} disconnected`);
+  }
+
+  private finishGame(client: any) {
+    const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
+      return (
+        this.gamesPlaying[gameId].player1.id === client.id ||
+        this.gamesPlaying[gameId].player2.id === client.id
+      );
+    });
+    this.gamesPlaying[gameId].finished = true;
   }
 
   @SubscribeMessage('createGame')
@@ -60,9 +64,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   run(client: any, gameId: string) {
     setTimeout(() => {
       this.gameService.updateBallPosition(this.gamesPlaying[gameId]);
-      client.emit('updatedGame', this.gamesPlaying[`game_${client.id}`]);
-      if (this.gameStatus) this.run(client, gameId);
+      if (this.gameService.isPointScored(this.gamesPlaying[gameId])) {
+        this.gameService.addPoint(this.gamesPlaying[gameId]);
+        this.gameService.restartBall(this.gamesPlaying[gameId]);
+      }
+      if (this.gameService.isGameFinished(this.gamesPlaying[gameId])) {
+        this.gameServer
+          .to(gameId)
+          .emit('gameFinished', this.gamesPlaying[gameId]);
+      } else {
+        this.gameServer
+          .to(gameId)
+          .emit('updatedGame', this.gamesPlaying[gameId]);
+      }
+      if (!this.gamesPlaying[gameId].finished) this.run(client, gameId);
     }, 1000 / 60);
+    this.gamesPlaying.delete(gameId);
   }
 
   @SubscribeMessage('movePlayer')

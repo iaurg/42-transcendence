@@ -37,6 +37,7 @@ export class GameLobbyService {
   initGame(player1Id: string): GameDto {
     const gameDto: GameDto = {
       gameId: `game_${player1Id}`,
+      finished: false,
       player1: {
         id: player1Id,
         x: 10,
@@ -53,6 +54,10 @@ export class GameLobbyService {
       canvas: {
         width: 800,
         height: 600,
+      },
+      score: {
+        player1: 0,
+        player2: 0,
       },
     };
     return gameDto;
