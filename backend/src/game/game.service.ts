@@ -118,16 +118,4 @@ export class GameService {
       return true;
     }
   }
-
-  setPlayerReady(game: GameDto, playerId: string) {
-    if (game.player1.id === playerId) {
-      game.player1.ready = true;
-    } else {
-      game.player2.ready = true;
-    }
-  }
-
-  checkPlayersReady(game: GameDto): boolean {
-    return game.player1.ready && game.player2.ready;
-  }
 }

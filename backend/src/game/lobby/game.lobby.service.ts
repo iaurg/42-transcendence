@@ -23,7 +23,6 @@ export class GameLobbyService {
       id: player.id,
       x: gameDto.canvas.width - 10,
       y: gameDto.canvas.height - 10,
-      ready: false,
     };
     player.join(`game_${gameDto.player1.id}`);
     console.log('Player 2 joined');
@@ -39,7 +38,6 @@ export class GameLobbyService {
         id: player1Id,
         x: 10,
         y: 10,
-        ready: false,
       },
       player2: undefined,
       ball: {
