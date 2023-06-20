@@ -3,23 +3,37 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 9090",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.15",
+    "@phosphor-icons/react": "^2.0.9",
+    "@tanstack/react-query": "^4.29.13",
+    "@tanstack/react-query-devtools": "^4.29.13",
     "@types/node": "18.15.11",
     "@types/react": "18.0.33",
     "@types/react-dom": "18.0.11",
-    "autoprefixer": "10.4.14",
+    "axios": "^1.4.0",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
-    "next": "13.3.0",
-    "postcss": "8.4.21",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "tailwindcss": "3.3.1",
+    "konva": "^9.2.0",
+    "next": "^13.4.6",
+    "nookies": "^2.5.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.44.3",
+    "react-konva": "^18.2.9",
+    "react-popper": "^2.3.0",
+    "socket.io-client": "^4.6.2",
     "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwind-scrollbar": "^3.0.4",
+    "tailwindcss": "^3.3.2"
   }
 }
