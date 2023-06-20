@@ -68,7 +68,7 @@ export class JwtAuthService {
     const domain = this.configService.get('DOMAIN', 'localhost');
     const cookieOptions = {
       domain: domain,
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'lax',
       secure: domain !== 'localhost',
     } as CookieOptions;

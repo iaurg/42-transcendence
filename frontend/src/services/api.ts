@@ -9,7 +9,7 @@ export function setupAPIClient(ctx: Context = undefined) {
   const cookies = parseCookies(ctx);
 
   const api = axios.create({
-    baseURL: "https://api.github.com/", //process.env.NEXT_PUBLIC_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL, //process.env.NEXT_PUBLIC_API_URL,
     //headers: {
     //  Authorization: `${cookies["transcendence"]}`,
     //},
@@ -28,7 +28,12 @@ export function setupAPIClient(ctx: Context = undefined) {
     },
     (error: AxiosError) => {
       if (error.response?.status === 401) {
-        destroyCookie(undefined, "transcendence");
+        // TODO refresh if access token is invalid
+
+        // TODO if refresh token is invalid, logout and delete cookies
+
+
+        // destroyCookie(undefined, "transcendence");
         localStorage.clear();
         if (process.browser) {
           // signOut("");
