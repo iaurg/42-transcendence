@@ -261,6 +261,7 @@ export class ChatGateway
   }
 
   // TODO: Add rule, if you are banned you cannot invite people to this chat
+  // TODO: Drop this rule and replace it by an invite event
   @SubscribeMessage('addToChat')
   async addToChat(
     @SocketUser('login') login: string,
@@ -377,7 +378,7 @@ export class ChatGateway
       }
     }
   }
-
+  // TODO:
   async handleConnection(@ConnectedSocket() client: Socket) {
     // const login = client.handshake.auth?.user?.login;
     // TODO: remove this hardcoded user id
@@ -388,7 +389,7 @@ export class ChatGateway
     }
     this.connectedUsers[login] = client;
     client.emit('connected', { message: `You are connected as ${login}` });
-    const chats = await this.chatService.listChatsByUserLogin(login);
+    const chats = await this.chatService.listChatsByUserLogin(login); // < --- list all chats instead
     console.log(`User ${login} received ${chats.length} chats`);
     for (const chat of chats) {
       client.join(`chat:${chat.id.toString()}`);

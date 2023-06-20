@@ -405,6 +405,10 @@ export class ChatService {
           },
         },
       });
+      if (existingUsers.some((existingUser) => existingUser.role === chatMemberRole.OWNER)) {
+        console.log(`Some users in the guest list are chat owners`);
+        return null;
+      }
       if (existingUsers.length !== guestList.length) {
         console.log(`Some users in the guest list are not members of chat ${chatId}`);
         return null;
