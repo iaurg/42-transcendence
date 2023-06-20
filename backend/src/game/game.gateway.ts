@@ -31,33 +31,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client ${client.id} disconnected`);
   }
 
-  private finishGame(client: any) {
-    const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
-      return (
-        this.gamesPlaying[gameId].player1.id === client.id ||
-        this.gamesPlaying[gameId].player2.id === client.id
-      );
-    });
-    this.gamesPlaying[gameId].finished = true;
-  }
-
-  @SubscribeMessage('createGame')
-  createGame(client: any) {
-    client.join(`game_${client.id}`);
-    this.gamesPlaying[`game_${client.id}`] = this.gameLobby.initGame(client.id);
-    console.log(`New game created: game_${client.id}`);
-  }
-
   @SubscribeMessage('joinGame')
   joinGame(client: any) {
-    const game = this.gameLobby.joinMatch(client);
-    this.gamesPlaying[game.gameId] = game;
-    this.gameServer
-      .to(game.gameId)
-      .emit('gameCreated', this.gamesPlaying[game.gameId]);
-    console.log(
-      `game ${game.gameId} created, game: ${this.gamesPlaying[game.gameId]}`,
-    );
+    if (this.gameLobby.joinPlayer1(client)) {
+      console.log(`waiting Player 2`);
+      client.emit('waitingPlayer2', `game_${client.id}`);
+    } else {
+      const game = this.gameLobby.joinPlayer2(client);
+      this.gamesPlaying[game.gameId] = game;
+      this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
+    }
   }
 
   @SubscribeMessage('startGame')
@@ -72,18 +55,34 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameServer
           .to(gameId)
           .emit('gameFinished', this.gamesPlaying[gameId]);
-      } else {
+      }
+      if (!this.gamesPlaying[gameId].finished) {
         this.gameServer
           .to(gameId)
           .emit('updatedGame', this.gamesPlaying[gameId]);
+        this.run(client, gameId);
       }
-      if (!this.gamesPlaying[gameId].finished) this.run(client, gameId);
-    }, 1000 / 60);
+    }, 2000);
     this.gamesPlaying.delete(gameId);
   }
 
   @SubscribeMessage('movePlayer')
   updatePlayer(client: any, info: GameMoveDto) {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
+  }
+
+  private finishGame(client: any) {
+    const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
+      return (
+        this.gamesPlaying[gameId].player1.id === client.id ||
+        this.gamesPlaying[gameId].player2.id === client.id
+      );
+    });
+    if (gameId) {
+      this.gamesPlaying[gameId].finished = true;
+      this.gameServer
+        .to(gameId)
+        .emit('gameAbandoned', this.gamesPlaying[gameId]);
+    }
   }
 }
