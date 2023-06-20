@@ -4,6 +4,8 @@ import { GameDto } from '../dto/game.dto';
 @Injectable()
 export class GameLobbyService {
   private lobby: GameDto[] = [];
+  private PLAYER_INITIAL_X = 0;
+  private PLAYER_INITIAL_Y = 285;
 
   joinPlayer1(player: any): boolean {
     if (this.lobby.length == 0) {
@@ -21,8 +23,8 @@ export class GameLobbyService {
     const gameDto = this.lobby[0];
     gameDto.player2 = {
       id: player.id,
-      x: gameDto.canvas.width - 10,
-      y: gameDto.canvas.height - 10,
+      x: gameDto.canvas.width - this.PLAYER_INITIAL_X,
+      y: gameDto.canvas.height - this.PLAYER_INITIAL_Y,
     };
     player.join(`game_${gameDto.player1.id}`);
     console.log('Player 2 joined');
@@ -36,8 +38,8 @@ export class GameLobbyService {
       finished: false,
       player1: {
         id: player1Id,
-        x: 10,
-        y: 10,
+        x: this.PLAYER_INITIAL_X,
+        y: this.PLAYER_INITIAL_Y,
       },
       player2: undefined,
       ball: {

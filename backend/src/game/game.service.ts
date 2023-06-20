@@ -10,7 +10,7 @@ export class GameService {
   private PLAYER1 = '1';
   private PLAYER2 = '2';
   private PADDLE_WIDTH = 10;
-  private PADDLE_HEIGHT = 10;
+  private PADDLE_HEIGHT = 30;
   private MAX_SCORE = 5;
 
   updateBallPosition(gameDto: GameDto) {
