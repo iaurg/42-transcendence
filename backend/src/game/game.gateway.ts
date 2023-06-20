@@ -38,7 +38,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gamesPlaying[gameId].player2.id === client.id
       );
     });
-    this.gamesPlaying[gameId].finished = true;
+    if (gameId) this.gamesPlaying[gameId].finished = true;
   }
 
   @SubscribeMessage('createGame')
@@ -50,14 +50,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinGame')
   joinGame(client: any) {
-    const game = this.gameLobby.joinMatch(client);
-    this.gamesPlaying[game.gameId] = game;
-    this.gameServer
-      .to(game.gameId)
-      .emit('gameCreated', this.gamesPlaying[game.gameId]);
-    console.log(
-      `game ${game.gameId} created, game: ${this.gamesPlaying[game.gameId]}`,
-    );
+    if (this.gameLobby.joinPlayer1(client)) {
+      console.log(`waiting Player 2`);
+      client.emit('waitingPlayer2', `game_${client.id}`);
+    } else {
+      const game = this.gameLobby.joinPlayer2(client);
+      this.gamesPlaying[game.gameId] = game;
+      this.gameServer.to(game.gameId).emit('gameCreated', game);
+    }
   }
 
   @SubscribeMessage('startGame')

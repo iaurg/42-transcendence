@@ -5,24 +5,19 @@ import { GameDto } from '../dto/game.dto';
 export class GameLobbyService {
   private lobby: GameDto[] = [];
 
-  joinMatch(player: any): GameDto {
+  joinPlayer1(player: any): boolean {
     if (this.lobby.length == 0) {
-      return this.joinPlayer1(player);
+      const gameDto = this.initGame(player.id);
+      this.lobby.push(gameDto);
+      console.log('player 1 joined');
+      player.join(`game_${gameDto.player1.id}`);
+      return true;
     } else {
-      return this.joinPlayer2(player);
+      return false;
     }
   }
 
-  private joinPlayer1(player: any): GameDto {
-    const gameDto = this.initGame(player.id);
-    this.lobby.push(gameDto);
-    console.log('player 1 joined');
-    this.waitingForPlayer2();
-    player.join(`game_${gameDto.player1.id}`);
-    return gameDto;
-  }
-
-  private joinPlayer2(player: any): GameDto {
+  joinPlayer2(player: any): GameDto {
     const gameDto = this.lobby[0];
     gameDto.player2 = {
       id: player.id,
