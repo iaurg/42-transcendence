@@ -62,7 +62,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           .emit('updatedGame', this.gamesPlaying[gameId]);
         this.run(client, gameId);
       }
-    }, 2000);
+    }, 1000 / 60);
     this.gamesPlaying.delete(gameId);
   }
 
