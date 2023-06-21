@@ -22,7 +22,8 @@ source "vsphere-iso" "ubuntu22-04" {
   CPUs    = "2"
   RAM     = "2048"
   storage {
-    disk_size = "32768"
+    disk_size             = "32768"
+    disk_thin_provisioned = true
   }
   network_adapters {
     network = var.vcenter_network
@@ -33,12 +34,12 @@ source "vsphere-iso" "ubuntu22-04" {
   ]
   iso_checksum    = "5e38b55d57d94ff029719342357325ed3bda38fa80054f9330dc789cd2d43931"
   iso_target_path = "./iso"
-  http_directory  = "http"
   boot_wait       = "5s"
   cd_files        = ["./http/meta-data", "./http/user-data"]
   cd_label        = "cidata"
   boot_command = [
     "<esc><esc><esc><esc>e<wait>",
+    "<del><del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del>",
@@ -52,8 +53,7 @@ source "vsphere-iso" "ubuntu22-04" {
     "<del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del>",
     "<del><del><del><del><del><del><del><del>",
-    "<del><del><del><del><del><del><del><del>",
-    "linux /casper/vmlinuz --- autoinstall ds=\"nocloud-net;seedfrom=http://{{.HTTPIP}}:{{.HTTPPort}}/\"<enter><wait>",
+    "linux /casper/vmlinuz --- autoinstall ds=\"nocloud-net;seedfrom=https://raw.githubusercontent.com/caio-vinicius/cloud-init/master/ubuntu22-04/http/\"<enter><wait>",
     "initrd /casper/initrd<enter><wait>",
     "boot<enter>",
     "<enter><f10><wait>"
@@ -64,8 +64,9 @@ source "vsphere-iso" "ubuntu22-04" {
   ssh_timeout            = "30m"
   ssh_port               = 22
   ssh_handshake_attempts = "100"
-  shutdown_command       = "sudo -S shutdown -P now"
+  shutdown_command       = "sudo shutdown -P now"
   shutdown_timeout       = "10m"
+  guest_os_type          = "ubuntu64Guest"
 }
 
 build {

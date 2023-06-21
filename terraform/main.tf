@@ -33,12 +33,18 @@ data "vsphere_network" "network" {
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
+data "vsphere_virtual_machine" "template" {
+  name          = var.vsphere_template
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+
 resource "vsphere_virtual_machine" "vm" {
-  name             = "transcendence"
+  name             = "NEWtranscendence"
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore.id
   num_cpus         = 2
   memory           = 2048
+  guest_id         = data.vsphere_virtual_machine.template.guest_id
   network_interface {
     network_id = data.vsphere_network.network.id
   }
@@ -49,8 +55,4 @@ resource "vsphere_virtual_machine" "vm" {
   clone {
     template_uuid = data.vsphere_virtual_machine.template.id
   }
-}
-
-output "ip" {
-  value = vsphere_virtual_machine.vm.network_interface.0.ipv4_address
 }

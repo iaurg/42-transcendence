@@ -1,65 +1,23 @@
 #cloud-config
 autoinstall:
     version: 1
-    early-commands:
-        - sudo systemctl stop ssh
-    locale: en_US
-    keyboard:
-        layout: en
-        variant: us
-    network:
-        network:
-            version: 2
-            ethernets:
-                ens192:
-                    dhcp4: true
     identity:
         hostname: ubuntu-server
+        password: "$6$exDY1mhS4KUYCE/2$zmn9ToZwTKLhCw.b4/b.ZRTIZM30JZ4QrOQ2aOXJ8yk96xpcCof0kxKwuX1kqLG/ygbJ1f8wxED22bTL4F46P0"
         username: ubuntu
-        password: "$6$rounds=4096$ntlX/dlo6b$HXaLN4RcLIGaEDdQdR2VTYi9pslSeXWL131MqaakqE285Nv0kW9KRontQYivCbycZerUMcjVsuLl2V8bbdadI1"
-    ssh:
-        install-server: yes
-        allow-pw: yes
-        authorized-keys:
-            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBkKZwb7Avr9vcsUEgM8GHJv5wJJa65UwVX30WXRhk6N caio-projects@caio-pc
-    write_files:
-    - path: /etc/ssh/sshd_config
-      content: |
-            Port 22
-            Protocol 2
-            HostKey /etc/ssh/ssh_host_rsa_key
-            HostKey /etc/ssh/ssh_host_dsa_key
-            HostKey /etc/ssh/ssh_host_ecdsa_key
-            HostKey /etc/ssh/ssh_host_ed25519_key
-            UsePrivilegeSeparation yes
-            KeyRegenerationInterval 3600
-            ServerKeyBits 1024
-            SyslogFacility AUTH
-            LogLevel INFO
-            LoginGraceTime 120
-            PermitRootLogin yes
-            StrictModes no
-            RSAAuthentication yes
-            PubkeyAuthentication no
-            IgnoreRhosts yes
-            RhostsRSAAuthentication no
-            HostbasedAuthentication no
-            PermitEmptyPasswords no
-            ChallengeResponseAuthentication no
-            X11Forwarding yes
-            X11DisplayOffset 10
-            PrintMotd no
-            PrintLastLog yes
-            TCPKeepAlive yes
-            AcceptEnv LANG LC_*
-            Subsystem sftp /usr/lib/openssh/sftp-server
-            UsePAM yes
-            AllowUsers ubuntu
     storage:
         layout:
-            name: direct
+            name: lvm
+    ssh:
+        allow-pw: true
+        install-server: true
+        authorized-keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBkKZwb7Avr9vcsUEgM8GHJv5wJJa65UwVX30WXRhk6N caio-projects@caio-pc
     user-data:
         disable_root: false
-    late-commands:
-        - echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/ubuntu
+    late-commmands:
+        - sed -i -e 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+        - sed -i -e 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config
+        - echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu
         - curtin in-target --target=/target -- chmod 440 /etc/sudoers.d/ubuntu
+        - curtin in-target --target=/target -- apt-get update
