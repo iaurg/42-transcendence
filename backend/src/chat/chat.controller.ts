@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { chatMemberRole, chatType } from '@prisma/client';
-import { ChatMemberDto } from './dto';
 
 // create a new chat in the database using post request
 // get all chats from the database using get request
@@ -23,9 +22,11 @@ export class ChatController {
   async createChat(
     @Body('type') chatType: chatType,
     @Body('login') login: string,
+    @Body('chatName') chatName: string,
+    @Body('password') password: string,
   ) {
     try {
-      const createdChat = await this.chatService.createChat(login, chatType);
+      const createdChat = await this.chatService.createChat(login,chatName, chatType, password);
       const { id } = createdChat;
       // emit to all clients that a new chat has been created
       return { message: 'chat successfully created', id, chatType };

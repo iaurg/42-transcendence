@@ -210,6 +210,19 @@ export class ChatService {
 
   async deleteChat(id: number): Promise<Chat> {
     try {
+    // Delete chat messages
+    const deletedMessages = await this.prisma.message.deleteMany({
+      where: {
+        chatId: id,
+      },
+    });
+    // Delete chat members
+    const deletedMembers = await this.prisma.chatMember.deleteMany({
+      where: {
+        chatId: id,
+      },
+    });
+    // Delete chat
     const deletedChat = await this.prisma.chat.delete({
       where: {
         id,
@@ -452,6 +465,87 @@ export class ChatService {
               },
               data: {
                 status: chatMemberStatus.BANNED,
+              },
+            }],
+          },
+        },
+      });
+
+      return updatedChat;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async giveOwner(chatId: number, userLogin: string): Promise<Chat> {
+    try {
+      const updatedChat = await this.prisma.chat.update({
+        where: {
+          id: chatId,
+        },
+        data: {
+          users: {
+            updateMany: [{
+              where: {
+                userLogin,
+              },
+              data: {
+                role: chatMemberRole.OWNER,
+              },
+            }],
+          },
+        },
+      });
+
+      return updatedChat;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async muteUserFromChat(chatId: number, member: string): Promise<Chat> {
+    try {
+      const updatedChat = await this.prisma.chat.update({
+        where: {
+          id: chatId,
+        },
+        data: {
+          users: {
+            updateMany: [{
+              where: {
+                userLogin: member,
+              },
+              data: {
+                status: chatMemberStatus.MUTED,
+              },
+            }],
+          },
+        },
+      });
+
+      return updatedChat;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async unmuteUserFromChat(chatId: number, member: string): Promise<Chat> {
+    try {
+      const updatedChat = await this.prisma.chat.update({
+        where: {
+          id: chatId,
+        },
+        data: {
+          users: {
+            updateMany: [{
+              where: {
+                userLogin: member,
+              },
+              data: {
+                status: chatMemberStatus.ACTIVE,
               },
             }],
           },
