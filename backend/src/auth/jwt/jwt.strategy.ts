@@ -30,6 +30,7 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: JwtPayload) {
     const user = await this.userService.findOne(payload.sub);
     if (!user) {
+      // TODO different msg for invalid access token
       throw new UnauthorizedException('Please log in to continue');
     }
     return user;
