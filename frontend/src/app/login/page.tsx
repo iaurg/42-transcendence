@@ -1,4 +1,5 @@
-"use client"
+"use client";
+import { api } from "@/services/apiClient";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -18,7 +19,6 @@ export default function LoginPage() {
           <p className="text-md md:text-xl">
             Autentique com seu login, é necessário ter uma conta na Intra da 42.
           </p>
-          {/* TODO Evaluate if redir to backend is ok */}
           <a
             href={`${process.env.NEXT_PUBLIC_API_URL}/auth/intra`}
             className="bg-purple42-200 hover:bg-purple42-300 text-white font-bold py-2 px-4 rounded-lg mt-8 transition-all text-center w-full"

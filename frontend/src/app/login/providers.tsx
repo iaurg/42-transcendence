@@ -9,8 +9,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-      {children}
-      <ReactQueryDevtools />
+        {children}
+        <ReactQueryDevtools />
       </AuthProvider>
     </QueryClientProvider>
   );

@@ -32,7 +32,6 @@ export function setupAPIClient(ctx: Context = undefined) {
 
         // TODO if refresh token is invalid, logout and delete cookies
 
-
         // destroyCookie(undefined, "transcendence");
         localStorage.clear();
         if (process.browser) {
