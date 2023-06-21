@@ -2,8 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
 import { ChatServiceMock } from './chat.service.mock';
-import { Server, Socket } from 'socket.io';
-import { after } from 'node:test';
+import { Server } from 'socket.io';
 import { SocketIOClientMock } from './socket.io-mock-client';
 import { ChatDto } from './dto';
 describe('ChatGateway', () => {
@@ -34,7 +33,7 @@ describe('ChatGateway', () => {
         {
           provide: ChatService,
           useClass: ChatServiceMock,
-        }
+        },
       ],
     }).compile();
 
@@ -50,11 +49,9 @@ describe('ChatGateway', () => {
     const login = 'testUser';
     const chatDto: ChatDto = {
       chatId: 1,
-      password: 'password'
-    }
+      password: 'password',
+    };
 
-
-    const password = 'password'; // Mock the password
     const getChatByIdSpy = jest.spyOn(chatService, 'getChatById');
     const addUserToChatSpy = jest.spyOn(chatService, 'addUserToChat');
     const joinChatSpy = jest.spyOn(chatGateway, 'joinChat');

@@ -13,7 +13,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 
 @Controller('user*')
 export class UsersController {
-  constructor(private service: UsersService) { }
+  constructor(private service: UsersService) {}
 
   @Get('me')
   findMe(@Body() dto: any) {

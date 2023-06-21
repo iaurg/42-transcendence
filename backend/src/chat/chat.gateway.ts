@@ -25,6 +25,7 @@ interface ConnectedUsers {
 
 export const SocketUser = createParamDecorator(
   (data: string, ctx: ExecutionContext) => {
+    // eslint-disable-line @typescript-eslint/no-unused-vars
     // const client = ctx.switchToWs().getClient<Socket>();
     // const user = client.handshake.auth?.user;
 
@@ -81,7 +82,7 @@ export class ChatGateway
     );
     await this.addConnectedUsersToChat(chatId);
     this.server.to(`chat:${chatId}`).emit('newMessage', newMessage);
-    client.emit('message', { message: 'Message sent' })
+    client.emit('message', { message: 'Message sent' });
   }
 
   @SubscribeMessage('listMessages')
@@ -227,7 +228,7 @@ export class ChatGateway
     client.leave(`chat:${chatId}`);
 
     const userCount = await this.getNumberofUsersInChat(chatId);
-    client.emit('leaveChat', { message: `You left chat ${chatId}`, userCount,  });
+    client.emit('leaveChat', { message: `You left chat ${chatId}`, userCount });
     if (userCount === 0) {
       await this.chatService.deleteChat(chatId);
       client.emit('deleteChat', {
@@ -243,14 +244,19 @@ export class ChatGateway
     // find the first admin
     const firstAdmin = members.find((member) => member.role === 'ADMIN');
     if (firstAdmin) {
-      const chat = await this.chatService.giveOwner(chatId, firstAdmin.userLogin);
+      const chat = await this.chatService.giveOwner(
+        chatId,
+        firstAdmin.userLogin,
+      );
       if (!chat) {
         client.emit('leaveChat', { error: 'Failed to give ownership' });
         return;
       }
       const socket = this.connectedUsers[firstAdmin.userLogin];
       if (socket) {
-        socket.emit('leaveChat', { message: `You are now the admin of chat ${chatId}` });
+        socket.emit('leaveChat', {
+          message: `You are now the admin of chat ${chatId}`,
+        });
       }
       return;
     }
@@ -261,7 +267,9 @@ export class ChatGateway
     }
     const socket = this.connectedUsers[members[0].userLogin];
     if (socket) {
-      socket.emit('leaveChat', { message: `You are now the admin of chat ${chatId}` });
+      socket.emit('leaveChat', {
+        message: `You are now the admin of chat ${chatId}`,
+      });
     }
   }
 
@@ -280,7 +288,9 @@ export class ChatGateway
     }
     const member = await this.chatService.getMemberFromChat(chatId, login);
     if (!member || member.role === 'MEMBER') {
-      client.emit('deleteChat', { error: 'You are not allowed to delete this chat' });
+      client.emit('deleteChat', {
+        error: 'You are not allowed to delete this chat',
+      });
       return;
     }
     const members = await this.chatService.listMembersByChatId(chatId);
@@ -295,7 +305,9 @@ export class ChatGateway
       const socket = this.connectedUsers[member.userLogin];
       if (socket) {
         socket.leave(`chat:${chatId}`);
-        socket.emit('leaveChat', { message: `Chat ${chatId} has been deleted` });
+        socket.emit('leaveChat', {
+          message: `Chat ${chatId} has been deleted`,
+        });
       }
     }
   }
@@ -317,7 +329,9 @@ export class ChatGateway
       client.emit('addToChat', { error: 'Failed to add users to chat' });
       return;
     }
-    client.emit('addToChat', {message:`You added ${guestList} to chat ${chatId}`});
+    client.emit('addToChat', {
+      message: `You added ${guestList} to chat ${chatId}`,
+    });
     for (const guest of guestList) {
       const socket = this.connectedUsers[guest];
       if (socket) {
@@ -343,7 +357,9 @@ export class ChatGateway
       return;
     }
 
-    client.emit('giveAdmin', { message: `Admin permissions given to ${guestList}` });
+    client.emit('giveAdmin', {
+      message: `Admin permissions given to ${guestList}`,
+    });
   }
 
   // TODO: Kick people from a chat
@@ -366,12 +382,22 @@ export class ChatGateway
     const socket = this.connectedUsers[user];
     if (socket) {
       socket.leave(`chat:${chatId}`);
-      socket.emit('leaveChat', { message: `You have been kicked from chat ${chatId}` });
+      socket.emit('leaveChat', {
+        message: `You have been kicked from chat ${chatId}`,
+      });
     }
-    client.emit('kickMember', { message: `You kicked ${user} from chat ${chatId}` });
+    client.emit('kickMember', {
+      message: `You kicked ${user} from chat ${chatId}`,
+    });
   }
 
-  async notValidAction(event: string, chatId: number, login: string, user: string, client: Socket): Promise<boolean> {
+  async notValidAction(
+    event: string,
+    chatId: number,
+    login: string,
+    user: string,
+    client: Socket,
+  ): Promise<boolean> {
     const you = await this.chatService.getMemberFromChat(chatId, login);
     const member = await this.chatService.getMemberFromChat(chatId, user);
 
@@ -407,9 +433,13 @@ export class ChatGateway
     const socket = this.connectedUsers[user];
     if (socket) {
       socket.leave(`chat:${chatId}`);
-      socket.emit('leaveChat', { message: `You have been banned from chat ${chatId}` });
+      socket.emit('leaveChat', {
+        message: `You have been banned from chat ${chatId}`,
+      });
     }
-    client.emit('banMember', { message: `You banned ${user} from chat ${chatId}` });
+    client.emit('banMember', {
+      message: `You banned ${user} from chat ${chatId}`,
+    });
   }
 
   @SubscribeMessage('muteMember')
@@ -428,7 +458,9 @@ export class ChatGateway
       client.emit('muteMember', { error: 'Failed to mute user' });
       return;
     }
-    client.emit('muteMember', { message: `You muted ${user} from chat ${chatId}` });
+    client.emit('muteMember', {
+      message: `You muted ${user} from chat ${chatId}`,
+    });
   }
 
   @SubscribeMessage('unmuteMember')
@@ -438,7 +470,9 @@ export class ChatGateway
     @MessageBody('user') user: string,
     @ConnectedSocket() client: Socket,
   ) {
-    if (await this.notValidAction('unmuteMember', chatId, login, user, client)) {
+    if (
+      await this.notValidAction('unmuteMember', chatId, login, user, client)
+    ) {
       return;
     }
     const updatedChat = await this.chatService.unmuteUserFromChat(chatId, user);
@@ -447,9 +481,10 @@ export class ChatGateway
       client.emit('unmuteMember', { error: 'Failed to unmute user' });
       return;
     }
-    client.emit('unmuteMember', { message: `You unmuted ${user} from chat ${chatId}` });
+    client.emit('unmuteMember', {
+      message: `You unmuted ${user} from chat ${chatId}`,
+    });
   }
-
 
   async getNumberofUsersInChat(chatId: number) {
     const numberOfUsers = await this.chatService.getNumberOfUsersByChatId(
@@ -481,7 +516,9 @@ export class ChatGateway
     const allChats = await this.chatService.listChats();
     client.emit('listChats', allChats);
     const chats = await this.chatService.listChatsByUserLogin(login);
-    console.log(`User ${login} joined ${chats.length}/${allChats.length} chats`);
+    console.log(
+      `User ${login} joined ${chats.length}/${allChats.length} chats`,
+    );
     // TODO: Remove this after implementing chat rooms
     for (const chat of chats) {
       client.join(`chat:${chat.id.toString()}`);

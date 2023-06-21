@@ -3,7 +3,6 @@ import {
   Chat,
   ChatMember,
   Message,
-  User,
   chatMemberRole,
   chatMemberStatus,
   chatType,
@@ -40,19 +39,22 @@ export class ChatService {
     return createdMessage;
   }
 
-  async getMemberFromChat(chatId: number, userLogin: string): Promise<ChatMember> {
+  async getMemberFromChat(
+    chatId: number,
+    userLogin: string,
+  ): Promise<ChatMember> {
     try {
-    const member = await this.prisma.chatMember.findUnique({
-      where: {
-        chatId_userLogin: {
-          chatId,
-          userLogin,
+      const member = await this.prisma.chatMember.findUnique({
+        where: {
+          chatId_userLogin: {
+            chatId,
+            userLogin,
+          },
         },
-      },
-    });
+      });
 
-    return member;
-  } catch (error) {
+      return member;
+    } catch (error) {
       console.log(error);
       return null;
     }
@@ -163,7 +165,11 @@ export class ChatService {
     return createdChat;
   }
 
-  async addUsersToChat(chatId: number, guestList: string[], role: chatMemberRole = 'MEMBER'): Promise<Chat> {
+  async addUsersToChat(
+    chatId: number,
+    guestList: string[],
+    role: chatMemberRole = 'MEMBER',
+  ): Promise<Chat> {
     try {
       // First check if any of the users already exist in the chat
       const existingUsers = await this.prisma.chatMember.findMany({
@@ -175,7 +181,7 @@ export class ChatService {
         },
       });
       if (existingUsers.length > 0) {
-        console.log (`Some users already exist in chat ${chatId}`);
+        console.log(`Some users already exist in chat ${chatId}`);
         guestList = guestList.filter((guest) => {
           return !existingUsers.some((existingUser) => {
             return existingUser.userLogin === guest;
@@ -183,7 +189,9 @@ export class ChatService {
         }, []);
       }
       if (guestList.length === 0) {
-        console.log(`No new users to add to chat ${chatId}, returning default chat`);
+        console.log(
+          `No new users to add to chat ${chatId}, returning default chat`,
+        );
         return await this.getChatById(chatId);
       }
       const updatedChat = await this.prisma.chat.update({
@@ -210,29 +218,30 @@ export class ChatService {
 
   async deleteChat(id: number): Promise<Chat> {
     try {
-    // Delete chat messages
-    const deletedMessages = await this.prisma.message.deleteMany({
-      where: {
-        chatId: id,
-      },
-    });
-    // Delete chat members
-    const deletedMembers = await this.prisma.chatMember.deleteMany({
-      where: {
-        chatId: id,
-      },
-    });
-    // Delete chat
-    const deletedChat = await this.prisma.chat.delete({
-      where: {
-        id,
-      },
-    });
-    return deletedChat;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }}
+      // Delete chat messages
+      await this.prisma.message.deleteMany({
+        where: {
+          chatId: id,
+        },
+      });
+      // Delete chat members
+      await this.prisma.chatMember.deleteMany({
+        where: {
+          chatId: id,
+        },
+      });
+      // Delete chat
+      const deletedChat = await this.prisma.chat.delete({
+        where: {
+          id,
+        },
+      });
+      return deletedChat;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 
   async getChatById(id: number): Promise<Chat> {
     const chat = await this.prisma.chat.findUnique({
@@ -418,12 +427,18 @@ export class ChatService {
           },
         },
       });
-      if (existingUsers.some((existingUser) => existingUser.role === chatMemberRole.OWNER)) {
+      if (
+        existingUsers.some(
+          (existingUser) => existingUser.role === chatMemberRole.OWNER,
+        )
+      ) {
         console.log(`Some users in the guest list are chat owners`);
         return null;
       }
       if (existingUsers.length !== guestList.length) {
-        console.log(`Some users in the guest list are not members of chat ${chatId}`);
+        console.log(
+          `Some users in the guest list are not members of chat ${chatId}`,
+        );
         return null;
       }
       const updatedChat = await this.prisma.chat.update({
@@ -459,14 +474,16 @@ export class ChatService {
         },
         data: {
           users: {
-            updateMany: [{
-              where: {
-                userLogin: member,
+            updateMany: [
+              {
+                where: {
+                  userLogin: member,
+                },
+                data: {
+                  status: chatMemberStatus.BANNED,
+                },
               },
-              data: {
-                status: chatMemberStatus.BANNED,
-              },
-            }],
+            ],
           },
         },
       });
@@ -486,14 +503,16 @@ export class ChatService {
         },
         data: {
           users: {
-            updateMany: [{
-              where: {
-                userLogin,
+            updateMany: [
+              {
+                where: {
+                  userLogin,
+                },
+                data: {
+                  role: chatMemberRole.OWNER,
+                },
               },
-              data: {
-                role: chatMemberRole.OWNER,
-              },
-            }],
+            ],
           },
         },
       });
@@ -513,14 +532,16 @@ export class ChatService {
         },
         data: {
           users: {
-            updateMany: [{
-              where: {
-                userLogin: member,
+            updateMany: [
+              {
+                where: {
+                  userLogin: member,
+                },
+                data: {
+                  status: chatMemberStatus.MUTED,
+                },
               },
-              data: {
-                status: chatMemberStatus.MUTED,
-              },
-            }],
+            ],
           },
         },
       });
@@ -540,14 +561,16 @@ export class ChatService {
         },
         data: {
           users: {
-            updateMany: [{
-              where: {
-                userLogin: member,
+            updateMany: [
+              {
+                where: {
+                  userLogin: member,
+                },
+                data: {
+                  status: chatMemberStatus.ACTIVE,
+                },
               },
-              data: {
-                status: chatMemberStatus.ACTIVE,
-              },
-            }],
+            ],
           },
         },
       });

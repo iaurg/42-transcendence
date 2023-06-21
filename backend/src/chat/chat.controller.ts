@@ -20,16 +20,21 @@ export class ChatController {
 
   @Post('/create')
   async createChat(
-    @Body('type') chatType: chatType,
+    @Body('type') ct: chatType,
     @Body('login') login: string,
     @Body('chatName') chatName: string,
     @Body('password') password: string,
   ) {
     try {
-      const createdChat = await this.chatService.createChat(login,chatName, chatType, password);
+      const createdChat = await this.chatService.createChat(
+        login,
+        chatName,
+        ct,
+        password,
+      );
       const { id } = createdChat;
       // emit to all clients that a new chat has been created
-      return { message: 'chat successfully created', id, chatType };
+      return { message: 'chat successfully created', id, ct };
     } catch (error) {
       throw new HttpException(
         {
@@ -102,11 +107,11 @@ export class ChatController {
   }
 
   @Get()
-  async listChats(@Query('type') chatType: chatType, @Query('id') id: number) {
+  async listChats(@Query('type') ct: chatType, @Query('id') id: number) {
     const chatId = Number(id);
     try {
-      if (chatType) {
-        const chats = await this.chatService.listChatsByType(chatType);
+      if (ct) {
+        const chats = await this.chatService.listChatsByType(ct);
         return chats;
       } else if (chatId) {
         const chat = await this.chatService.getChatById(chatId);

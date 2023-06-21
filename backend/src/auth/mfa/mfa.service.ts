@@ -59,7 +59,9 @@ export class MultiFactorAuthService {
 
   async enableMfa(user: User, res: Response) {
     console.log('enableMfa');
-    const updated_user = await this.usersService.update(user.login, { mfaEnabled: true });
+    const updated_user = await this.usersService.update(user.login, {
+      mfaEnabled: true,
+    });
     const tokens = await this.jwtAuthService.generateJwt(updated_user, true);
     await this.jwtAuthService.storeTokensInCookie(res, tokens);
     console.log('post-enable tokens', tokens);
