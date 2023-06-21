@@ -31,7 +31,7 @@ export const SocketUser = createParamDecorator(
 
     // return data ? user?.[data] : user;
     const user = {
-      login: 'caio',
+      login: 'lula',
     };
 
     return user[data];
@@ -224,6 +224,7 @@ export class ChatGateway
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
+    const you = await this.chatService.getMemberFromChat(chatId, login);
     await this.chatService.removeUserFromChat(login, chatId);
     client.leave(`chat:${chatId}`);
 
@@ -236,12 +237,17 @@ export class ChatGateway
       });
       return;
     }
+    // If you were not the owner of the chat, just leave
+    if (you.role !== 'OWNER') {
+      return;
+    }
     const members = await this.chatService.listMembersByChatId(chatId);
     if (!members) {
       client.emit('leaveChat', { error: 'Failed to list members' });
       return;
     }
-    // find the first admin
+
+    // If you were the owner of the chat, give ownership to the first admin, if there is no admin, give to the first member
     const firstAdmin = members.find((member) => member.role === 'ADMIN');
     if (firstAdmin) {
       const chat = await this.chatService.giveOwner(
@@ -255,7 +261,7 @@ export class ChatGateway
       const socket = this.connectedUsers[firstAdmin.userLogin];
       if (socket) {
         socket.emit('leaveChat', {
-          message: `You are now the admin of chat ${chatId}`,
+          message: `${firstAdmin.userLogin} is now the owner of chat ${chatId}`,
         });
       }
       return;
