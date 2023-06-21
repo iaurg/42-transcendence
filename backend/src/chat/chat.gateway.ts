@@ -345,11 +345,16 @@ export class ChatGateway
 
   @SubscribeMessage('giveAdmin')
   async giveAdmin(
+    @SocketUser('login') login: string,
     @MessageBody() users: InviteChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     const { chatId, guestList } = users;
-
+    for (const user of guestList) {
+      if (await this.notValidAction('giveAdmin', chatId, login, user, client)) {
+        return;
+      }
+    }
     const updatedChat = await this.chatService.giveAdmin(chatId, guestList);
 
     if (!updatedChat) {
@@ -362,7 +367,6 @@ export class ChatGateway
     });
   }
 
-  // TODO: Kick people from a chat
   @SubscribeMessage('kickMember')
   async kickMember(
     @SocketUser('login') login: string,
@@ -413,7 +417,6 @@ export class ChatGateway
     return false;
   }
 
-  // TODO: Ban people from a chat
   @SubscribeMessage('banMember')
   async banMember(
     @SocketUser('login') login: string,
