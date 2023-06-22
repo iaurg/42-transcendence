@@ -7,8 +7,20 @@ const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
 });
 
+/**
+ * Backend websocket events
+ * 1. joinGame
+ * 2. startGame
+ * 3. updatedGame
+ * 4. movePlayer
+ * 5. gameFinished
+ * 6. gameAbandoned
+ */
+
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
+  const [waitingPlayer2, setWaitingPlayer2] = useState(false);
+
   const [gameData, setGameData] = useState({
     players: [
       {
@@ -53,12 +65,22 @@ export default function PlayPage() {
       console.log("Disconnected from the WebSocket server");
     });
 
-    socket.emit("createGame");
+    socket.emit("joinGame");
+    
+    socket.on("waitingPlayer2", () => {
+      console.log("waitingPlayer2");
+      setWaitingPlayer2(true);
+    })
 
-    socket.emit("startGame");
+    socket.on("gameCreated", () => {
+      console.log("gameCreated");
+      setWaitingPlayer2(false);
+      socket.emit("startGame");
+    });
 
     // listen event from server called updatedGame
     socket.on("updatedGame", (data: any) => {
+      console.log("updatedGame", data);
       setGameData((prevGameData) => ({
         ...prevGameData,
         ball: data.ball,
@@ -109,6 +131,29 @@ export default function PlayPage() {
       window.removeEventListener("resize", updateCanvasSize);
     };
   }, [canvasRef]);
+
+  if (waitingPlayer2) {
+    return (
+      <>
+        <div
+          className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+        "
+        >
+          <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
+          <div className="text-white text-3xl text-center">Waiting for player 2...</div>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
