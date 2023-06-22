@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { FriendsModule } from './friends/friends.module';
     AuthModule,
     ChatModule,
     FriendsModule,
+    LobbyModule,
   ],
   providers: [PrismaService],
 })
