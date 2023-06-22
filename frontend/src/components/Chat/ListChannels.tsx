@@ -1,6 +1,8 @@
 import { Plus } from "@phosphor-icons/react";
 import ChannelCard from "./ChannelCard";
 import { useGetUser } from "@/services/queries/user/getUser";
+import { Chat, ChatContext } from "@/contexts/ChatContext";
+import { useContext } from "react";
 
 type ListChannelsProps = {
   handleShowCreateChannel: () => void;
@@ -8,6 +10,8 @@ type ListChannelsProps = {
 
 export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
   const { data, isLoading, isError } = useGetUser();
+
+  const { chatList } = useContext(ChatContext);
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -37,8 +41,9 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
           className="flex flex-col flex-1 max-h-[80vh] bg-black42-300 overflow-y-scroll overscroll-contain my-4
                         scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
         >
-          {data?.map((channel: any) => (
-            <ChannelCard key={channel.id} name={channel.full_name} />
+          {chatList?.map((channel: Chat) => (
+            // TODO: add user context for chat owner
+            <ChannelCard key={channel.id} name={channel.name} isProtected={channel.chatType === 'PROTECTED'} isOwner={channel.owner === 'caio'} />
           ))}
         </div>
       )}

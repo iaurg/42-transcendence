@@ -69,6 +69,7 @@ model Chat {
   updatedAt DateTime     @updatedAt
   messages  Message[]
   users     ChatMember[]
+  owner     String
   chatType  chatType     @default(PUBLIC)
   password  String?
 }

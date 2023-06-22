@@ -125,6 +125,7 @@ export class ChatService {
         name: chatName,
         chatType: type,
         password,
+        owner: login,
         users: {
           create: {
             userLogin: login,
@@ -147,6 +148,7 @@ export class ChatService {
       data: {
         name: chatName,
         chatType: 'PRIVATE',
+        owner: user,
         users: {
           create: [
             { userLogin: user, role: chatMemberRole.ADMIN },
@@ -502,6 +504,7 @@ export class ChatService {
           id: chatId,
         },
         data: {
+          owner: userLogin,
           users: {
             updateMany: [
               {

@@ -31,14 +31,14 @@ export const SocketUser = createParamDecorator(
 
     // return data ? user?.[data] : user;
     const user = {
-      login: 'lula',
+      login: 'caio',
     };
 
     return user[data];
   },
 );
 
-@WebSocketGateway({ namespace: '/chat', transports: ['websocket'], cors: '*' })
+@WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -95,11 +95,9 @@ export class ChatGateway
   }
 
   @SubscribeMessage('listChats')
-  async listChats(
-    @SocketUser('login') login: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const chats = await this.chatService.listChatsByUserLogin(login);
+  async listChats(@ConnectedSocket() client: Socket) {
+    const chats = await this.chatService.listChats();
+    // TODO: do not display PRIVATE CHATS
     client.emit('listChats', chats);
   }
 
@@ -120,15 +118,15 @@ export class ChatGateway
   ) {
     const { chatName, chatType, password } = chatDto;
     if (chatType === 'PUBLIC' && password) {
-      client.emit('createChat', { error: 'Public chat cannot have password' });
+      client.emit('error', { error: 'Public chat cannot have password' });
       return;
     }
     if (chatType === 'PRIVATE' && password) {
-      client.emit('createChat', { error: 'Private chat cannot have password' });
+      client.emit('error', { error: 'Private chat cannot have password' });
       return;
     }
     if (chatType === 'PROTECTED' && !password) {
-      client.emit('createChat', { error: 'Protected chat must have password' });
+      client.emit('error', { error: 'Protected chat must have password' });
       return;
     }
     const createdChat = await this.chatService.createChat(
@@ -139,14 +137,15 @@ export class ChatGateway
     );
 
     if (!createdChat) {
-      client.emit('createChat', { error: 'Chat not created' });
+      client.emit('error', { error: 'Chat not created' });
       return;
     }
-    client.emit('createChat', {
+    client.emit('ok', {
       message: `Chat ${createdChat.id} successfully created`,
     });
     client.join(`chat:${createdChat.id}`);
     client.emit('joinChat', { message: `You joined chat ${createdChat.id}` });
+    client.emit('createChat', createdChat);
   }
 
   @SubscribeMessage('createPrivateChat')
@@ -523,7 +522,6 @@ export class ChatGateway
     this.connectedUsers[login] = client;
     client.emit('connected', { message: `You are connected as ${login}` });
     const allChats = await this.chatService.listChats();
-    client.emit('listChats', allChats);
     const chats = await this.chatService.listChatsByUserLogin(login);
     console.log(
       `User ${login} joined ${chats.length}/${allChats.length} chats`,
