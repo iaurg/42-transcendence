@@ -40,34 +40,41 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const game = this.gameLobby.joinPlayer2(client);
       this.gamesPlaying[game.gameId] = game;
       this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
+      this.startGame(client, game.gameId);
     }
   }
 
   @SubscribeMessage('startGame')
-  run(client: any, gameId: string) {
-    setTimeout(() => {
-      this.gameService.updateBallPosition(this.gamesPlaying[gameId]);
-      if (this.gameService.isPointScored(this.gamesPlaying[gameId])) {
-        this.gameService.addPoint(this.gamesPlaying[gameId]);
-        this.gameService.restartBall(this.gamesPlaying[gameId]);
-      }
-      if (this.gameService.isGameFinished(this.gamesPlaying[gameId])) {
-        this.gameServer
-          .to(gameId)
-          .emit('gameFinished', this.gamesPlaying[gameId]);
-      }
-      if (!this.gamesPlaying[gameId].finished) {
-        this.gameServer
-          .to(gameId)
-          .emit('updatedGame', this.gamesPlaying[gameId]);
-        this.run(client, gameId);
-      }
+  startGame(client: any, gameId: string) {
+    const game = this.gamesPlaying[gameId];
+    
+    console.log("started game", game)
+
+    this.gameService.updateBallPosition(game);
+    if (this.gameService.isPointScored(game)) {
+      this.gameService.addPoint(game);
+      this.gameService.restartBall(game);
+    }
+    if (this.gameService.isGameFinished(game)) {
+      this.gameServer
+        .to(gameId)
+        .emit('gameFinished', game);
+    }
+    if (!game.finished) {
+      this.gameServer
+        .to(gameId)
+        .emit('updatedGame', game);
+    }
+
+    setTimeout( () => {
+      this.startGame(client, gameId);
     }, 1000 / 60);
+
     this.gamesPlaying.delete(gameId);
   }
 
   @SubscribeMessage('movePlayer')
-  updatePlayer(client: any, info: GameMoveDto) {
+  movePlayer(client: any, info: GameMoveDto) {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
   }
 
