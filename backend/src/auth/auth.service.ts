@@ -6,7 +6,10 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService, private configService: ConfigService) {}
+  constructor(
+    private usersService: UsersService,
+    private configService: ConfigService,
+  ) {}
   async logout(user: User, res: Response) {
     await this.usersService.update(user.login, { refreshToken: null });
     res.redirect(`${this.configService.get('FRONTEND_URL')}/login`);

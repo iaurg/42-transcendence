@@ -10,4 +10,4 @@ import { ChatController } from './chat.controller';
   controllers: [ChatController],
   providers: [ChatService, PrismaService, ChatGateway],
 })
-export class ChatModule { }
+export class ChatModule {}

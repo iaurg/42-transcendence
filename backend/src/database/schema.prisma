@@ -29,6 +29,8 @@ model User {
   mfaSecret    String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  chats       ChatMember[]
+  messages    Message[]
 }
 
 model Friend {
@@ -46,10 +48,11 @@ enum FriendshipStatus {
 
 model Message {
   id        String   @id @default(uuid())
-  login     String
+  user      User?    @relation(fields: [userLogin], references: [login])
+  userLogin String?
   createdAt DateTime @default(now())
   chat      Chat     @relation(fields: [chatId], references: [id])
-  chatId    String
+  chatId    Int
   content   String
 }
 
@@ -60,11 +63,38 @@ enum chatType {
 }
 
 model Chat {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        Int          @id @default(autoincrement())
+  name      String       @default("New chat")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   messages  Message[]
-  users     String[]
-  chatType  chatType  @default(PUBLIC)
+  users     ChatMember[]
+  owner     String
+  chatType  chatType     @default(PUBLIC)
   password  String?
+}
+
+enum chatMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum chatMemberStatus {
+  ACTIVE
+  MUTED
+  BANNED
+}
+
+model ChatMember {
+  id        Int              @id @default(autoincrement())
+  createdAt DateTime         @default(now())
+  chat      Chat             @relation(fields: [chatId], references: [id])
+  chatId    Int
+  user      User             @relation(fields: [userLogin], references: [login])
+  userLogin String
+  role      chatMemberRole   @default(MEMBER)
+  status    chatMemberStatus @default(ACTIVE)
+
+  @@unique([chatId, userLogin], name: "chatId_userLogin")
 }

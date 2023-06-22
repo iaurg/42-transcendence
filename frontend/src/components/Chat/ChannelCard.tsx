@@ -5,12 +5,12 @@ import { ChatContext } from "@/contexts/ChatContext";
 
 type ChannelCardProps = {
   name: string;
+  isProtected: boolean;
+  isOwner: boolean;
 };
 
-export default function ChannelCard({ name }: ChannelCardProps) {
+export default function ChannelCard({ name, isProtected, isOwner }: ChannelCardProps) {
   const { setShowElement, setSelectedChannelId } = useContext(ChatContext);
-  const isPrivate = true;
-  const isOwner = true;
 
   const handleDeleteChannel = () => {
     console.log("deletando canal");
@@ -28,7 +28,7 @@ export default function ChannelCard({ name }: ChannelCardProps) {
           {name}
         </span>
         <div className="flex ml-1 space-x-1">
-          {isPrivate && <Lock color="white" size={12} />}
+          {isProtected && <Lock color="white" size={12} />}
           {isOwner && <Crown className="text-orange42-500" size={12} />}
         </div>
       </div>
