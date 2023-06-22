@@ -73,4 +73,8 @@ build {
   sources = [
     "source.vsphere-iso.ubuntu22-04"
   ]
+
+  #provisioner "ansible" {
+  #  playbook_file = "./ansible/playbook.yml"
+  #}
 }
