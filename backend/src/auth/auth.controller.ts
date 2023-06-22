@@ -17,7 +17,6 @@ export class AuthController {
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
       const user = req.user as User;
-      console.log(user);
       await this.jwtAuthService.removeTokensFromCookie(res);
       return await this.authService.logout(user, res);
     } catch (error) {

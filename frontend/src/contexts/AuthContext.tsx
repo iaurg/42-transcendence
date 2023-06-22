@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useState } from "react";
 
-// NOTE tipagem
 type AuthContextType = {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User>>;

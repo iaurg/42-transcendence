@@ -6,6 +6,7 @@ import { ExtractJwt } from 'passport-jwt';
 import { Strategy } from 'passport-jwt';
 import { UsersService } from 'src/users/users.service';
 import { JwtPayload } from '../dto/jwt.dto';
+import argon2 from 'argon2';
 
 @Injectable()
 export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -30,8 +31,7 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: JwtPayload) {
     const user = await this.userService.findOne(payload.sub);
     if (!user) {
-      // TODO different msg for invalid access token
-      throw new UnauthorizedException('Please log in to continue');
+      throw new UnauthorizedException('User not found');
     }
     return user;
   }
@@ -61,14 +61,18 @@ export class RefreshJwtStrategy extends PassportStrategy(
     const refreshToken =
       RefreshJwtStrategy.extractRefreshJwtFromBearer(req) ??
       RefreshJwtStrategy.getRefreshTokenFromCookie(req);
-
     if (!refreshToken) {
-      throw new UnauthorizedException('JWT refresh token not found');
+      throw new UnauthorizedException('Session expired');
     }
-
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
-      throw new UnauthorizedException('Please log in to continue');
+      throw new UnauthorizedException('User not found');
+    }
+    const isValid = await argon2.verify(user.refreshToken, refreshToken, {
+      secret: Buffer.from(this.configService.get('HASH_PEPPER')),
+    });
+    if (!isValid) {
+      throw new UnauthorizedException('Session expired');
     }
     return user;
   }

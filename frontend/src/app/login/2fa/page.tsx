@@ -16,6 +16,12 @@ export default function AuthPage() {
   }, []);
 
   const change2faFocus = (index: number) => {
+    if (index < 0) {
+      index = 0;
+    }
+    if (index > 5) {
+      index = 5;
+    }
     const ref = inputRefs.current[index];
     if (ref) {
       ref.focus();
@@ -28,14 +34,19 @@ export default function AuthPage() {
     const { value } = e.target;
     console.log("value", value);
 
-    if (value.length == 1 && /^[0-9]*$/.test(value)) {
-      const newCode = code;
-      newCode[index] = String(value);
-      setCode((code) => [...newCode]);
-      console.log("code", code);
-      if (e !== undefined) {
-        console.log("change2faFocus inside if", index);
-        change2faFocus(index + 1);
+    for (let i = 0; i < value.length; i++) {
+      if (index + i > 5) {
+        break;
+      }
+      const number = value[i];
+      if (/^[0-9]*$/.test(number)) {
+        const newCode = code;
+        newCode[index + i] = String(number);
+        setCode((code) => [...newCode]);
+        console.log("code", code);
+        if (e !== undefined) {
+          change2faFocus(index + i + 1);
+        }
       }
     }
   };
@@ -61,20 +72,17 @@ export default function AuthPage() {
     if (keyboardKeyCode === "Enter") {
       handleSubmit();
     }
-
-    // if (code[index] === undefined) {
-    //   console.log("calling change2faFocus", index);
-    // } else {
-    //   console.log("handle_change", index);
-    //   handleChange(undefined, index);
-    // }
   };
 
   const handleSubmit = async () => {
     // Handle submission logic here
-    console.log("Submitted code:", code);
+    console.log("Submitted code:", code.join(""));
     await api
-      .post("/auth/2fa/authenticate", { code }, { withCredentials: true })
+      .post(
+        "/auth/2fa/authenticate",
+        { code: code.join("") },
+        { withCredentials: true }
+      )
       .then((r) => {
         if (r.status == 201) router.push("/game");
       })
@@ -83,14 +91,6 @@ export default function AuthPage() {
         toast.error("Código inválido");
       });
   };
-  // if (r.status == 201){
-  //   router.push("/game");
-  // }
-  // else {
-  //   console.log(r.status);
-  //   toast.error("Código inválido");
-  // }
-  // };
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -104,7 +104,7 @@ export default function AuthPage() {
             <input
               key={index}
               type="text"
-              maxLength={1}
+              id={"2fa code:".concat(String(index))}
               className="w-12 h-12 border border-gray-300 text-4xl rounded text-center mx-1"
               value={value || ""}
               onChange={(e) => handleChange(e, index)}

@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { CookieOptions, Response } from 'express';
@@ -96,10 +96,10 @@ export class JwtAuthService {
   async refreshJwt(login: string) {
     const user = await this.usersService.findOne(login);
     if (!user) {
-      throw new ForbiddenException('User not found');
+      throw new UnauthorizedException('User not found');
     }
     if (!user.refreshToken) {
-      throw new ForbiddenException('Session expired, please log in again.');
+      throw new UnauthorizedException('Session expired');
     }
     return await this.generateJwt(user);
   }
