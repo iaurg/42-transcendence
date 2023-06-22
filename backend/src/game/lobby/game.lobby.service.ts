@@ -47,7 +47,7 @@ export class GameLobbyService {
         y: 300,
         dx: 4,
         dy: 4,
-        radius: 0,
+        radius: 5,
       },
       canvas: {
         width: 800,
