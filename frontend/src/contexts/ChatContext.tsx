@@ -1,4 +1,5 @@
 "use client";
+import chatService from "@/services/chatClient";
 import React, { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
@@ -33,7 +34,7 @@ export type Chat = {
   owner: string;
 };
 
-type ChatList = Chat[];
+export type ChatList = Chat[];
 
 export const ChatContext = createContext<ChatContextType>(
   {} as ChatContextType
@@ -48,30 +49,22 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
   useEffect(() => {
     // Connect to the Socket.IO server
-    const socket = io("http://localhost:3000/chat", {
-      transports: ["websocket", "polling", "flashsocket"],
-    });
+    chatService.connect();
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the WebSocket server");
-    });
+    chatService.socket?.emit("listChats");
 
-    socket.on("connect", () => {
-      socket.emit("listChats");
-    });
-
-    socket.on("listChats", (chatList: ChatList) => {
+    chatService.socket?.on("listChats", (chatList: ChatList) => {
       setChatList(() => chatList);
     });
 
-    socket.on("createChat", (chat: any) => {
+    chatService.socket?.on("createChat", (chat: any) => {
       console.log("createChat", chat);
       setChatList((chatList) => [...chatList, chat]);
     });
 
     // Clean up the connection on component unmount
     return () => {
-      socket.disconnect();
+      chatService.socket?.disconnect();
     };
   }, []);
 
