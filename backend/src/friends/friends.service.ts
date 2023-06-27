@@ -52,16 +52,18 @@ export class FriendsService {
         },
         status: 'ACCEPTED',
       },
-      include: {
-        users: true,
+      select: {
+        users: {
+          where: {
+            id: {
+              not: userId
+            }
+          }
+        }
       },
     });
 
-    const friends = friendships.flatMap((friendship) =>
-      friendship.users.filter((user) => user.id !== userId),
-    );
-
-    return friends;
+    return friendships;
   }
 
   async updateFriendStatus(updateFriendDto: UpdateFriendDto) {
