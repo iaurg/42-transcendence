@@ -27,7 +27,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: any) {
-    this.finishGame(client);
+    const gameId = this.finishGame(client);
+    client.leave(gameId);
+    this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
     console.log(`Client ${client.id} disconnected`);
   }
 
@@ -47,8 +49,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('startGame')
   startGame(client: any, gameId: string) {
     const game = this.gamesPlaying[gameId];
-    
-    console.log("started game", game)
 
     this.gameService.updateBallPosition(game);
     if (this.gameService.isPointScored(game)) {
@@ -56,17 +56,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameService.restartBall(game);
     }
     if (this.gameService.isGameFinished(game)) {
-      this.gameServer
-        .to(gameId)
-        .emit('gameFinished', game);
+      this.gameServer.to(gameId).emit('gameFinished', game);
+      this.finishGame(client);
     }
-    if (!game.finished) {
-      this.gameServer
-        .to(gameId)
-        .emit('updatedGame', game);
+    if (game.finished) {
+      return;
     }
 
-    setTimeout( () => {
+    this.gameServer.to(gameId).emit('updatedGame', game);
+    console.log('started game', game);
+    setTimeout(() => {
       this.startGame(client, gameId);
     }, 1000 / 60);
 
@@ -78,7 +77,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
   }
 
-  private finishGame(client: any) {
+  private finishGame(client: any): string {
     const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
       return (
         this.gamesPlaying[gameId].player1.id === client.id ||
@@ -87,9 +86,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     if (gameId) {
       this.gamesPlaying[gameId].finished = true;
-      this.gameServer
-        .to(gameId)
-        .emit('gameAbandoned', this.gamesPlaying[gameId]);
+      this.gamesPlaying.delete(gameId);
+      return gameId;
     }
+    return null;
   }
 }

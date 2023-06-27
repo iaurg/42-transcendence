@@ -81,9 +81,9 @@ export class GameService {
   }
 
   isPointScored(gameDto: GameDto): boolean {
-    if (gameDto.ball.y + gameDto.ball.radius > gameDto.canvas.height) {
+    if (gameDto.ball.x + gameDto.ball.radius > gameDto.canvas.height) {
       return true;
-    } else if (gameDto.ball.y - gameDto.ball.radius < 0) {
+    } else if (gameDto.ball.x - gameDto.ball.radius < 0) {
       return true;
     }
     return false;
