@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import { type } from "os";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 
@@ -17,43 +18,43 @@ const Game = dynamic(() => import("../../../../components/Game"), {
  * 6. gameAbandoned
  */
 
+export type GameData = {
+  gameId: string;
+  finished: boolean;
+  player1: {
+    id: string;
+    x: number;
+    y: number;
+  };
+  player2: {
+    id: string;
+    x: number;
+    y: number;
+  };
+  ball: {
+    x: number;
+    y: number;
+    dx: number;
+    dy: number;
+    radius: number;
+  };
+  canvas: {
+    width: number;
+    height: number;
+  };
+  score: {
+    player1: number;
+    player2: number;
+  };
+};
+
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
-  const [waitingPlayer2, setWaitingPlayer2] = useState(false);
+  const [waitingPlayer2, setWaitingPlayer2] = useState(true);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [gameAbandoned, setGameAbandoned] = useState(false);
 
-  const [gameData, setGameData] = useState({
-    players: [
-      {
-        x: 10,
-        y: 10,
-        width: 15,
-        height: 80,
-        speed: 5,
-      },
-      {
-        x: 780,
-        y: 10,
-        width: 15,
-        height: 80,
-        speed: 1,
-      },
-    ],
-    ball: {
-      x: 50,
-      y: 50,
-      radius: 10,
-      dx: 2, // velocity in the x-axis
-      dy: 2, // velocity in the y-axis
-    },
-    canvas: {
-      width: 800,
-      height: 600,
-    },
-    score: {
-      player1: 0,
-      player2: 0,
-    },
-  });
+  const [gameData, setGameData] = useState({} as GameData);
 
   useEffect(() => {
     // Connect to the Socket.IO server
@@ -66,11 +67,11 @@ export default function PlayPage() {
     });
 
     socket.emit("joinGame");
-    
+
     socket.on("waitingPlayer2", () => {
       console.log("waitingPlayer2");
       setWaitingPlayer2(true);
-    })
+    });
 
     socket.on("gameCreated", () => {
       console.log("gameCreated");
@@ -81,10 +82,17 @@ export default function PlayPage() {
     // listen event from server called updatedGame
     socket.on("updatedGame", (data: any) => {
       console.log("updatedGame", data);
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        ball: data.ball,
-      }));
+      setGameData((prevGameData) => data);
+    });
+
+    socket.on("gameFinished", (data: any) => {
+      console.log("gameFinished", data);
+      setGameFinished(true);
+    });
+
+    socket.on("gameAbandoned", (data: any) => {
+      console.log("gameAbandoned", data);
+      setGameAbandoned(true);
     });
 
     // Clean up the connection on component unmount
@@ -111,14 +119,10 @@ export default function PlayPage() {
         players: [
           // position the players on the left and right sides of the canvas
           {
-            ...prevGameData.players[0],
-            x: 15,
-            y: canvas ? canvas.clientHeight / 2 - 40 : 0,
+            ...prevGameData.player1,
           },
           {
-            ...prevGameData.players[1],
-            x: canvas ? canvas.clientWidth - 30 : 0,
-            y: canvas ? canvas.clientHeight / 2 - 40 : 0,
+            ...prevGameData.player2,
           },
         ],
       }));
@@ -149,10 +153,56 @@ export default function PlayPage() {
         "
         >
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
-          <div className="text-white text-3xl text-center">Waiting for player 2...</div>
+          <div className="text-white text-3xl text-center">
+            Waiting for player 2...
+          </div>
         </div>
       </>
-    )
+    );
+  }
+
+  if (gameFinished) {
+    return (
+      <>
+        <div
+          className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+        "
+        >
+          <div className="text-white text-3xl text-center">Game finished</div>
+        </div>
+      </>
+    );
+  }
+
+  if (gameAbandoned) {
+    return (
+      <>
+        <div
+          className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+        "
+        >
+          <div className="text-white text-3xl text-center">Game abandoned</div>
+        </div>
+      </>
+    );
   }
 
   return (
