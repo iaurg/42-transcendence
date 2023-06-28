@@ -1,6 +1,7 @@
 "use client";
-import { PencilSimple } from "@phosphor-icons/react";
+import { Key, PencilSimple } from "@phosphor-icons/react";
 import { StatusTag } from "../StatusTag";
+import MFAModal from "../MFAModal";
 
 export function UserInfo() {
   return (
@@ -14,6 +15,7 @@ export function UserInfo() {
           <StatusTag status="online" />
         </div>
         <PencilSimple color="white" size={24} />
+        <MFAModal />
       </div>
     </div>
   );
