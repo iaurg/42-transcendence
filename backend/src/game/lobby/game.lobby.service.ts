@@ -5,9 +5,11 @@ import { GameDto } from '../dto/game.dto';
 export class GameLobbyService {
   private lobby: GameDto[] = [];
   private PLAYER_INITIAL_X = 0;
-  private PLAYER_INITIAL_Y = 285;
+  // private PLAYER_INITIAL_Y = 300;
   private PADDLE_WIDTH = 10;
-  private PADDLE_HEIGHT = 30;
+  private PADDLE_HEIGHT = 550; // CHANGE THIS
+  private CANVAS_WIDTH = 800;
+  private CANVAS_HEIGHT = 600;
 
   joinPlayer1(player: any): boolean {
     if (this.lobby.length == 0) {
@@ -26,7 +28,7 @@ export class GameLobbyService {
     gameDto.player2 = {
       id: player.id,
       x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
-      y: gameDto.canvas.height - this.PLAYER_INITIAL_Y,
+      y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
       width: this.PADDLE_WIDTH,
       height: this.PADDLE_HEIGHT,
     };
@@ -43,7 +45,7 @@ export class GameLobbyService {
       player1: {
         id: player1Id,
         x: this.PLAYER_INITIAL_X,
-        y: this.PLAYER_INITIAL_Y,
+        y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
         width: this.PADDLE_WIDTH,
         height: this.PADDLE_HEIGHT,
       },
@@ -56,8 +58,8 @@ export class GameLobbyService {
         radius: 5,
       },
       canvas: {
-        width: 800,
-        height: 600,
+        width: this.CANVAS_WIDTH,
+        height: this.CANVAS_HEIGHT,
       },
       score: {
         player1: 0,
