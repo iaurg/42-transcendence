@@ -73,7 +73,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('movePlayer')
-  movePlayer(client: any, info: GameMoveDto) {
+  movePlayer(info: GameMoveDto) {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
   }
 
