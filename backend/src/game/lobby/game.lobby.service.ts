@@ -6,6 +6,8 @@ export class GameLobbyService {
   private lobby: GameDto[] = [];
   private PLAYER_INITIAL_X = 0;
   private PLAYER_INITIAL_Y = 285;
+  private PADDLE_WIDTH = 10;
+  private PADDLE_HEIGHT = 30;
 
   joinPlayer1(player: any): boolean {
     if (this.lobby.length == 0) {
@@ -23,8 +25,10 @@ export class GameLobbyService {
     const gameDto = this.lobby[0];
     gameDto.player2 = {
       id: player.id,
-      x: gameDto.canvas.width - this.PLAYER_INITIAL_X,
+      x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
       y: gameDto.canvas.height - this.PLAYER_INITIAL_Y,
+      width: this.PADDLE_WIDTH,
+      height: this.PADDLE_HEIGHT,
     };
     player.join(`game_${gameDto.player1.id}`);
     console.log('Player 2 joined');
@@ -40,6 +44,8 @@ export class GameLobbyService {
         id: player1Id,
         x: this.PLAYER_INITIAL_X,
         y: this.PLAYER_INITIAL_Y,
+        width: this.PADDLE_WIDTH,
+        height: this.PADDLE_HEIGHT,
       },
       player2: undefined,
       ball: {
