@@ -25,11 +25,15 @@ export type GameData = {
     id: string;
     x: number;
     y: number;
+    width: number;
+    height: number;
   };
   player2: {
     id: string;
     x: number;
     y: number;
+    width: number;
+    height: number;
   };
   ball: {
     x: number;
@@ -73,8 +77,8 @@ export default function PlayPage() {
       setWaitingPlayer2(true);
     });
 
-    socket.on("gameCreated", () => {
-      console.log("gameCreated");
+    socket.on("gameCreated", (data:any) => {
+      console.log("gameCreated", data);
       setWaitingPlayer2(false);
       socket.emit("startGame");
     });
@@ -82,7 +86,14 @@ export default function PlayPage() {
     // listen event from server called updatedGame
     socket.on("updatedGame", (data: any) => {
       console.log("updatedGame", data);
-      setGameData((prevGameData) => data);
+      //set game data based on data from server
+      setGameData(
+        (gameData: GameData ) => ({
+          ...gameData,
+          ...data,
+        })
+
+      );      
     });
 
     socket.on("gameFinished", (data: any) => {
@@ -103,40 +114,16 @@ export default function PlayPage() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const updateCanvasSize = () => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        canvas: {
-          width: canvas ? canvas.clientWidth : 0,
-          height: canvas ? canvas.clientHeight : 0,
-        },
-        // put the ball in the center of the canvas
-        ball: {
-          ...prevGameData.ball,
-          x: canvas ? canvas.clientWidth / 2 : 0,
-          y: canvas ? canvas.clientHeight / 2 : 0,
-        },
-        players: [
-          // position the players on the left and right sides of the canvas
-          {
-            ...prevGameData.player1,
-          },
-          {
-            ...prevGameData.player2,
-          },
-        ],
-      }));
-    };
 
-    updateCanvasSize();
-    window.addEventListener("resize", updateCanvasSize);
+    // updateCanvas();
+    //window.addEventListener("resize", updateCanvasSize);
 
     return () => {
-      window.removeEventListener("resize", updateCanvasSize);
+      // window.removeEventListener("resize", updateCanvasSize);
     };
   }, [canvasRef]);
 
-  if (waitingPlayer2) {
+  if (waitingPlayer2 || !gameData.gameId) {
     return (
       <>
         <div
@@ -204,7 +191,6 @@ export default function PlayPage() {
       </>
     );
   }
-
   return (
     <>
       <div
@@ -230,14 +216,14 @@ export default function PlayPage() {
             mx-auto
           "
         >
-          <div>32</div>
-          <div>42</div>
+          <div>Score: {gameData.score?.player1}</div>
+          <div>Score: {gameData.score?.player2}</div>
         </div>
         <div
           id="game-canvas"
           style={{
-            width: "80%",
-            height: "80%",
+            width: 800,
+            height: 600,
             margin: "0 auto",
             borderRadius: "10px",
             marginTop: "10px",
