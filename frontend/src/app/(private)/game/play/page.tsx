@@ -1,6 +1,5 @@
 "use client";
 import dynamic from "next/dynamic";
-import { type } from "os";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 
@@ -52,24 +51,35 @@ export type GameData = {
   };
 };
 
+export type MovePlayerData = {
+  gameId: string;
+  player: string;
+  direction: string;
+}
+
+
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
   const [waitingPlayer2, setWaitingPlayer2] = useState(true);
   const [gameFinished, setGameFinished] = useState(false);
   const [gameAbandoned, setGameAbandoned] = useState(false);
-
+  const [clientId, setClientId] = useState("");
   const [gameData, setGameData] = useState({} as GameData);
 
   useEffect(() => {
-    // Connect to the Socket.IO server
-    const socket = io("http://localhost:3000/game", {
+    const socket = io("http://localhost:3000/game",{
       transports: ["websocket", "polling", "flashsocket"],
+    });
+
+    // Listen for the 'connect' event
+    socket.on('connect', () => {
+      setClientId(socket.id);
     });
 
     socket.on("disconnect", () => {
       console.log("Disconnected from the WebSocket server");
     });
-
+ 
     socket.emit("joinGame");
 
     socket.on("waitingPlayer2", () => {
@@ -77,7 +87,7 @@ export default function PlayPage() {
       setWaitingPlayer2(true);
     });
 
-    socket.on("gameCreated", (data:any) => {
+    socket.on("gameCreated", (data:any, data2:any,) => {
       console.log("gameCreated", data);
       setWaitingPlayer2(false);
       socket.emit("startGame");
@@ -85,14 +95,12 @@ export default function PlayPage() {
 
     // listen event from server called updatedGame
     socket.on("updatedGame", (data: any) => {
-      console.log("updatedGame", data);
       //set game data based on data from server
       setGameData(
         (gameData: GameData ) => ({
           ...gameData,
           ...data,
         })
-
       );      
     });
 
@@ -105,23 +113,17 @@ export default function PlayPage() {
       console.log("gameAbandoned", data);
       setGameAbandoned(true);
     });
-
-    // Clean up the connection on component unmount
-    return () => {
-      socket.disconnect();
-    };
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-
-    // updateCanvas();
-    //window.addEventListener("resize", updateCanvasSize);
-
-    return () => {
-      // window.removeEventListener("resize", updateCanvasSize);
-    };
-  }, [canvasRef]);
+  /*
+  const handleMovePlayer = useCallback((direction: string) => {
+    socket.emit("movePlayer", {
+      gameId: gameData.gameId,
+      player: "player1",
+      direction: direction,
+    });
+  }, [gameData]);
+  */
 
   if (waitingPlayer2 || !gameData.gameId) {
     return (
@@ -201,6 +203,7 @@ export default function PlayPage() {
         mt-4
       "
       >
+        Você é o {clientId}
         <div
           className="
             flex
