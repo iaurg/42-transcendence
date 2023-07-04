@@ -51,10 +51,10 @@ export class GameLobbyService {
       },
       player2: undefined,
       ball: {
-        x: 400,
-        y: 300,
-        dx: 4,
-        dy: 4,
+        x: 0,
+        y: 0,
+        dx: 0,
+        dy: 0,
         radius: 5,
       },
       canvas: {
