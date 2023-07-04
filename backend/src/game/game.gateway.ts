@@ -42,6 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const game = this.gameLobby.joinPlayer2(client);
       this.gamesPlaying[game.gameId] = game;
       this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
+      this.gameService.restartBall(game);
       this.startGame(client, game.gameId);
     }
   }
