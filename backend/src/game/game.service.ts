@@ -11,7 +11,8 @@ export class GameService {
   private PLAYER2 = '2';
   private PADDLE_WIDTH = 10;
   private PADDLE_HEIGHT = 30;
-  private MAX_SCORE = 5;
+  private MAX_SCORE = 50;
+  private BALL_SPEED = 6;
 
   updateBallPosition(gameDto: GameDto) {
     gameDto.ball.x += gameDto.ball.dx;
@@ -100,13 +101,22 @@ export class GameService {
   restartBall(gameDto: GameDto) {
     gameDto.ball.x = gameDto.canvas.width / 2;
     gameDto.ball.y = gameDto.canvas.height / 2;
-    gameDto.ball.dx = this.randomDirection();
-    gameDto.ball.dy = this.randomDirection();
+
+    const directionY = Math.random() < 0.5 ? 1 : -1;
+    const directionX = Math.random() < 0.5 ? 1 : -1;
+    const angle = this.getRandomAngle();
+
+    gameDto.ball.dx = this.BALL_SPEED * Math.cos(angle) * directionX;
+    gameDto.ball.dy = this.BALL_SPEED * Math.sin(angle) * directionY;
   }
 
-  private randomDirection(): number {
-    const random = Math.random();
-    return random < 0.5 ? 4 : -4;
+  private getRandomAngle() {
+    const angles = [25, 35, 45, 55, 65];
+    const randomIndex = Math.floor(Math.random() * angles.length);
+    const randomDegree = angles[randomIndex];
+
+    const randomAngle = (randomDegree * Math.PI) / 180;
+    return randomAngle;
   }
 
   isGameFinished(gameDto: GameDto): boolean {
