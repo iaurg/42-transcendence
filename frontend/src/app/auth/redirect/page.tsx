@@ -1,17 +1,17 @@
 "use client";
-import { AuthContext, User } from "@/contexts/AuthContext";
+import { AuthContext, TokenPayload } from "@/contexts/AuthContext";
 import { useContext, useEffect } from "react";
 import nookies from "nookies";
 import jwt_decode from "jwt-decode";
 import { useRouter } from "next/navigation";
 
 export default function RootLoginRedirectPage() {
-  const { user, setUser } = useContext(AuthContext);
+  const { payload: user, setPayload: setUser } = useContext(AuthContext);
   const router = useRouter();
   useEffect(() => {
     const { accessToken } = nookies.get(null, "accesssToken");
     if (accessToken) {
-      const payload: User = jwt_decode(accessToken);
+      const payload: TokenPayload = jwt_decode(accessToken);
       if (payload) setUser(payload);
     } else {
       router.push("/login");

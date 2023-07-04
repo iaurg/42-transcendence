@@ -2,21 +2,34 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return await this.prisma.user.findMany();
+  async findAll(args: any = {}) {
+    return await this.prisma.user.findMany(args);
   }
 
-  async findOne(login: string) {
-    return await this.prisma.user.findUnique({
-      where: {
-        login: login,
-      },
-    });
+  async findOne(login: string, select: any = null): Promise<User | null> {
+    let args = {} as any;
+    if (select != null) {
+      args = {
+        where: {
+          login: login,
+        },
+        select: select,
+      };
+    } else {
+      args = {
+        where: {
+          login: login,
+        },
+      };
+    }
+    const user: User = await this.prisma.user.findUnique(args);
+    return user;
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -52,9 +65,5 @@ export class UsersService {
         login: login,
       },
     });
-  }
-
-  async findMe(dto: any) {
-    return 'null';
   }
 }

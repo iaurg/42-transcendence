@@ -20,7 +20,7 @@ export class MultiFactorAuthService {
     const secret = authenticator.generateSecret();
     const appName = this.configService.get('APP_NAME');
     const otpauthUrl = authenticator.keyuri(login, appName, secret);
-    const updated_user = await this.usersService.update(login, {
+    await this.usersService.update(login, {
       mfaSecret: secret,
     });
     return otpauthUrl;

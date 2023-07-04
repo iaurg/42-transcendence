@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function AuthPage() {
-  // change it to a component
+  // TODO change it to a component
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const router = useRouter();
 
