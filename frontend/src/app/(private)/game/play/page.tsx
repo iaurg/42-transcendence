@@ -73,11 +73,12 @@ export default function PlayPage() {
 
     // Listen for the 'connect' event
     socket.on('connect', () => {
-      setClientId(socket.id);
+      // setClientId(socket.id);
     });
 
     socket.on("disconnect", () => {
       console.log("Disconnected from the WebSocket server");
+      socket.emit("finishGame")
     });
  
     socket.emit("joinGame");
@@ -113,6 +114,10 @@ export default function PlayPage() {
       console.log("gameAbandoned", data);
       setGameAbandoned(true);
     });
+
+    return () => {
+      socket.disconnect();
+    };    
   }, []);
 
   /*
@@ -125,7 +130,7 @@ export default function PlayPage() {
   }, [gameData]);
   */
 
-  if (waitingPlayer2 || !gameData.gameId) {
+  if (waitingPlayer2) {
     return (
       <>
         <div
