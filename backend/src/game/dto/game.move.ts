@@ -1,5 +1,5 @@
 export class GameMoveDto {
   gameId: string;
-  player: string;
+  player_id: string;
   direction: string;
 }

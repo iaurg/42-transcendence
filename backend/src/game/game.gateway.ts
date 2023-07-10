@@ -13,10 +13,19 @@ import { GameMoveDto } from './dto/game.move';
 
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private PADDLE_WIDTH = 10;
+  private PADDLE_HEIGHT = 50;
+
   constructor(
     private gameService: GameService,
     private gameLobby: GameLobbyService,
-  ) {}
+  ) {
+    // set paddle size
+    this.gameService.PADDLE_HEIGHT = this.PADDLE_HEIGHT;
+    this.gameService.PADDLE_WIDTH = this.PADDLE_WIDTH;
+    this.gameLobby.PADDLE_HEIGHT = this.PADDLE_HEIGHT;
+    this.gameLobby.PADDLE_WIDTH = this.PADDLE_WIDTH;
+  }
 
   @WebSocketServer()
   gameServer: Server;

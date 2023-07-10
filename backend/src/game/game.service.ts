@@ -5,12 +5,8 @@ import { Player } from './dto/game.player.dto';
 
 @Injectable()
 export class GameService {
-  private UP = 'UP';
-  private DOWN = 'DOWN';
-  private PLAYER1 = '1';
-  private PLAYER2 = '2';
-  private PADDLE_WIDTH = 10;
-  private PADDLE_HEIGHT = 30;
+  public PADDLE_WIDTH: number;
+  public PADDLE_HEIGHT: number;
   private MAX_SCORE = 50;
   private BALL_SPEED = 6;
 
@@ -58,16 +54,16 @@ export class GameService {
   }
 
   updatePlayerPosition(gameDto: GameDto, moveInfo: GameMoveDto) {
-    if (moveInfo.player == this.PLAYER1) {
-      if (moveInfo.direction == this.UP) {
+    if (moveInfo.player_id == gameDto.player1.id) {
+      if (moveInfo.direction == 'UP') {
         this.movePlayerUp(gameDto.player1);
-      } else if (moveInfo.direction == this.DOWN) {
+      } else if (moveInfo.direction == 'DOWN') {
         this.movePlayerDown(gameDto.player1, gameDto.canvas.height);
       }
-    } else if (moveInfo.player == this.PLAYER2) {
-      if (moveInfo.direction == this.UP) {
+    } else if (moveInfo.player_id == gameDto.player2.id) {
+      if (moveInfo.direction == 'UP') {
         this.movePlayerUp(gameDto.player2);
-      } else if (moveInfo.direction == this.DOWN) {
+      } else if (moveInfo.direction == 'DOWN') {
         this.movePlayerDown(gameDto.player2, gameDto.canvas.height);
       }
     }
