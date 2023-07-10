@@ -5,7 +5,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
@@ -22,11 +22,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   gameServer: Server;
   private gamesPlaying: Map<string, GameDto> = new Map();
 
-  handleConnection(client: any) {
+  handleConnection(client: Socket) {
     console.log(`Client ${client.id} connected`);
   }
 
-  handleDisconnect(client: any) {
+  handleDisconnect(client: Socket) {
     const gameId = this.finishGame(client);
     client.leave(gameId);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
@@ -34,7 +34,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinGame')
-  joinGame(client: any) {
+  joinGame(client: Socket) {
     if (this.gameLobby.joinPlayer1(client)) {
       console.log(`waiting Player 2`);
       client.emit('waitingPlayer2', `game_${client.id}`);
@@ -48,7 +48,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('startGame')
-  startGame(client: any, gameId: string) {
+  startGame(client: Socket, gameId: string) {
     const game = this.gamesPlaying[gameId];
 
     this.gameService.updateBallPosition(game);
@@ -78,7 +78,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
   }
 
-  private finishGame(client: any): string {
+  private finishGame(client: Socket): string {
     const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
       return (
         this.gamesPlaying[gameId].player1.id === client.id ||
