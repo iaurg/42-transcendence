@@ -7,7 +7,7 @@ export class GameLobbyService {
   private PLAYER_INITIAL_X = 0;
   // private PLAYER_INITIAL_Y = 300;
   private PADDLE_WIDTH = 10;
-  private PADDLE_HEIGHT = 550; // CHANGE THIS
+  private PADDLE_HEIGHT = 30; // CHANGE THIS
   private CANVAS_WIDTH = 800;
   private CANVAS_HEIGHT = 600;
 
