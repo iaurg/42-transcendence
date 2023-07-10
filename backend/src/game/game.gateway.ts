@@ -74,7 +74,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.gameServer.to(gameId).emit('updatedGame', game);
-    console.log('started game', game);
+
     setTimeout(() => {
       this.startGame(client, gameId);
     }, 1000 / 60);
@@ -83,7 +83,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('movePlayer')
-  movePlayer(info: GameMoveDto) {
+  movePlayer(_: Socket, info: GameMoveDto) {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
   }
 
