@@ -1,23 +1,26 @@
 import { ArrowRight, Crown, Lock, TrashSimple } from "@phosphor-icons/react";
 import { use, useContext, useEffect } from "react";
-import Chat from ".";
 import { ChatContext } from "@/contexts/ChatContext";
+import chatService from "@/services/chatClient";
 
 type ChannelCardProps = {
+  chatId: number;
   name: string;
   isProtected: boolean;
   isOwner: boolean;
 };
 
-export default function ChannelCard({ name, isProtected, isOwner }: ChannelCardProps) {
-  const { setShowElement, setSelectedChannelId } = useContext(ChatContext);
-
+export default function ChannelCard({ chatId, name, isProtected, isOwner }: ChannelCardProps) {
+  const { setShowElement, setSelectedChannelId, setSelectedChannelName } = useContext(ChatContext);
+  // TODO: Implement delete channel
   const handleDeleteChannel = () => {
-    console.log("deletando canal");
+    chatService.socket?.emit("deleteChannel", { chatId });
   };
 
   const handleOpenChannel = () => {
-    setSelectedChannelId(name);
+    setSelectedChannelId(chatId);
+    setSelectedChannelName(name);
+    chatService.socket?.emit("listMessages", { chatId });
     setShowElement("showChannelOpen");
   };
 
@@ -37,7 +40,7 @@ export default function ChannelCard({ name, isProtected, isOwner }: ChannelCardP
           <TrashSimple
             className="text-red-400 cursor-pointer"
             size={18}
-            onClick={handleDeleteChannel}
+            onClick={() => handleDeleteChannel()}
           />
         )}
         <ArrowRight

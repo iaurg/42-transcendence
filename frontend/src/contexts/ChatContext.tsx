@@ -1,4 +1,5 @@
 "use client";
+import chatService from "@/services/chatClient";
 import React, { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
@@ -14,8 +15,10 @@ type ChatContextType = {
   showElement: Elements;
   setShowElement: React.Dispatch<React.SetStateAction<Elements>>;
   handleToggleCollapse: () => void;
-  selectedChannelId: string;
-  setSelectedChannelId: React.Dispatch<React.SetStateAction<string>>;
+  selectedChannelId: number;
+  setSelectedChannelId: React.Dispatch<React.SetStateAction<number>>;
+  selectedChannelName: string;
+  setSelectedChannelName: React.Dispatch<React.SetStateAction<string>>;
   chatList: ChatList;
 };
 
@@ -33,7 +36,7 @@ export type Chat = {
   owner: string;
 };
 
-type ChatList = Chat[];
+export type ChatList = Chat[];
 
 export const ChatContext = createContext<ChatContextType>(
   {} as ChatContextType
@@ -42,36 +45,29 @@ export const ChatContext = createContext<ChatContextType>(
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showElement, setShowElement] = useState<Elements>("showChannels");
-  const [selectedChannelId, setSelectedChannelId] = useState<string>("");
+  const [selectedChannelId, setSelectedChannelId] = useState<number>(0);
+  const [selectedChannelName, setSelectedChannelName] = useState<string>("");
 
   const [chatList, setChatList] = useState<ChatList>([]);
 
   useEffect(() => {
     // Connect to the Socket.IO server
-    const socket = io("http://localhost:3000/chat", {
-      transports: ["websocket", "polling", "flashsocket"],
-    });
+    chatService.connect();
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the WebSocket server");
-    });
+    chatService.socket?.emit("listChats");
 
-    socket.on("connect", () => {
-      socket.emit("listChats");
-    });
-
-    socket.on("listChats", (chatList: ChatList) => {
+    chatService.socket?.on("listChats", (chatList: ChatList) => {
       setChatList(() => chatList);
     });
 
-    socket.on("createChat", (chat: any) => {
+    chatService.socket?.on("createChat", (chat: any) => {
       console.log("createChat", chat);
       setChatList((chatList) => [...chatList, chat]);
     });
 
     // Clean up the connection on component unmount
     return () => {
-      socket.disconnect();
+      chatService.socket?.disconnect();
     };
   }, []);
 
@@ -89,6 +85,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         handleToggleCollapse,
         selectedChannelId,
         setSelectedChannelId,
+        selectedChannelName,
+        setSelectedChannelName,
         chatList,
       }}
     >
