@@ -1,7 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
-import io from "socket.io-client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
@@ -55,8 +55,7 @@ export type MovePlayerData = {
   gameId: string;
   player: string;
   direction: string;
-}
-
+};
 
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
@@ -65,70 +64,81 @@ export default function PlayPage() {
   const [gameAbandoned, setGameAbandoned] = useState(false);
   const [clientId, setClientId] = useState("");
   const [gameData, setGameData] = useState({} as GameData);
+  const socket = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socket = io("http://localhost:3000/game",{
+    // Listen for the 'connect' event
+    socket.current = io("http://localhost:3000/game", {
       transports: ["websocket", "polling", "flashsocket"],
     });
 
-    // Listen for the 'connect' event
-    socket.on('connect', () => {
-      // setClientId(socket.id);
+    socket.current.on("connect", () => {
+      console.log("Connected to the WebSocket server");
+      if (socket.current) {
+        setClientId(socket.current.id);
+      }
     });
 
-    socket.on("disconnect", () => {
+    socket.current.on("disconnect", () => {
       console.log("Disconnected from the WebSocket server");
-      socket.emit("finishGame")
+      if (socket.current) {
+        socket.current.emit("finishGame");
+      }
     });
- 
-    socket.emit("joinGame");
 
-    socket.on("waitingPlayer2", () => {
+    socket.current.emit("joinGame");
+
+    socket.current.on("waitingPlayer2", () => {
       console.log("waitingPlayer2");
       setWaitingPlayer2(true);
     });
 
-    socket.on("gameCreated", (data:any, data2:any,) => {
+    socket.current.on("gameCreated", (data: any, data2: any) => {
       console.log("gameCreated", data);
       setWaitingPlayer2(false);
-      socket.emit("startGame");
+      if (socket.current) {
+        socket.current.emit("startGame");
+      }
     });
 
     // listen event from server called updatedGame
-    socket.on("updatedGame", (data: any) => {
+    socket.current.on("updatedGame", (data: any) => {
       //set game data based on data from server
-      setGameData(
-        (gameData: GameData ) => ({
-          ...gameData,
-          ...data,
-        })
-      );      
+      setGameData((gameData: GameData) => ({
+        ...gameData,
+        ...data,
+      }));
     });
 
-    socket.on("gameFinished", (data: any) => {
+    socket.current.on("gameFinished", (data: any) => {
       console.log("gameFinished", data);
       setGameFinished(true);
     });
 
-    socket.on("gameAbandoned", (data: any) => {
+    socket.current.on("gameAbandoned", (data: any) => {
       console.log("gameAbandoned", data);
       setGameAbandoned(true);
     });
 
     return () => {
-      socket.disconnect();
-    };    
+      if (socket.current) {
+        socket.current.disconnect();
+      }
+    };
   }, []);
 
-  /*
-  const handleMovePlayer = useCallback((direction: string) => {
-    socket.emit("movePlayer", {
-      gameId: gameData.gameId,
-      player: "player1",
-      direction: direction,
-    });
-  }, [gameData]);
-  */
+  const handleMovePlayer = useCallback(
+    (direction: string) => {
+      if (socket.current) {
+        socket.current.emit("movePlayer", {
+          gameId: gameData.gameId,
+          player_id: clientId,
+          direction: direction,
+        });
+      }
+    },
+    [gameData, clientId]
+  );
 
   if (waitingPlayer2) {
     return (
@@ -209,6 +219,8 @@ export default function PlayPage() {
       "
       >
         Você é o {clientId}
+        <button onClick={() => handleMovePlayer("UP")}>Go UP</button>
+        <button onClick={() => handleMovePlayer("DOWN")}>Go DOWN</button>
         <div
           className="
             flex
