@@ -87,10 +87,14 @@ export class ChatGateway
 
   @SubscribeMessage('listMessages')
   async listMessages(
-    @MessageBody(new ParseIntPipe()) chatId: number,
+    @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
-    const messages = await this.chatService.listChatsById(chatId);
+    const messages = await this.chatService.getMessagesByChatId(chatId);
+    if (!messages) {
+      client.emit('error', { error: 'Failed to list messages' });
+      return;
+    }
     client.emit('listMessages', messages);
   }
 

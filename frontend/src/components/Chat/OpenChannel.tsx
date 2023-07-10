@@ -1,138 +1,25 @@
 import { ChatContext } from "@/contexts/ChatContext";
 import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver from "./ChatUsersChannelPopOver";
+import chatService from "@/services/chatClient";
+
+interface Message {
+  id: number;
+  content: string;
+  userLogin: string;
+}
 
 export function OpenChannel() {
-  const { setShowElement, selectedChannelId } = useContext(ChatContext);
-  const [message, setMessage] = useState("");
+  const { setShowElement, selectedChannelId, selectedChannelName } = useContext(ChatContext);
+  // List messages from the websocket
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      content: "Olá, tudo bem?",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 2,
-      content: "Tudo ótimo, e você?",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 3,
-      content: "Estou bem também, obrigado por perguntar!",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 4,
-      content: "Que bom!",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 5,
-      content: "E como foi o seu dia?",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 6,
-      content: "Foi um dia tranquilo. E o seu?",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 7,
-      content:
-        "O meu dia também foi bom. Estou animado para o final de semana!",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 8,
-      content:
-        "Com certeza! Vai ser ótimo descansar e aproveitar o tempo livre.",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 9,
-      content: "Você tem algum plano específico para o final de semana?",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 10,
-      content:
-        "Eu vou sair para jantar com alguns amigos no sábado à noite. E você?",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 11,
-      content:
-        "Eu vou aproveitar para descansar e assistir alguns filmes e séries.",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 12,
-      content: "Que legal! Espero que você se divirta.",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 13,
-      content: "Obrigado!",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 14,
-      content: "Bom, eu preciso ir agora. Até mais!",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 15,
-      content: "Até mais!",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-  ]);
+  chatService.socket?.on("listMessages", (messages: Message[]) => {
+    console.log(messages);
+    setMessages(() => messages);
+  });
 
   const handleSendMessage = () => {
     console.log("sending message");
@@ -140,14 +27,16 @@ export function OpenChannel() {
     const randomId = Math.floor(Math.random() * 1000);
     const randomUserId = Math.floor(Math.random() * 2) + 1;
     const randomUser = randomUserId === 1 ? "João" : "Maria";
-    const newMessage = {
+    const newMessage: Message = {
       id: randomId,
       content: message,
-      user: {
-        id: randomUserId,
-        name: randomUser,
-      },
+      userLogin: randomUser,
     };
+
+    chatService.socket?.emit("message", {
+      chatId: selectedChannelId,
+      content: message
+    })
 
     setMessages([...messages, newMessage]);
 
@@ -172,12 +61,15 @@ export function OpenChannel() {
             </div>
           </ChatUsersChannelPopOver>
         </div>
-        <h3 className="text-white text-lg">{selectedChannelId}</h3>
+        <h3 className="text-white text-lg">{selectedChannelName}</h3>
         <XCircle
           className="cursor-pointer"
           color="white"
           size={20}
-          onClick={() => setShowElement("showChannels")}
+          onClick={() => {
+            chatService.socket?.off("listMessages");
+            setShowElement("showChannels");
+          }}
         />
       </div>
       <div
@@ -186,16 +78,16 @@ export function OpenChannel() {
             scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
       >
         {/* add alternated users messages inside scrollable area */}
-        {messages.map((message) => (
+        {messages.map((message: any) => (
           <div
             key={message.id}
-            className={`${
-              message.user.id === 1
-                ? "text-white bg-purple42-200 self-end"
-                : "text-white bg-black42-300 self-start"
-            } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
+            // TODO: Implement user context to compare user login with message user
+            className={`${message.userLogin === 'caio'
+              ? "text-white bg-purple42-200 self-end"
+              : "text-white bg-black42-300 self-start"
+              } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
           >
-            <span className="font-semibold">{message.user.name}: </span>
+            <span className="font-semibold">{message.userLogin}: </span>
             {message.content}
           </div>
         ))}

@@ -15,8 +15,10 @@ type ChatContextType = {
   showElement: Elements;
   setShowElement: React.Dispatch<React.SetStateAction<Elements>>;
   handleToggleCollapse: () => void;
-  selectedChannelId: string;
-  setSelectedChannelId: React.Dispatch<React.SetStateAction<string>>;
+  selectedChannelId: number;
+  setSelectedChannelId: React.Dispatch<React.SetStateAction<number>>;
+  selectedChannelName: string;
+  setSelectedChannelName: React.Dispatch<React.SetStateAction<string>>;
   chatList: ChatList;
 };
 
@@ -43,7 +45,8 @@ export const ChatContext = createContext<ChatContextType>(
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showElement, setShowElement] = useState<Elements>("showChannels");
-  const [selectedChannelId, setSelectedChannelId] = useState<string>("");
+  const [selectedChannelId, setSelectedChannelId] = useState<number>(0);
+  const [selectedChannelName, setSelectedChannelName] = useState<string>("");
 
   const [chatList, setChatList] = useState<ChatList>([]);
 
@@ -82,6 +85,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         handleToggleCollapse,
         selectedChannelId,
         setSelectedChannelId,
+        selectedChannelName,
+        setSelectedChannelName,
         chatList,
       }}
     >
