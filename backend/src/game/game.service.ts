@@ -38,14 +38,16 @@ export class GameService {
     ) {
       if (
         gameDto.ball.y > gameDto.player2.y &&
-        gameDto.ball.y < gameDto.player2.y + this.PADDLE_HEIGHT
+        gameDto.ball.y < gameDto.player2.y + this.PADDLE_HEIGHT &&
+        gameDto.ball.dx > 0
       ) {
         return true;
       }
     } else if (gameDto.ball.x - gameDto.ball.radius < this.PADDLE_WIDTH) {
       if (
         gameDto.ball.y > gameDto.player1.y &&
-        gameDto.ball.y < gameDto.player1.y + this.PADDLE_HEIGHT
+        gameDto.ball.y < gameDto.player1.y + this.PADDLE_HEIGHT &&
+        gameDto.ball.dx < 0
       ) {
         return true;
       }
