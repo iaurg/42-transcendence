@@ -127,18 +127,34 @@ export default function PlayPage() {
     };
   }, []);
 
-  const handleMovePlayer = useCallback(
-    (direction: string) => {
+  useEffect(() => {
+    const handleMovePlayer = (direction: string) => {
       if (socket.current) {
+        console.log("movePlayer", direction, gameData.gameId, clientId);
         socket.current.emit("movePlayer", {
           gameId: gameData.gameId,
           player_id: clientId,
           direction: direction,
         });
       }
-    },
-    [gameData, clientId]
-  );
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowUp") {
+        console.log("up");
+        handleMovePlayer("UP");
+      } else if (e.key === "ArrowDown") {
+        console.log("down");
+        handleMovePlayer("DOWN");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [clientId, gameData]);
 
   if (waitingPlayer2) {
     return (
@@ -218,9 +234,7 @@ export default function PlayPage() {
         mt-4
       "
       >
-        Você é o {clientId}
-        <button onClick={() => handleMovePlayer("UP")}>Go UP</button>
-        <button onClick={() => handleMovePlayer("DOWN")}>Go DOWN</button>
+        <span className="text-white">Você é o {clientId}</span>
         <div
           className="
             flex

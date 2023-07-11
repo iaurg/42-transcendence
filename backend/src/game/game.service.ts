@@ -7,7 +7,7 @@ import { Player } from './dto/game.player.dto';
 export class GameService {
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
-  private MAX_SCORE = 50;
+  private MAX_SCORE = 10;
   private BALL_SPEED = 6;
 
   updateBallPosition(gameDto: GameDto) {

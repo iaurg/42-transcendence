@@ -14,7 +14,7 @@ import { GameMoveDto } from './dto/game.move';
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private PADDLE_WIDTH = 10;
-  private PADDLE_HEIGHT = 50;
+  private PADDLE_HEIGHT = 150;
 
   constructor(
     private gameService: GameService,
