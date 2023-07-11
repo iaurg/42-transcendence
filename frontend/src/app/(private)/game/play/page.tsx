@@ -64,6 +64,7 @@ export default function PlayPage() {
   const [gameAbandoned, setGameAbandoned] = useState(false);
   const [clientId, setClientId] = useState("");
   const [gameData, setGameData] = useState({} as GameData);
+  const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
   const socket = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -112,6 +113,7 @@ export default function PlayPage() {
 
     socket.current.on("gameFinished", (data: any) => {
       console.log("gameFinished", data);
+      setGameFinishedData(data);
       setGameFinished(true);
     });
 
@@ -198,6 +200,10 @@ export default function PlayPage() {
         "
         >
           <div className="text-white text-3xl text-center">Game finished</div>
+          <div className="text-white text-3xl text-center flex flex-col">
+            <span>Player 1 Final Score: {gameFinishedData.score?.player1}</span>
+            <span>Player 2 Final Score: {gameFinishedData.score?.player2}</span>
+          </div>
         </div>
       </>
     );
