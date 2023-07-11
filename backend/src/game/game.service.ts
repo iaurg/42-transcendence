@@ -70,11 +70,11 @@ export class GameService {
   }
 
   private movePlayerUp(player: Player) {
-    if (player.y - 10 >= 0) player.y -= 10;
+    if (player.y >= 0) player.y -= 10;
   }
 
   private movePlayerDown(player: Player, canvasHeight: number) {
-    if (player.y + 10 <= canvasHeight) player.y += 10;
+    if (player.y + this.PADDLE_HEIGHT <= canvasHeight) player.y += 10;
   }
 
   isPointScored(gameDto: GameDto): boolean {
