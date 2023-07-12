@@ -61,13 +61,13 @@ export class GameService {
   }
 
   updatePlayerPosition(gameDto: GameDto, moveInfo: GameMoveDto) {
-    if (moveInfo.player_id == gameDto.player1.id) {
+    if (moveInfo.player_id == gameDto.player1.socketId) {
       if (moveInfo.direction == 'UP') {
         this.movePlayerUp(gameDto.player1);
       } else if (moveInfo.direction == 'DOWN') {
         this.movePlayerDown(gameDto.player1, gameDto.canvas.height);
       }
-    } else if (moveInfo.player_id == gameDto.player2.id) {
+    } else if (moveInfo.player_id == gameDto.player2.socketId) {
       if (moveInfo.direction == 'UP') {
         this.movePlayerUp(gameDto.player2);
       } else if (moveInfo.direction == 'DOWN') {
