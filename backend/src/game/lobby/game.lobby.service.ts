@@ -12,10 +12,10 @@ export class GameLobbyService {
 
   joinPlayer1(player: any): boolean {
     if (this.lobby.length == 0) {
-      const gameDto = this.initGame(player.id);
+      const gameDto = this.initGame(player.socketId);
       this.lobby.push(gameDto);
       console.log('player 1 joined');
-      player.join(`game_${gameDto.player1.id}`);
+      player.join(`game_${gameDto.player1.socketId}`);
       return true;
     } else {
       return false;
@@ -25,13 +25,14 @@ export class GameLobbyService {
   joinPlayer2(player: any): GameDto {
     const gameDto = this.lobby[0];
     gameDto.player2 = {
-      id: player.id,
+      socketId: player.socketId,
+      userId: '',
       x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
       y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
       width: this.PADDLE_WIDTH,
       height: this.PADDLE_HEIGHT,
     };
-    player.join(`game_${gameDto.player1.id}`);
+    player.join(`game_${gameDto.player1.socketId}`);
     console.log('Player 2 joined');
     this.lobby.splice(0, 1);
     return gameDto;
@@ -42,7 +43,8 @@ export class GameLobbyService {
       gameId: `game_${player1Id}`,
       finished: false,
       player1: {
-        id: player1Id,
+        socketId: player1Id,
+        userId: '',
         x: this.PLAYER_INITIAL_X,
         y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
         width: this.PADDLE_WIDTH,
