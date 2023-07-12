@@ -109,7 +109,7 @@ export class GameService {
   }
 
   private getRandomAngle() {
-    const angles = [25, 35, 45, 55, 65];
+    const angles = [25, 35, 45, 55];
     const randomIndex = Math.floor(Math.random() * angles.length);
     const randomDegree = angles[randomIndex];
 

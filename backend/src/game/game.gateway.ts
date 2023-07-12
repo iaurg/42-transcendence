@@ -15,6 +15,7 @@ import { GameMoveDto } from './dto/game.move';
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private PADDLE_WIDTH = 10;
   private PADDLE_HEIGHT = 150;
+  private FRAMES_PER_SECOND = 60;
 
   constructor(
     private gameService: GameService,
@@ -50,7 +51,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       const game = this.gameLobby.joinPlayer2(client);
       this.gamesPlaying[game.gameId] = game;
-      this.gameService.restartBall(game);
+      this.gameService.restartBall(this.gamesPlaying[game.gameId]);
       this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
       this.startGame(client, game.gameId);
     }
@@ -59,27 +60,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('startGame')
   startGame(client: Socket, gameId: string) {
     const game = this.gamesPlaying[gameId];
+    if (game) {
+      this.gameService.updateBallPosition(game);
+      if (this.gameService.isPointScored(game)) {
+        this.gameService.addPoint(game);
+        this.gameService.restartBall(game);
+      }
+      if (this.gameService.isGameFinished(game)) {
+        this.gameServer.to(gameId).emit('gameFinished', game);
+        this.finishGame(client);
+      }
+      if (game.finished) {
+        return;
+      }
 
-    this.gameService.updateBallPosition(game);
-    if (this.gameService.isPointScored(game)) {
-      this.gameService.addPoint(game);
-      this.gameService.restartBall(game);
+      this.gameServer.to(gameId).emit('updatedGame', game);
     }
-    if (this.gameService.isGameFinished(game)) {
-      this.gameServer.to(gameId).emit('gameFinished', game);
-      this.finishGame(client);
-    }
-    if (game.finished) {
-      return;
-    }
-
-    this.gameServer.to(gameId).emit('updatedGame', game);
 
     setTimeout(() => {
       this.startGame(client, gameId);
-    }, 1000 / 60);
-
-    this.gamesPlaying.delete(gameId);
+    }, 1000 / this.FRAMES_PER_SECOND);
   }
 
   @SubscribeMessage('movePlayer')
