@@ -1,115 +1,235 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
-import io from "socket.io-client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
 });
 
+/**
+ * Backend websocket events
+ * 1. joinGame
+ * 2. startGame
+ * 3. updatedGame
+ * 4. movePlayer
+ * 5. gameFinished
+ * 6. gameAbandoned
+ */
+
+export type GameData = {
+  gameId: string;
+  finished: boolean;
+  player1: {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  player2: {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  ball: {
+    x: number;
+    y: number;
+    dx: number;
+    dy: number;
+    radius: number;
+  };
+  canvas: {
+    width: number;
+    height: number;
+  };
+  score: {
+    player1: number;
+    player2: number;
+  };
+};
+
+export type MovePlayerData = {
+  gameId: string;
+  player: string;
+  direction: string;
+};
+
 export default function PlayPage() {
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
-  const [gameData, setGameData] = useState({
-    players: [
-      {
-        x: 10,
-        y: 10,
-        width: 15,
-        height: 80,
-        speed: 5,
-      },
-      {
-        x: 780,
-        y: 10,
-        width: 15,
-        height: 80,
-        speed: 1,
-      },
-    ],
-    ball: {
-      x: 50,
-      y: 50,
-      radius: 10,
-      dx: 2, // velocity in the x-axis
-      dy: 2, // velocity in the y-axis
-    },
-    canvas: {
-      width: 800,
-      height: 600,
-    },
-    score: {
-      player1: 0,
-      player2: 0,
-    },
-  });
+  const [waitingPlayer2, setWaitingPlayer2] = useState(true);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [gameAbandoned, setGameAbandoned] = useState(false);
+  const [clientId, setClientId] = useState("");
+  const [gameData, setGameData] = useState({} as GameData);
+  const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
+  const socket = useRef<Socket | null>(null);
 
   useEffect(() => {
-    // Connect to the Socket.IO server
-    const socket = io("http://localhost:3000/game", {
+    // Listen for the 'connect' event
+    socket.current = io("http://localhost:3000/game", {
       transports: ["websocket", "polling", "flashsocket"],
     });
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the WebSocket server");
+    socket.current.on("connect", () => {
+      console.log("Connected to the WebSocket server");
+      if (socket.current) {
+        setClientId(socket.current.id);
+      }
     });
 
-    socket.emit("createGame");
+    socket.current.on("disconnect", () => {
+      console.log("Disconnected from the WebSocket server");
+      if (socket.current) {
+        socket.current.emit("finishGame");
+      }
+    });
 
-    socket.emit("startGame");
+    socket.current.emit("joinGame");
+
+    socket.current.on("waitingPlayer2", () => {
+      console.log("waitingPlayer2");
+      setWaitingPlayer2(true);
+    });
+
+    socket.current.on("gameCreated", (data: any, data2: any) => {
+      console.log("gameCreated", data);
+      setWaitingPlayer2(false);
+      if (socket.current) {
+        socket.current.emit("startGame");
+      }
+    });
 
     // listen event from server called updatedGame
-    socket.on("updatedGame", (data: any) => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        ball: data.ball,
+    socket.current.on("updatedGame", (data: any) => {
+      //set game data based on data from server
+      setGameData((gameData: GameData) => ({
+        ...gameData,
+        ...data,
       }));
     });
 
-    // Clean up the connection on component unmount
+    socket.current.on("gameFinished", (data: any) => {
+      console.log("gameFinished", data);
+      setGameFinishedData(data);
+      setGameFinished(true);
+    });
+
+    socket.current.on("gameAbandoned", (data: any) => {
+      console.log("gameAbandoned", data);
+      setGameAbandoned(true);
+    });
+
     return () => {
-      socket.disconnect();
+      if (socket.current) {
+        socket.current.disconnect();
+      }
     };
   }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const updateCanvasSize = () => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        canvas: {
-          width: canvas ? canvas.clientWidth : 0,
-          height: canvas ? canvas.clientHeight : 0,
-        },
-        // put the ball in the center of the canvas
-        ball: {
-          ...prevGameData.ball,
-          x: canvas ? canvas.clientWidth / 2 : 0,
-          y: canvas ? canvas.clientHeight / 2 : 0,
-        },
-        players: [
-          // position the players on the left and right sides of the canvas
-          {
-            ...prevGameData.players[0],
-            x: 15,
-            y: canvas ? canvas.clientHeight / 2 - 40 : 0,
-          },
-          {
-            ...prevGameData.players[1],
-            x: canvas ? canvas.clientWidth - 30 : 0,
-            y: canvas ? canvas.clientHeight / 2 - 40 : 0,
-          },
-        ],
-      }));
+    const handleMovePlayer = (direction: string) => {
+      if (socket.current) {
+        console.log("movePlayer", direction, gameData.gameId, clientId);
+        socket.current.emit("movePlayer", {
+          gameId: gameData.gameId,
+          player_id: clientId,
+          direction: direction,
+        });
+      }
     };
 
-    updateCanvasSize();
-    window.addEventListener("resize", updateCanvasSize);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowUp") {
+        console.log("up");
+        handleMovePlayer("UP");
+      } else if (e.key === "ArrowDown") {
+        console.log("down");
+        handleMovePlayer("DOWN");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("resize", updateCanvasSize);
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [canvasRef]);
+  }, [clientId, gameData]);
 
+  if (waitingPlayer2) {
+    return (
+      <>
+        <div
+          className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+        "
+        >
+          <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
+          <div className="text-white text-3xl text-center">
+            Waiting for player 2...
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (gameFinished) {
+    return (
+      <>
+        <div
+          className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+        "
+        >
+          <div className="text-white text-3xl text-center">Game finished</div>
+          <div className="text-white text-3xl text-center flex flex-col">
+            <span>Player 1 Final Score: {gameFinishedData.score?.player1}</span>
+            <span>Player 2 Final Score: {gameFinishedData.score?.player2}</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (gameAbandoned) {
+    return (
+      <>
+        <div
+          className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+        "
+        >
+          <div className="text-white text-3xl text-center">Game abandoned</div>
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <div
@@ -120,6 +240,7 @@ export default function PlayPage() {
         mt-4
       "
       >
+        <span className="text-white">Você é o {clientId}</span>
         <div
           className="
             flex
@@ -135,14 +256,14 @@ export default function PlayPage() {
             mx-auto
           "
         >
-          <div>32</div>
-          <div>42</div>
+          <div>Score: {gameData.score?.player1}</div>
+          <div>Score: {gameData.score?.player2}</div>
         </div>
         <div
           id="game-canvas"
           style={{
-            width: "80%",
-            height: "80%",
+            width: 800,
+            height: 600,
             margin: "0 auto",
             borderRadius: "10px",
             marginTop: "10px",

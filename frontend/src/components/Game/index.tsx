@@ -1,48 +1,34 @@
 "use client";
-import Konva from "konva";
-import { useState } from "react";
+import { GameData } from "@/app/(private)/game/play/page";
 import { Stage, Layer, Rect, Circle, Line } from "react-konva";
 
 type ColoredPaddleProps = {
   x: number;
   y: number;
+  width: number;
+  height: number;
 };
 
-const ColoredRect = ({ x, y }: ColoredPaddleProps) => {
-  return <Rect x={x} y={y} width={15} height={80} fill={"#9D4EDD"} />;
+const ColoredRect = ({ x, y, width, height }: ColoredPaddleProps) => {
+  return <Rect x={x} y={y} width={width} height={height} fill={"#9D4EDD"} />;
 };
 
 type GameProps = {
-  data: {
-    players: any;
-    ball: {
-      x: number;
-      y: number;
-      radius: number;
-      dx: number; // velocity in the x-axis
-      dy: number; // velocity in the y-axis
-    };
-    canvas: {
-      width: number;
-      height: number;
-    };
-  };
+  data: GameData;
 };
 
 export default function Game({ data }: GameProps) {
   return (
     <Stage
-      width={data.canvas.width}
-      height={data.canvas.height}
+      width={800}
+      height={600}
       style={{
         backgroundColor: "#1F173D",
         borderRadius: "10px",
-        width: "100%",
-        height: "100%",
       }}
     >
       <Layer>
-        <ColoredRect x={data.players[0].x} y={data.players[0].y} />
+        <ColoredRect key={data.player1.id} x={data.player1.x} y={data.player1.y} width={data.player1.width} height={data.player1.height}/>
         <Circle
           x={data.ball.x}
           y={data.ball.y}
@@ -60,7 +46,7 @@ export default function Game({ data }: GameProps) {
           dash={[15, 10]}
           zIndex={2}
         />
-        <ColoredRect x={data.players[1].x} y={data.players[1].y} />
+        <ColoredRect key={data.player2.id}  x={data.player2.x} y={data.player2.y} width={data.player2.width} height={data.player2.height} />
       </Layer>
     </Stage>
   );
