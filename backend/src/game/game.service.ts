@@ -9,6 +9,7 @@ export class GameService {
   public PADDLE_HEIGHT: number;
   private MAX_SCORE = 10;
   private BALL_SPEED = 6;
+  private BALL_ACCELERATION = 1.1;
 
   updateBallPosition(gameDto: GameDto) {
     gameDto.ball.x += gameDto.ball.dx;
@@ -28,7 +29,11 @@ export class GameService {
   }
 
   private calculateBallCollision(gameDto: GameDto) {
-    if (this.isPlayerCollision(gameDto)) gameDto.ball.dx *= -1;
+    if (this.isPlayerCollision(gameDto)) {
+      gameDto.ball.dx *= -1;
+      gameDto.ball.dx *= this.BALL_ACCELERATION;
+      gameDto.ball.dy *= this.BALL_ACCELERATION;
+    }
   }
 
   private isPlayerCollision(gameDto: GameDto): boolean {
