@@ -12,7 +12,7 @@ export class GameLobbyService {
 
   joinPlayer1(player: any): boolean {
     if (this.lobby.length == 0) {
-      const gameDto = this.initGame(player.socketId);
+      const gameDto = this.initGame(player.id);
       this.lobby.push(gameDto);
       console.log('player 1 joined');
       player.join(`game_${gameDto.player1.socketId}`);
@@ -25,7 +25,7 @@ export class GameLobbyService {
   joinPlayer2(player: any): GameDto {
     const gameDto = this.lobby[0];
     gameDto.player2 = {
-      socketId: player.socketId,
+      socketId: player.id,
       userId: '',
       x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
       y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
