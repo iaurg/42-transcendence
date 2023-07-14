@@ -1,7 +1,7 @@
-import { ChatContext } from "@/contexts/ChatContext";
+import { ChatContext, ChatList } from "@/contexts/ChatContext";
 import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
 import { useContext, useEffect, useState } from "react";
-import ChatUsersChannelPopOver from "./ChatUsersChannelPopOver";
+import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 
 interface Message {
@@ -11,34 +11,29 @@ interface Message {
 }
 
 export function OpenChannel() {
-  const { setShowElement, selectedChannelId, selectedChannelName } = useContext(ChatContext);
+  const { selectedChannelId, selectedChannelName, handleCloseChat } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
+  const [users, setUsers] = useState<ChatMember[]>([]);
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
-    console.log(messages);
     setMessages(() => messages);
+  });
+  chatService.socket?.on("message", (message: Message) => {
+    setMessages([...messages, message]);
+  });
+  chatService.socket?.on("listMembers", (members: ChatMember[]) => {
+    setNumberOfUsersInChat(members.length);
+    setUsers(members);
   });
 
   const handleSendMessage = () => {
-    console.log("sending message");
-    // fake add message into messages array ramdomly to simulate a real time chat
-    const randomId = Math.floor(Math.random() * 1000);
-    const randomUserId = Math.floor(Math.random() * 2) + 1;
-    const randomUser = randomUserId === 1 ? "João" : "Maria";
-    const newMessage: Message = {
-      id: randomId,
-      content: message,
-      userLogin: randomUser,
-    };
-
     chatService.socket?.emit("message", {
       chatId: selectedChannelId,
       content: message
-    })
-
-    setMessages([...messages, newMessage]);
+    });
 
     setMessage("");
 
@@ -54,9 +49,11 @@ export function OpenChannel() {
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-8">
         <div className="flex items-center">
-          <ChatUsersChannelPopOver>
+          <ChatUsersChannelPopOver
+            users={users}
+          >
             <div className="flex space-x-1 items-center">
-              <span className="text-xs">(12)</span>
+              <span className="text-xs">({numberOfUsersInChat})</span>
               <UsersThree className="text-white" size={20} />
             </div>
           </ChatUsersChannelPopOver>
@@ -66,10 +63,7 @@ export function OpenChannel() {
           className="cursor-pointer"
           color="white"
           size={20}
-          onClick={() => {
-            chatService.socket?.off("listMessages");
-            setShowElement("showChannels");
-          }}
+          onClick={() => handleCloseChat(selectedChannelId)}
         />
       </div>
       <div

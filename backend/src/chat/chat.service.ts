@@ -107,6 +107,11 @@ export class ChatService {
       },
     });
 
+    if (members.length === 0)
+    {
+      return null;
+    }
+
     return members;
   }
 

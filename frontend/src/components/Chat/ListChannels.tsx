@@ -9,9 +9,8 @@ type ListChannelsProps = {
 };
 
 export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
-  const { data, isLoading, isError } = useGetUser();
 
-  const { chatList } = useContext(ChatContext);
+  const { isLoading, chatList } = useContext(ChatContext);
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -29,12 +28,6 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
         <div className="flex flex-col flex-1 justify-center items-center">
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
           <span className="text-white text-lg mt-4">Carregando...</span>
-        </div>
-      ) : isError ? (
-        <div className="flex flex-col flex-1 justify-center items-center">
-          <span className="text-white text-lg mt-4">
-            Erro ao carregar os canais
-          </span>
         </div>
       ) : (
         <div

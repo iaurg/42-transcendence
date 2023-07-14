@@ -12,7 +12,6 @@ type ChannelCardProps = {
 
 export default function ChannelCard({ chatId, name, isProtected, isOwner }: ChannelCardProps) {
   const { setShowElement, setSelectedChannelId, setSelectedChannelName } = useContext(ChatContext);
-  // TODO: Implement delete channel
   const handleDeleteChannel = () => {
     chatService.socket?.emit("deleteChannel", { chatId });
   };
@@ -20,7 +19,9 @@ export default function ChannelCard({ chatId, name, isProtected, isOwner }: Chan
   const handleOpenChannel = () => {
     setSelectedChannelId(chatId);
     setSelectedChannelName(name);
+    chatService.socket?.emit("joinChat", { chatId });
     chatService.socket?.emit("listMessages", { chatId });
+    chatService.socket?.emit("listMembers", { chatId });
     setShowElement("showChannelOpen");
   };
 
