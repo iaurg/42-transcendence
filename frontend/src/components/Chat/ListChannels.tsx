@@ -38,10 +38,7 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
             // TODO: add user context for chat owner
             <ChannelCard
               key={channel.id}
-              chatId={channel.id}
-              name={channel.name}
-              isProtected={channel.chatType === 'PROTECTED'}
-              isOwner={channel.owner === 'caio'}
+              chat={channel}
             />
           ))}
         </div>

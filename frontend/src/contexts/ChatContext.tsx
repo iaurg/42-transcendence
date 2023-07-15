@@ -14,10 +14,8 @@ type ChatContextType = {
   showElement: Elements;
   setShowElement: React.Dispatch<React.SetStateAction<Elements>>;
   handleToggleCollapse: () => void;
-  selectedChannelId: number;
-  setSelectedChannelId: React.Dispatch<React.SetStateAction<number>>;
-  selectedChannelName: string;
-  setSelectedChannelName: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedChat: React.Dispatch<React.SetStateAction<Chat>>;
+  selectedChat: Chat;
   chatList: ChatList;
   isLoading: boolean;
   handleCloseChat: (chatId: number) => void;
@@ -46,12 +44,19 @@ export const ChatContext = createContext<ChatContextType>(
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showElement, setShowElement] = useState<Elements>("showChannels");
-  const [selectedChannelId, setSelectedChannelId] = useState<number>(0);
-  const [selectedChannelName, setSelectedChannelName] = useState<string>("");
+  const [selectedChat, setSelectedChat] = useState<Chat>({} as Chat);
 
   const [chatList, setChatList] = useState<ChatList>([]);
 
   const [isLoading, setIsLoading] = useState(true);
+
+
+  const handleOpenChannel = (chat: Chat) => {
+    setSelectedChat(chat);
+    chatService.socket?.emit("listMessages", { chatId: chat.id });
+    chatService.socket?.emit("listMembers", { chatId: chat.id });
+    setShowElement("showChannelOpen");
+  };
 
   useEffect(() => {
     // Connect to the Socket.IO server
@@ -68,8 +73,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
     chatService.socket?.emit("listChats");
 
-    chatService.socket?.on("createChat", (chat: any) => {
-      console.log("createChat", chat);
+    chatService.socket?.on("createChat", (chat: Chat) => {
+      handleOpenChannel(chat);
       setChatList((chatList) => [...chatList, chat]);
     });
 
@@ -100,10 +105,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         showElement,
         setShowElement,
         handleToggleCollapse,
-        selectedChannelId,
-        setSelectedChannelId,
-        selectedChannelName,
-        setSelectedChannelName,
+        setSelectedChat,
+        selectedChat,
         chatList,
         isLoading,
         handleCloseChat,

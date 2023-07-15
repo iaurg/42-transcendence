@@ -11,7 +11,7 @@ interface Message {
 }
 
 export function OpenChannel() {
-  const { selectedChannelId, selectedChannelName, handleCloseChat } = useContext(ChatContext);
+  const { selectedChat, handleCloseChat } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -31,7 +31,7 @@ export function OpenChannel() {
 
   const handleSendMessage = () => {
     chatService.socket?.emit("message", {
-      chatId: selectedChannelId,
+      chatId: selectedChat.id,
       content: message
     });
 
@@ -44,6 +44,14 @@ export function OpenChannel() {
       }
     }, 100);
   };
+
+  if (selectedChat.chatType === "PROTECTED") {
+    // password logic
+  }
+
+  if (selectedChat.chatType === "PRIVATE") {
+    // private logic
+  }
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -58,12 +66,12 @@ export function OpenChannel() {
             </div>
           </ChatUsersChannelPopOver>
         </div>
-        <h3 className="text-white text-lg">{selectedChannelName}</h3>
+        <h3 className="text-white text-lg">{selectedChat.name}</h3>
         <XCircle
           className="cursor-pointer"
           color="white"
           size={20}
-          onClick={() => handleCloseChat(selectedChannelId)}
+          onClick={() => handleCloseChat(selectedChat.id)}
         />
       </div>
       <div
