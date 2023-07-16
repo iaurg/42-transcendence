@@ -1,19 +1,28 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Key } from "@phosphor-icons/react";
 import { Fragment, useState } from "react";
-import { StatusTag } from "../StatusTag";
+import MFAStatus from "./MFAStatus";
+import MFAWelcome from "./MFAWelcome";
+import MFACode from "./MFACode";
+import MFASuccess from "./MFASuccess";
 
 // #TODO: implementar a lógica de autenticação de dois fatores baseada no Figma
 
 export default function MFAModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState(0); // [0, 1, 2]
 
   function closeModal() {
     setIsOpen(false);
+    setStep(0);
   }
 
   function openModal() {
     setIsOpen(true);
+  }
+
+  function handleStep(step: number) {
+    setStep(step);
   }
 
   return (
@@ -57,23 +66,14 @@ export default function MFAModal() {
                   >
                     Autenticação de dois fatores
                   </Dialog.Title>
-                  <StatusTag status="online" />
-                  <div className="mt-2">
-                    <p className="text-sm text-white">
-                      Your payment has been successfully submitted. Weve sent
-                      you an email with all of the details of your order.
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="submit"
-                      className="bg-purple42-300 text-white rounded-lg p-2 w-full"
-                      onClick={closeModal}
-                    >
-                      Gerar 2FA
-                    </button>
-                  </div>
+                  <MFAStatus status="disabled" />
+                  {step === 0 ? (
+                    <MFAWelcome handleStep={handleStep} />
+                  ) : step === 1 ? (
+                    <MFACode handleStep={handleStep} />
+                  ) : step === 2 ? (
+                    <MFASuccess handleStep={handleStep} />
+                  ) : null}
                 </Dialog.Panel>
               </Transition.Child>
             </div>
