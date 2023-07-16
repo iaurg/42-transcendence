@@ -4,6 +4,7 @@ import { StatusTag } from "../StatusTag";
 import MFAModal from "../MFAModal";
 import { useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
+import EditUserModal from "../EditUserModal";
 
 export function UserInfo() {
   const { user } = useContext(AuthContext);
@@ -18,7 +19,7 @@ export function UserInfo() {
           <div className="text-lg">{user.displayName}</div>{" "}
           <StatusTag status={user.status} />
         </div>
-        <PencilSimple color="white" size={24} />
+        <EditUserModal />
         <MFAModal />
       </div>
     </div>
