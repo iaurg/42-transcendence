@@ -7,6 +7,7 @@ import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
   imports: [
@@ -15,10 +16,11 @@ import { FriendsModule } from './friends/friends.module';
     }),
     UsersModule,
     PrismaModule,
-    AuthModule,
+    // AuthModule,
     ChatModule,
     GameModule,
     FriendsModule,
+    LobbyModule,
   ],
   providers: [PrismaService],
 })
