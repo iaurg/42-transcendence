@@ -1,5 +1,5 @@
 import { ArrowRight, Crown, Lock, TrashSimple } from "@phosphor-icons/react";
-import { use, useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Chat, ChatContext } from "@/contexts/ChatContext";
 import chatService from "@/services/chatClient";
 
@@ -8,7 +8,7 @@ type ChannelCardProps = {
 };
 
 export default function ChannelCard({ chat }: ChannelCardProps) {
-  const { setShowElement, setSelectedChat, selectedChat } = useContext(ChatContext);
+  const { setShowElement, setSelectedChat } = useContext(ChatContext);
   const handleDeleteChannel = () => {
     chatService.socket?.emit("deleteChat", { chatId: chat.id });
   };

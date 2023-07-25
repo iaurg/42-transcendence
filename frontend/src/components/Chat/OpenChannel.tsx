@@ -11,7 +11,7 @@ interface Message {
 }
 
 export function OpenChannel() {
-  const { selectedChat, handleCloseChat, setShowElement } = useContext(ChatContext);
+  const { selectedChat, handleCloseChat, setShowElement, validationRequired, setValidationRequired } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -56,15 +56,9 @@ export function OpenChannel() {
       chatId: selectedChat.id,
       password: data.password,
     });
-    // TODO: Implement this after the merge
-    // if (selectedChat.password) {
-    //   const response = chatService.client?.get(`/verify?chatId=${selectedChat.id}&password=${data.password}`);
-    //   if (response.status === 200)
-    //     setShowElement("showChannelOpen");
-    // }
   };
 
-  if (selectedChat.chatType === "PROTECTED") {
+  if (selectedChat.chatType === "PROTECTED" && validationRequired) {
     return (
       <div className="flex flex-col flex-1 justify-between">
         <div className="flex flex-row justify-between items-center h-9">
@@ -73,7 +67,7 @@ export function OpenChannel() {
             className="cursor-pointer"
             color="white"
             size={20}
-            onClick={() => setShowElement("showChannels")}
+            onClick={() => { setShowElement("showChannels"); setValidationRequired(true); }}
           />
         </div>
         <div className="flex flex-col flex-1 justify-center bg-black42-300 my-4">
@@ -104,10 +98,6 @@ export function OpenChannel() {
         </div>
       </div>
     )
-  }
-
-  if (selectedChat.chatType === "PRIVATE") {
-    // private logic
   }
 
   return (

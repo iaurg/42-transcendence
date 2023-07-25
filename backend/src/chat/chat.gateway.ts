@@ -197,16 +197,16 @@ export class ChatGateway
     const { chatId, password } = chatDto;
     const chat = await this.chatService.getChatById(chatId);
     if (!chat) {
-      client.emit('error', { error: 'Chat not found' });
+      client.emit('joinChat', { error: 'Chat not found' });
       return;
     }
     if (chat.chatType === 'PRIVATE') {
-      client.emit('error', { error: 'Chat is private' });
+      client.emit('joinChat', { error: 'Chat is private' });
       return;
     }
     if (chat.chatType === 'PROTECTED') {
       if (!password) {
-        client.emit('error', { error: 'Password not provided' });
+        client.emit('joinChat', { error: 'Password not provided' });
         return;
       }
       const isValidPassword = await argon2.verify(chat.password, password);
@@ -217,11 +217,12 @@ export class ChatGateway
     }
     const addedUser = await this.chatService.addUserToChat(login, chatId);
     if (!addedUser) {
-      client.emit('error', { error: 'User is already in chat' });
+      client.emit('joinChat', { message: 'User is already in chat', chat });
+      client.join(`chat:${chatId}`);
       return;
     }
     client.join(`chat:${chatId}`);
-    client.emit('joinChat', { message: `You joined chat ${chatId}` });
+    client.emit('joinChat', { message: `You joined chat ${chatId}`, chat });
   }
 
   @SubscribeMessage('leaveChat')
@@ -501,6 +502,20 @@ export class ChatGateway
     client.emit('unmuteMember', {
       message: `You unmuted ${user} from chat ${chatId}`,
     });
+  }
+
+  @SubscribeMessage('verifyPassword')
+  async verifyPassword(
+    @MessageBody('chatId', new ParseIntPipe()) chatId: number,
+    @MessageBody('password') password: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const chat = await this.chatService.verifyChatPassword(chatId, password);
+
+    if (!chat) {
+      return client.emit('verifyPassword', { error: 'Error handling the request' });
+    }
+    return client.emit('verifyPassword', { message: 'Password is correct' });
   }
 
   async getNumberofUsersInChat(chatId: number) {

@@ -19,6 +19,8 @@ type ChatContextType = {
   chatList: ChatList;
   isLoading: boolean;
   handleCloseChat: (chatId: number) => void;
+  setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
+  validationRequired: boolean;
 };
 
 type ChatProviderProps = {
@@ -47,6 +49,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [selectedChat, setSelectedChat] = useState<Chat>({} as Chat);
   const [chatList, setChatList] = useState<ChatList>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [validationRequired, setValidationRequired] = useState(true);
 
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
@@ -55,13 +58,20 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     setShowElement("showChannelOpen");
   };
 
+  const timeout = (delay: number) => {
+    return new Promise(res => setTimeout(res, delay));
+  }
+
   useEffect(() => {
     // Connect to the Socket.IO server
     chatService.connect();
-
+    // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
       setChatList(() => newChatList);
       setIsLoading(false);
+      timeout(10000).then(() => {
+        chatService.socket?.emit("listChats");
+      });
     });
 
     chatService.socket?.on("deleteChat", (deletedChat: any) => {
@@ -71,8 +81,17 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.emit("listChats");
 
     chatService.socket?.on("createChat", (chat: Chat) => {
+      setValidationRequired(false);
       handleOpenChannel(chat);
       setChatList((chatList) => [...chatList, chat]);
+    });
+
+    chatService.socket?.on("joinChat", (response: any) => {
+      if (response.error) {
+        return;
+      }
+      setValidationRequired(false);
+      handleOpenChannel(response.chat);
     });
 
     // Clean up the connection on component unmount
@@ -91,6 +110,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.off("message");
     chatService.socket?.off("listMembers");
     chatService.socket?.off("joinChat");
+    setValidationRequired(true);
     setShowElement("showChannels");
     setIsLoading(false);
   }
@@ -108,6 +128,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         chatList,
         isLoading,
         handleCloseChat,
+        setValidationRequired,
+        validationRequired,
       }}
     >
       {children}
