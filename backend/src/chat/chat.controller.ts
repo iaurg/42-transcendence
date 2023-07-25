@@ -115,9 +115,8 @@ export class ChatController {
       chatId,
       password,
     );
-    if (!verified) throw new HttpException('Incorrect password', 401
-    );
-    return { message: 'Passwords match'};
+    if (!verified) throw new HttpException('Incorrect password', 401);
+    return { message: 'Passwords match' };
   }
 
   @Get()

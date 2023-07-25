@@ -239,7 +239,8 @@ export class ChatGateway
     if (userCount === 0) {
       await this.chatService.deleteChat(chatId);
       client.emit('deleteChat', {
-        message: `Chat ${chatId} has been deleted because there are no more users there`, chatId: chatId
+        message: `Chat ${chatId} has been deleted because there are no more users there`,
+        chatId: chatId,
       });
       return;
     }
@@ -318,7 +319,8 @@ export class ChatGateway
       if (socket) {
         socket.leave(`chat:${chatId}`);
         socket.emit('deleteChat', {
-          message: `Chat ${chatId} has been deleted`, chatId: chatId
+          message: `Chat ${chatId} has been deleted`,
+          chatId: chatId,
         });
       }
     }
