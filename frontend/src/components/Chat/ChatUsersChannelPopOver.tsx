@@ -1,14 +1,11 @@
-import { ChatContext } from "@/contexts/ChatContext";
-import chatService from "@/services/chatClient";
 import { Popover } from "@headlessui/react";
 import {
   Crown,
-  CrownSimple,
   MicrophoneSlash,
   Prohibit,
   SignOut,
 } from "@phosphor-icons/react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { usePopper } from "react-popper";
 
 type ChatUsersChannelPopOverProps = {
@@ -37,8 +34,6 @@ export default function ChatUsersChannelPopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "left",
   });
-  const { selectedChannelId } = useContext(ChatContext);
-
   return (
     <Popover className="absolute">
       <Popover.Button ref={setReferenceElement} className="outline-none">

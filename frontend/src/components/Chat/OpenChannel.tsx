@@ -3,7 +3,7 @@ import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
 import { useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
-
+import { useForm } from "react-hook-form";
 interface Message {
   id: number;
   content: string;
@@ -11,7 +11,7 @@ interface Message {
 }
 
 export function OpenChannel() {
-  const { selectedChat, handleCloseChat } = useContext(ChatContext);
+  const { selectedChat, handleCloseChat, setShowElement } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -45,8 +45,65 @@ export function OpenChannel() {
     }, 100);
   };
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<any>();
+
+  const onSubmit = (data: any) => {
+    chatService.socket?.emit("joinChat", {
+      chatId: selectedChat.id,
+      password: data.password,
+    });
+    // TODO: Implement this after the merge
+    // if (selectedChat.password) {
+    //   const response = chatService.client?.get(`/verify?chatId=${selectedChat.id}&password=${data.password}`);
+    //   if (response.status === 200)
+    //     setShowElement("showChannelOpen");
+    // }
+  };
+
   if (selectedChat.chatType === "PROTECTED") {
-    // password logic
+    return (
+      <div className="flex flex-col flex-1 justify-between">
+        <div className="flex flex-row justify-between items-center h-9">
+          <h3 className="text-white text-lg">{selectedChat.name}</h3>
+          <XCircle
+            className="cursor-pointer"
+            color="white"
+            size={20}
+            onClick={() => setShowElement("showChannels")}
+          />
+        </div>
+        <div className="flex flex-col flex-1 justify-center bg-black42-300 my-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+            <div className="flex flex-col space-y-2">
+              <input
+                type="password"
+                className="bg-black42-400 text-white rounded-lg p-2 placeholder-gray-700"
+                placeholder="Senha do canal"
+                {...register("password", {
+                  required: true,
+                })}
+              />
+              {errors.password && (
+                <span className="text-red-600 text-xs">
+                  Campo obrigatório
+                </span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="bg-purple42-300 text-white rounded-lg p-2 w-full"
+            >
+              Acessar
+            </button>
+          </form>
+        </div>
+      </div>
+    )
   }
 
   if (selectedChat.chatType === "PRIVATE") {

@@ -211,7 +211,7 @@ export class ChatGateway
       }
       const isValidPassword = await argon2.verify(chat.password, password);
       if (!isValidPassword) {
-        client.emit('error', { error: 'Wrong password' });
+        client.emit('joinChat', { error: 'Wrong password' });
         return;
       }
     }

@@ -8,7 +8,7 @@ type ChannelCardProps = {
 };
 
 export default function ChannelCard({ chat }: ChannelCardProps) {
-  const { setShowElement, setSelectedChat } = useContext(ChatContext);
+  const { setShowElement, setSelectedChat, selectedChat } = useContext(ChatContext);
   const handleDeleteChannel = () => {
     chatService.socket?.emit("deleteChat", { chatId: chat.id });
   };

@@ -106,6 +106,20 @@ export class ChatController {
     return bannedMember;
   }
 
+  @Get('/verify')
+  async verifyChatPassword(
+    @Query('chatId', new ParseIntPipe()) chatId: number,
+    @Query('password') password: string,
+  ) {
+    const verified = await this.chatService.verifyChatPassword(
+      chatId,
+      password,
+    );
+    if (!verified) throw new HttpException('Incorrect password', 401
+    );
+    return { message: 'Passwords match'};
+  }
+
   @Get()
   async listChats(@Query('type') ct: chatType, @Query('id') id: number) {
     const chatId = Number(id);

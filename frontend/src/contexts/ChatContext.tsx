@@ -45,11 +45,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showElement, setShowElement] = useState<Elements>("showChannels");
   const [selectedChat, setSelectedChat] = useState<Chat>({} as Chat);
-
   const [chatList, setChatList] = useState<ChatList>([]);
-
   const [isLoading, setIsLoading] = useState(true);
-
 
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
@@ -93,6 +90,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.off("listMessages");
     chatService.socket?.off("message");
     chatService.socket?.off("listMembers");
+    chatService.socket?.off("joinChat");
     setShowElement("showChannels");
     setIsLoading(false);
   }
