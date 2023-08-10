@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { GameDto } from './dto/game.dto';
 import { GameMoveDto } from './dto/game.move';
 import { Player } from './dto/game.player.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class GameService {
+  constructor(private prismaService: PrismaService) {}
+
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
   private MAX_SCORE = 10;
@@ -122,11 +125,35 @@ export class GameService {
     return randomAngle;
   }
 
+  private async storeGameResult(gameDto: GameDto) {
+    /*
+    const player1 = await this.prismaService.user.findFirst({
+      where: { id: gameDto.player1.userId },
+    });
+
+    const player2 = await this.prismaService.user.findFirst({
+      where: { id: gameDto.player2.userId },
+    });
+    */
+
+    //TODO: change to the real winner id from the database
+    const winner =
+      gameDto.score.player1 > gameDto.score.player2
+        ? gameDto.player1
+        : gameDto.player2;
+
+    //TODO: add the game result into the user leaderboard database
+    console.log(
+      `Winner: ${winner.socketId} with ${gameDto.score.player1} points`,
+    );
+  }
+
   isGameFinished(gameDto: GameDto): boolean {
     if (
       gameDto.score.player1 >= this.MAX_SCORE ||
       gameDto.score.player2 >= this.MAX_SCORE
     ) {
+      this.storeGameResult(gameDto);
       gameDto.finished = true;
       return true;
     }
