@@ -1,5 +1,5 @@
 "use client";
-import { GameData } from "@/app/(private)/game/play/page";
+import { GameData } from "@/contexts/GameContext";
 import { Stage, Layer, Rect, Circle, Line } from "react-konva";
 
 type ColoredPaddleProps = {
@@ -15,6 +15,33 @@ const ColoredRect = ({ x, y, width, height }: ColoredPaddleProps) => {
 
 type GameProps = {
   data: GameData;
+};
+
+const gameLayouts = {
+  default: {
+    backgroundColor: "#1F173D",
+    paddleColor: "#9D4EDD",
+    ballColor: "#FF9E00",
+    lineColor: "#9D4EDD",
+  },
+  sunlight: {
+    backgroundColor: "#F9F871",
+    paddleColor: "#F87171",
+    ballColor: "#FF9E00",
+    lineColor: "#9D4EDD",
+  },
+  moonlight: {
+    backgroundColor: "#1F173D",
+    paddleColor: "#00BFFF", // Exclusive color for moonlight layout
+    ballColor: "#FF9E00",
+    lineColor: "#00BFFF", // Exclusive color for moonlight layout
+  },
+  dark: {
+    backgroundColor: "#1F173D",
+    paddleColor: "#5BC236", // Exclusive color for dark layout
+    ballColor: "#FF9E00",
+    lineColor: "#5BC236", // Exclusive color for dark layout
+  },
 };
 
 export default function Game({ data }: GameProps) {

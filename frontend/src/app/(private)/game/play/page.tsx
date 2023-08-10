@@ -1,7 +1,7 @@
 "use client";
 import { GameContext } from "@/contexts/GameContext";
 import dynamic from "next/dynamic";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef } from "react";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
@@ -14,7 +14,9 @@ export default function PlayPage() {
     gameAbandoned,
     gameFinishedData,
     gameData,
+    setGameLayout,
   } = useContext(GameContext);
+
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
 
   if (waitingPlayer2) {
@@ -100,6 +102,46 @@ export default function PlayPage() {
         mt-4
       "
       >
+        <div
+          className="
+          flex
+          flex-row
+          justify-between
+          items-center
+          px-4
+          py-2
+          text-white
+          font-bold
+          w-[80%]
+          mx-auto
+        "
+        >
+          Choose map colour:
+          <button
+            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setGameLayout("default")}
+          >
+            Default
+          </button>
+          <button
+            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setGameLayout("sunlight")}
+          >
+            Sunlight
+          </button>
+          <button
+            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setGameLayout("moonlight")}
+          >
+            Moonlight
+          </button>
+          <button
+            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setGameLayout("dark")}
+          >
+            Dark
+          </button>          
+        </div>
         <div
           className="
             flex
