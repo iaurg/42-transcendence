@@ -127,6 +127,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
     socket.current.on("gameFinished", (data: any) => {
       console.log("gameFinished", data);
+      socket.current?.emit("finishGame");
+      socket.current?.disconnect();
       setGameFinishedData(data);
       setGameFinished(true);
     });
