@@ -90,7 +90,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       if (response.error) {
         return;
       }
-      setValidationRequired(false);
       handleOpenChannel(response.chat);
     });
 

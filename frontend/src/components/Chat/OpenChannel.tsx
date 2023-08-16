@@ -29,6 +29,17 @@ export function OpenChannel() {
     setUsers(members);
   });
 
+  chatService.socket?.on("verifyPassword", (response: any) => {
+    if (response.error) {
+      setError("password", {
+        type: "manual",
+        message: "Senha incorreta"
+      });
+      return;
+    }
+    setValidationRequired(false);
+  });
+
   const handleSendMessage = () => {
     chatService.socket?.emit("message", {
       chatId: selectedChat.id,
@@ -45,13 +56,22 @@ export function OpenChannel() {
     }, 100);
   };
 
+  type FormInputs = {
+    password: string;
+  }
+
   const {
     register,
+    setError,
     handleSubmit,
     formState: { errors },
-  } = useForm<any>();
+  } = useForm<FormInputs>();
 
-  const onSubmit = (data: any) => {
+  const handleForm = (data: any) => {
+    chatService.socket?.emit("verifyPassword", {
+      chatId: selectedChat.id,
+      password: data.password,
+    });
     chatService.socket?.emit("joinChat", {
       chatId: selectedChat.id,
       password: data.password,
@@ -71,19 +91,17 @@ export function OpenChannel() {
           />
         </div>
         <div className="flex flex-col flex-1 justify-center bg-black42-300 my-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <form onSubmit={handleSubmit(handleForm)} className="space-y-3">
             <div className="flex flex-col space-y-2">
               <input
                 type="password"
                 className="bg-black42-400 text-white rounded-lg p-2 placeholder-gray-700"
                 placeholder="Senha do canal"
-                {...register("password", {
-                  required: true,
-                })}
+                {...register("password", { required: true })}
               />
               {errors.password && (
                 <span className="text-red-600 text-xs">
-                  Campo obrigatório
+                  Senha incorreta
                 </span>
               )}
             </div>
