@@ -67,11 +67,11 @@ export class ChatGateway
     const { chatId, content } = messageDto;
     const member = await this.chatService.getMemberFromChat(chatId, login);
     if (!member) {
-      client.emit('message', { error: 'You are not a member of this chat' });
+      client.emit('error', { error: 'You are not a member of this chat' });
       return;
     }
     if (member.status !== 'ACTIVE') {
-      client.emit('message', { error: 'You are not allowed to send messages' });
+      client.emit('error', { error: 'You are not allowed to send messages' });
       return;
     }
 
@@ -81,16 +81,19 @@ export class ChatGateway
       content,
     );
     await this.addConnectedUsersToChat(chatId);
-    this.server.to(`chat:${chatId}`).emit('newMessage', newMessage);
-    client.emit('message', { message: 'Message sent' });
+    this.server.to(`chat:${chatId}`).emit('message', newMessage);
   }
 
   @SubscribeMessage('listMessages')
   async listMessages(
-    @MessageBody(new ParseIntPipe()) chatId: number,
+    @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
-    const messages = await this.chatService.listChatsById(chatId);
+    const messages = await this.chatService.getMessagesByChatId(chatId);
+    if (!messages) {
+      client.emit('error', { error: 'Failed to list messages' });
+      return;
+    }
     client.emit('listMessages', messages);
   }
 
@@ -103,10 +106,14 @@ export class ChatGateway
 
   @SubscribeMessage('listMembers')
   async listMembers(
-    @MessageBody(new ParseIntPipe()) chatId: number,
+    @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
     const members = await this.chatService.listMembersByChatId(chatId);
+    if (!members) {
+      client.emit('error', { error: 'No members found!' });
+      return;
+    }
     client.emit('listMembers', members);
   }
 
@@ -210,11 +217,12 @@ export class ChatGateway
     }
     const addedUser = await this.chatService.addUserToChat(login, chatId);
     if (!addedUser) {
-      client.emit('joinChat', { error: 'Failed to add user to chat' });
+      client.emit('joinChat', { message: 'User is already in chat', chat });
+      client.join(`chat:${chatId}`);
       return;
     }
     client.join(`chat:${chatId}`);
-    client.emit('joinChat', { message: `You joined chat ${chatId}` });
+    client.emit('joinChat', { message: `You joined chat ${chatId}`, chat });
   }
 
   @SubscribeMessage('leaveChat')
@@ -233,6 +241,7 @@ export class ChatGateway
       await this.chatService.deleteChat(chatId);
       client.emit('deleteChat', {
         message: `Chat ${chatId} has been deleted because there are no more users there`,
+        chatId: chatId,
       });
       return;
     }
@@ -288,12 +297,12 @@ export class ChatGateway
     // Verify if the user is admin or the chat owner
     const chat = await this.chatService.getChatById(chatId);
     if (!chat) {
-      client.emit('deleteChat', { error: 'Chat not found' });
+      client.emit('error', { error: 'Chat not found' });
       return;
     }
     const member = await this.chatService.getMemberFromChat(chatId, login);
     if (!member || member.role === 'MEMBER') {
-      client.emit('deleteChat', {
+      client.emit('error', {
         error: 'You are not allowed to delete this chat',
       });
       return;
@@ -302,7 +311,7 @@ export class ChatGateway
     const deletedChat = await this.chatService.deleteChat(chatId);
 
     if (!deletedChat) {
-      client.emit('deleteChat', { error: 'Failed to delete chat' });
+      client.emit('error', { error: 'Failed to delete chat' });
       return;
     }
     // Everybody leave chat
@@ -310,8 +319,9 @@ export class ChatGateway
       const socket = this.connectedUsers[member.userLogin];
       if (socket) {
         socket.leave(`chat:${chatId}`);
-        socket.emit('leaveChat', {
+        socket.emit('deleteChat', {
           message: `Chat ${chatId} has been deleted`,
+          chatId: chatId,
         });
       }
     }
@@ -494,6 +504,20 @@ export class ChatGateway
     });
   }
 
+  @SubscribeMessage('verifyPassword')
+  async verifyPassword(
+    @MessageBody('chatId', new ParseIntPipe()) chatId: number,
+    @MessageBody('password') password: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const chat = await this.chatService.verifyChatPassword(chatId, password);
+
+    if (!chat) {
+      return client.emit('verifyPassword', { error: 'Error handling the request' });
+    }
+    return client.emit('verifyPassword', { message: 'Password is correct' });
+  }
+
   async getNumberofUsersInChat(chatId: number) {
     const numberOfUsers = await this.chatService.getNumberOfUsersByChatId(
       chatId,
@@ -529,14 +553,6 @@ export class ChatGateway
     // TODO: Remove this after implementing chat rooms
     for (const chat of chats) {
       client.join(`chat:${chat.id.toString()}`);
-      client.emit('joinChat', { message: `You joined chat ${chat.id}` });
-    }
-    for (const chat of chats) {
-      const messages = await this.chatService.getMessagesByChatId(chat.id);
-      console.log(
-        `User ${login} received ${messages.length} messages from chat ${chat.id}`,
-      );
-      client.emit('listMessages', messages);
     }
   }
 

@@ -1,10 +1,16 @@
+import chatService from "@/services/chatClient";
 import { XCircle } from "@phosphor-icons/react";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 type ListCreateChannelProps = {
   handleHideCreateChannel: () => void;
 };
+
+interface IFormInput {
+  name: string;
+  chatType: string;
+  password?: string;
+}
 
 export default function ListCreateChannel({
   handleHideCreateChannel,
@@ -14,11 +20,18 @@ export default function ListCreateChannel({
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm();
+  } = useForm<IFormInput>();
 
-  const onSubmit = (data: any) => console.log(data);
 
   const chatType = watch("chatType", "");
+
+  const onSubmit = (data: IFormInput) => {
+    chatService.socket?.emit("createChat", {
+      chatName: data.name,
+      chatType: chatType.toUpperCase(),
+      ...(data.password?.length) && { password: data.password },
+    });
+  };
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -55,13 +68,13 @@ export default function ListCreateChannel({
             >
               <option value="">Selecione</option>
               <option value="public">Público</option>
-              <option value="private">Privado</option>
+              <option value="protected">Privado</option>
             </select>
             {errors.chatType && (
               <span className="text-red-600 text-xs">Campo obrigatório</span>
             )}
 
-            {chatType === "private" && (
+            {chatType === "protected" && (
               <>
                 <input
                   type="password"

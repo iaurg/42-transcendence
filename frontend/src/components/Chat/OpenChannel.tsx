@@ -1,155 +1,50 @@
-import { ChatContext } from "@/contexts/ChatContext";
+import { ChatContext, ChatList } from "@/contexts/ChatContext";
 import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
-import { useContext, useState } from "react";
-import ChatUsersChannelPopOver from "./ChatUsersChannelPopOver";
+import { useContext, useEffect, useState } from "react";
+import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
+import chatService from "@/services/chatClient";
+import { useForm } from "react-hook-form";
+interface Message {
+  id: number;
+  content: string;
+  userLogin: string;
+}
 
 export function OpenChannel() {
-  const { setShowElement, selectedChannelId } = useContext(ChatContext);
-  const [message, setMessage] = useState("");
+  const { selectedChat, handleCloseChat, setShowElement, validationRequired, setValidationRequired } = useContext(ChatContext);
+  // List messages from the websocket
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
+  const [users, setUsers] = useState<ChatMember[]>([]);
 
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      content: "Olá, tudo bem?",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 2,
-      content: "Tudo ótimo, e você?",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 3,
-      content: "Estou bem também, obrigado por perguntar!",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 4,
-      content: "Que bom!",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 5,
-      content: "E como foi o seu dia?",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 6,
-      content: "Foi um dia tranquilo. E o seu?",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 7,
-      content:
-        "O meu dia também foi bom. Estou animado para o final de semana!",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 8,
-      content:
-        "Com certeza! Vai ser ótimo descansar e aproveitar o tempo livre.",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 9,
-      content: "Você tem algum plano específico para o final de semana?",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 10,
-      content:
-        "Eu vou sair para jantar com alguns amigos no sábado à noite. E você?",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 11,
-      content:
-        "Eu vou aproveitar para descansar e assistir alguns filmes e séries.",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 12,
-      content: "Que legal! Espero que você se divirta.",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-    {
-      id: 13,
-      content: "Obrigado!",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 14,
-      content: "Bom, eu preciso ir agora. Até mais!",
-      user: {
-        id: 1,
-        name: "João",
-      },
-    },
-    {
-      id: 15,
-      content: "Até mais!",
-      user: {
-        id: 2,
-        name: "Maria",
-      },
-    },
-  ]);
+  chatService.socket?.on("listMessages", (messages: Message[]) => {
+    setMessages(() => messages);
+  });
+  chatService.socket?.on("message", (message: Message) => {
+    setMessages([...messages, message]);
+  });
+  chatService.socket?.on("listMembers", (members: ChatMember[]) => {
+    setNumberOfUsersInChat(members.length);
+    setUsers(members);
+  });
+
+  chatService.socket?.on("verifyPassword", (response: any) => {
+    if (response.error) {
+      setError("password", {
+        type: "manual",
+        message: "Senha incorreta"
+      });
+      return;
+    }
+    setValidationRequired(false);
+  });
 
   const handleSendMessage = () => {
-    console.log("sending message");
-    // fake add message into messages array ramdomly to simulate a real time chat
-    const randomId = Math.floor(Math.random() * 1000);
-    const randomUserId = Math.floor(Math.random() * 2) + 1;
-    const randomUser = randomUserId === 1 ? "João" : "Maria";
-    const newMessage = {
-      id: randomId,
-      content: message,
-      user: {
-        id: randomUserId,
-        name: randomUser,
-      },
-    };
-
-    setMessages([...messages, newMessage]);
+    chatService.socket?.emit("message", {
+      chatId: selectedChat.id,
+      content: message
+    });
 
     setMessage("");
 
@@ -161,23 +56,87 @@ export function OpenChannel() {
     }, 100);
   };
 
+  type FormInputs = {
+    password: string;
+  }
+
+  const {
+    register,
+    setError,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormInputs>();
+
+  const handleForm = (data: any) => {
+    chatService.socket?.emit("verifyPassword", {
+      chatId: selectedChat.id,
+      password: data.password,
+    });
+    chatService.socket?.emit("joinChat", {
+      chatId: selectedChat.id,
+      password: data.password,
+    });
+  };
+
+  if (selectedChat.chatType === "PROTECTED" && validationRequired) {
+    return (
+      <div className="flex flex-col flex-1 justify-between">
+        <div className="flex flex-row justify-between items-center h-9">
+          <h3 className="text-white text-lg">{selectedChat.name}</h3>
+          <XCircle
+            className="cursor-pointer"
+            color="white"
+            size={20}
+            onClick={() => { setShowElement("showChannels"); setValidationRequired(true); }}
+          />
+        </div>
+        <div className="flex flex-col flex-1 justify-center bg-black42-300 my-4">
+          <form onSubmit={handleSubmit(handleForm)} className="space-y-3">
+            <div className="flex flex-col space-y-2">
+              <input
+                type="password"
+                className="bg-black42-400 text-white rounded-lg p-2 placeholder-gray-700"
+                placeholder="Senha do canal"
+                {...register("password", { required: true })}
+              />
+              {errors.password && (
+                <span className="text-red-600 text-xs">
+                  Senha incorreta
+                </span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="bg-purple42-300 text-white rounded-lg p-2 w-full"
+            >
+              Acessar
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-8">
         <div className="flex items-center">
-          <ChatUsersChannelPopOver>
+          <ChatUsersChannelPopOver
+            users={users}
+          >
             <div className="flex space-x-1 items-center">
-              <span className="text-xs">(12)</span>
+              <span className="text-xs">({numberOfUsersInChat})</span>
               <UsersThree className="text-white" size={20} />
             </div>
           </ChatUsersChannelPopOver>
         </div>
-        <h3 className="text-white text-lg">{selectedChannelId}</h3>
+        <h3 className="text-white text-lg">{selectedChat.name}</h3>
         <XCircle
           className="cursor-pointer"
           color="white"
           size={20}
-          onClick={() => setShowElement("showChannels")}
+          onClick={() => handleCloseChat(selectedChat.id)}
         />
       </div>
       <div
@@ -186,16 +145,16 @@ export function OpenChannel() {
             scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
       >
         {/* add alternated users messages inside scrollable area */}
-        {messages.map((message) => (
+        {messages.map((message: any) => (
           <div
             key={message.id}
-            className={`${
-              message.user.id === 1
-                ? "text-white bg-purple42-200 self-end"
-                : "text-white bg-black42-300 self-start"
-            } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
+            // TODO: Implement user context to compare user login with message user
+            className={`${message.userLogin === 'caio'
+              ? "text-white bg-purple42-200 self-end"
+              : "text-white bg-black42-300 self-start"
+              } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
           >
-            <span className="font-semibold">{message.user.name}: </span>
+            <span className="font-semibold">{message.userLogin}: </span>
             {message.content}
           </div>
         ))}

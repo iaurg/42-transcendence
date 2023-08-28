@@ -107,6 +107,10 @@ export class ChatService {
       },
     });
 
+    if (members.length === 0) {
+      return null;
+    }
+
     return members;
   }
 
@@ -583,5 +587,25 @@ export class ChatService {
       console.log(error);
       return null;
     }
+  }
+
+  async verifyChatPassword(chatId: number, password: string): Promise<boolean> {
+    const chat = await this.prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+    });
+
+    if (!chat) {
+      return false;
+    }
+
+    if (!chat.password) {
+      return true;
+    }
+
+    const isPasswordValid = await argon2.verify(chat.password, password);
+
+    return isPasswordValid;
   }
 }

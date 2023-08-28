@@ -1,6 +1,6 @@
 "use client";
+import chatService from "@/services/chatClient";
 import React, { createContext, useEffect, useState } from "react";
-import { io } from "socket.io-client";
 
 type Elements =
   | "showChannels"
@@ -14,9 +14,13 @@ type ChatContextType = {
   showElement: Elements;
   setShowElement: React.Dispatch<React.SetStateAction<Elements>>;
   handleToggleCollapse: () => void;
-  selectedChannelId: string;
-  setSelectedChannelId: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedChat: React.Dispatch<React.SetStateAction<Chat>>;
+  selectedChat: Chat;
   chatList: ChatList;
+  isLoading: boolean;
+  handleCloseChat: (chatId: number) => void;
+  setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
+  validationRequired: boolean;
 };
 
 type ChatProviderProps = {
@@ -33,7 +37,7 @@ export type Chat = {
   owner: string;
 };
 
-type ChatList = Chat[];
+export type ChatList = Chat[];
 
 export const ChatContext = createContext<ChatContextType>(
   {} as ChatContextType
@@ -42,42 +46,76 @@ export const ChatContext = createContext<ChatContextType>(
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [showElement, setShowElement] = useState<Elements>("showChannels");
-  const [selectedChannelId, setSelectedChannelId] = useState<string>("");
-
+  const [selectedChat, setSelectedChat] = useState<Chat>({} as Chat);
   const [chatList, setChatList] = useState<ChatList>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [validationRequired, setValidationRequired] = useState(true);
+
+  const handleOpenChannel = (chat: Chat) => {
+    setSelectedChat(chat);
+    // check if chat has an id
+    if (chat.id) {
+      chatService.socket?.emit("listMessages", { chatId: chat.id });
+      chatService.socket?.emit("listMembers", { chatId: chat.id });
+    }
+    setShowElement("showChannelOpen");
+  };
+
+  const timeout = (delay: number) => {
+    return new Promise(res => setTimeout(res, delay));
+  }
 
   useEffect(() => {
     // Connect to the Socket.IO server
-    const socket = io("http://localhost:3000/chat", {
-      transports: ["websocket", "polling", "flashsocket"],
+    chatService.connect();
+    // Listen for incoming messages recursively every 10 seconds
+    chatService.socket?.on("listChats", (newChatList: ChatList) => {
+      setChatList(() => newChatList);
+      setIsLoading(false);
+      timeout(10000).then(() => {
+        chatService.socket?.emit("listChats");
+      });
     });
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the WebSocket server");
+    chatService.socket?.on("deleteChat", (deletedChat: any) => {
+      setChatList((chatList) => chatList.filter((chat: Chat) => chat.id !== deletedChat.chatId));
     });
 
-    socket.on("connect", () => {
-      socket.emit("listChats");
-    });
+    chatService.socket?.emit("listChats");
 
-    socket.on("listChats", (chatList: ChatList) => {
-      setChatList(() => chatList);
-    });
-
-    socket.on("createChat", (chat: any) => {
-      console.log("createChat", chat);
+    chatService.socket?.on("createChat", (chat: Chat) => {
+      setValidationRequired(false);
+      handleOpenChannel(chat);
       setChatList((chatList) => [...chatList, chat]);
+    });
+
+    chatService.socket?.on("joinChat", (response: any) => {
+      if (response.error) {
+        return;
+      }
+      handleOpenChannel(response.chat);
     });
 
     // Clean up the connection on component unmount
     return () => {
-      socket.disconnect();
+      chatService.socket?.disconnect();
     };
   }, []);
 
   const handleToggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
+
+  const handleCloseChat = (chatId: number) => {
+    setIsLoading(true);
+    chatService.socket?.off("listMessages");
+    chatService.socket?.off("message");
+    chatService.socket?.off("listMembers");
+    chatService.socket?.off("joinChat");
+    setValidationRequired(true);
+    setShowElement("showChannels");
+    setIsLoading(false);
+  }
 
   return (
     <ChatContext.Provider
@@ -87,9 +125,13 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         showElement,
         setShowElement,
         handleToggleCollapse,
-        selectedChannelId,
-        setSelectedChannelId,
+        setSelectedChat,
+        selectedChat,
         chatList,
+        isLoading,
+        handleCloseChat,
+        setValidationRequired,
+        validationRequired,
       }}
     >
       {children}
