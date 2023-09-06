@@ -1,63 +1,161 @@
 import { Injectable } from '@nestjs/common';
 import { GameDto } from './dto/game.dto';
+import { GameMoveDto } from './dto/game.move';
+import { Player } from './dto/game.player.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class GameService {
-  initGame(player1Id: string): GameDto {
-    const gameDto: GameDto = {
-      player1: {
-        id: player1Id,
-        x: 10,
-        y: 10,
-      },
-      player2: undefined,
-      ball: {
-        x: 400,
-        y: 300,
-        dx: 4,
-        dy: 4,
-        radius: 0,
-      },
-      canvas: {
-        width: 800,
-        height: 600,
-      },
-    };
-    return gameDto;
-  }
+  constructor(private prismaService: PrismaService) {}
 
-  joinPlayer2(gameDto: GameDto, player2Id: string) {
-    gameDto.player2 = {
-      id: player2Id,
-      x: gameDto.canvas.width - 10,
-      y: gameDto.canvas.height - 10,
-    };
-  }
-
-  updateGame(GameDto: GameDto) {
-    this.updateBallPosition(GameDto);
-  }
+  public PADDLE_WIDTH: number;
+  public PADDLE_HEIGHT: number;
+  private MAX_SCORE = 10;
+  private BALL_SPEED = 6;
+  private BALL_ACCELERATION = 1.1;
 
   updateBallPosition(gameDto: GameDto) {
     gameDto.ball.x += gameDto.ball.dx;
     gameDto.ball.y += gameDto.ball.dy;
 
-    // Collision detection with walls
+    this.calculateBallBounce(gameDto);
+    this.calculateBallCollision(gameDto);
+  }
+
+  private calculateBallBounce(gameDto: GameDto) {
     if (
       gameDto.ball.y + gameDto.ball.radius > gameDto.canvas.height ||
       gameDto.ball.y - gameDto.ball.radius < 0
     ) {
       gameDto.ball.dy *= -1;
     }
-    if (
-      gameDto.ball.x + gameDto.ball.radius > gameDto.canvas.width ||
-      gameDto.ball.x - gameDto.ball.radius < 0
-    ) {
+  }
+
+  private calculateBallCollision(gameDto: GameDto) {
+    if (this.isPlayerCollision(gameDto)) {
       gameDto.ball.dx *= -1;
+      gameDto.ball.dx *= this.BALL_ACCELERATION;
+      gameDto.ball.dy *= this.BALL_ACCELERATION;
     }
   }
 
-  updatePlayerPosition(playerId: string, GameDto: GameDto) {
-    // Lógica do player
+  private isPlayerCollision(gameDto: GameDto): boolean {
+    if (
+      gameDto.ball.x + gameDto.ball.radius >
+      gameDto.canvas.width - this.PADDLE_WIDTH
+    ) {
+      if (
+        gameDto.ball.y > gameDto.player2.y &&
+        gameDto.ball.y < gameDto.player2.y + this.PADDLE_HEIGHT &&
+        gameDto.ball.dx > 0
+      ) {
+        return true;
+      }
+    } else if (gameDto.ball.x - gameDto.ball.radius < this.PADDLE_WIDTH) {
+      if (
+        gameDto.ball.y > gameDto.player1.y &&
+        gameDto.ball.y < gameDto.player1.y + this.PADDLE_HEIGHT &&
+        gameDto.ball.dx < 0
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  updatePlayerPosition(gameDto: GameDto, moveInfo: GameMoveDto) {
+    if (moveInfo.player_id == gameDto.player1.socketId) {
+      if (moveInfo.direction == 'UP') {
+        this.movePlayerUp(gameDto.player1);
+      } else if (moveInfo.direction == 'DOWN') {
+        this.movePlayerDown(gameDto.player1, gameDto.canvas.height);
+      }
+    } else if (moveInfo.player_id == gameDto.player2.socketId) {
+      if (moveInfo.direction == 'UP') {
+        this.movePlayerUp(gameDto.player2);
+      } else if (moveInfo.direction == 'DOWN') {
+        this.movePlayerDown(gameDto.player2, gameDto.canvas.height);
+      }
+    }
+  }
+
+  private movePlayerUp(player: Player) {
+    if (player.y >= 0) player.y -= 10;
+  }
+
+  private movePlayerDown(player: Player, canvasHeight: number) {
+    if (player.y + this.PADDLE_HEIGHT <= canvasHeight) player.y += 10;
+  }
+
+  isPointScored(gameDto: GameDto): boolean {
+    if (gameDto.ball.x + gameDto.ball.radius > gameDto.canvas.width) {
+      return true;
+    } else if (gameDto.ball.x - gameDto.ball.radius < 0) {
+      return true;
+    }
+    return false;
+  }
+
+  addPoint(gameDto: GameDto) {
+    if (gameDto.ball.x > gameDto.canvas.width / 2) {
+      gameDto.score.player1++;
+    } else {
+      gameDto.score.player2++;
+    }
+  }
+
+  restartBall(gameDto: GameDto) {
+    gameDto.ball.x = gameDto.canvas.width / 2;
+    gameDto.ball.y = gameDto.canvas.height / 2;
+
+    const directionY = Math.random() < 0.5 ? 1 : -1;
+    const directionX = Math.random() < 0.5 ? 1 : -1;
+    const angle = this.getRandomAngle();
+
+    gameDto.ball.dx = this.BALL_SPEED * Math.cos(angle) * directionX;
+    gameDto.ball.dy = this.BALL_SPEED * Math.sin(angle) * directionY;
+  }
+
+  private getRandomAngle() {
+    const angles = [25, 35, 45, 55];
+    const randomIndex = Math.floor(Math.random() * angles.length);
+    const randomDegree = angles[randomIndex];
+
+    const randomAngle = (randomDegree * Math.PI) / 180;
+    return randomAngle;
+  }
+
+  private async storeGameResult(gameDto: GameDto) {
+    /*
+    const player1 = await this.prismaService.user.findFirst({
+      where: { id: gameDto.player1.userId },
+    });
+
+    const player2 = await this.prismaService.user.findFirst({
+      where: { id: gameDto.player2.userId },
+    });
+    */
+
+    //TODO: change to the real winner id from the database
+    const winner =
+      gameDto.score.player1 > gameDto.score.player2
+        ? gameDto.player1
+        : gameDto.player2;
+
+    //TODO: add the game result into the user leaderboard database
+    console.log(
+      `Winner: ${winner.socketId} with ${gameDto.score.player1} points`,
+    );
+  }
+
+  isGameFinished(gameDto: GameDto): boolean {
+    if (
+      gameDto.score.player1 >= this.MAX_SCORE ||
+      gameDto.score.player2 >= this.MAX_SCORE
+    ) {
+      this.storeGameResult(gameDto);
+      gameDto.finished = true;
+      return true;
+    }
   }
 }

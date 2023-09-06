@@ -16,7 +16,7 @@ import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 
-@Controller('users')
+@Controller('user*')
 export class UsersController {
   constructor(private service: UsersService) {}
 

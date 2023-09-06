@@ -1,5 +1,8 @@
 export class Player {
-  id: string;
+  socketId: string;
+  userId: string;
   x: number;
   y: number;
+  width: number;
+  height: number;
 }

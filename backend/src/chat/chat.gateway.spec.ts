@@ -1,20 +1,64 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
-import { PrismaService } from '../prisma/prisma.service';
-
+import { ChatServiceMock } from './chat.service.mock';
+import { Server } from 'socket.io';
+import { SocketIOClientMock } from './socket.io-mock-client';
+import { ChatDto } from './dto';
 describe('ChatGateway', () => {
-  let gateway: ChatGateway;
+  let server;
+  let client;
+  const chatId = 1;
+  beforeAll(async () => {
+    // Start server
+    server = new Server();
+    server.listen(3333);
+
+    // Connect client
+    client = new SocketIOClientMock(chatId);
+  });
+
+  afterAll(async () => {
+    // Close server
+    server.close();
+  });
+
+  let chatGateway: ChatGateway;
+  let chatService: ChatService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChatGateway, ChatService, PrismaService],
+      providers: [
+        ChatGateway,
+        {
+          provide: ChatService,
+          useClass: ChatServiceMock,
+        },
+      ],
     }).compile();
 
-    gateway = module.get<ChatGateway>(ChatGateway);
+    chatGateway = module.get<ChatGateway>(ChatGateway);
+    chatService = module.get<ChatService>(ChatService);
   });
 
   it('should be defined', () => {
-    expect(gateway).toBeDefined();
+    expect(chatGateway).toBeDefined();
+  });
+
+  it('should join a chat successfully', async () => {
+    const login = 'testUser';
+    const chatDto: ChatDto = {
+      chatId: 1,
+      password: 'password',
+    };
+
+    const getChatByIdSpy = jest.spyOn(chatService, 'getChatById');
+    const addUserToChatSpy = jest.spyOn(chatService, 'addUserToChat');
+    const joinChatSpy = jest.spyOn(chatGateway, 'joinChat');
+    await chatGateway.joinChat(login, chatDto, client);
+
+    expect(getChatByIdSpy).toBeCalledWith(chatId);
+    expect(addUserToChatSpy).toBeCalledWith(login, chatId);
+    expect(joinChatSpy).toBeCalledWith(login, chatDto, client);
   });
 });

@@ -1,7 +1,6 @@
 import { Popover } from "@headlessui/react";
 import {
   Crown,
-  CrownSimple,
   MicrophoneSlash,
   Prohibit,
   SignOut,
@@ -10,10 +9,21 @@ import { useState } from "react";
 import { usePopper } from "react-popper";
 
 type ChatUsersChannelPopOverProps = {
+  users: ChatMember[];
   children: React.ReactNode;
 };
 
+type chatMemberRole = "OWNER" | "ADMIN" | "MEMBER"
+
+export interface ChatMember {
+  id: number
+  chatId: number
+  userLogin: string
+  role: chatMemberRole
+}
+
 export default function ChatUsersChannelPopOver({
+  users,
   children,
 }: ChatUsersChannelPopOverProps) {
   const [referenceElement, setReferenceElement] =
@@ -24,30 +34,6 @@ export default function ChatUsersChannelPopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "left",
   });
-
-  const fakeUsers = [
-    {
-      id: 1,
-      name: "João",
-    },
-    {
-      id: 2,
-      name: "Maria",
-    },
-    {
-      id: 3,
-      name: "José",
-    },
-    {
-      id: 4,
-      name: "Pedro",
-    },
-    {
-      id: 5,
-      name: "Ana",
-    },
-  ];
-
   return (
     <Popover className="absolute">
       <Popover.Button ref={setReferenceElement} className="outline-none">
@@ -61,12 +47,12 @@ export default function ChatUsersChannelPopOver({
         {...attributes.popper}
       >
         <div className="p-3">
-          {fakeUsers.map((user) => (
+          {users.map((user) => (
             <div
               className="flex items-center space-x-4 mb-4 justify-between"
               key={user.id}
             >
-              <div>{user.name}</div>
+              <div>{user.userLogin}</div>
               <div className="flex items-center space-x-2">
                 <Crown
                   className="cursor-pointer text-orange42-500"
