@@ -1,8 +1,10 @@
 import Image from "next/image";
+import { Toaster } from "react-hot-toast";
 
 export default function Page() {
   return (
     <div className="max-w-screen-xl m-auto">
+      <Toaster />
       <div className="flex flex-col h-screen md:flex-row">
         <div className="flex flex-col md:flex-1">
           <div className="flex flex-col flex-1 justify-center items-center md:items-start mx-4">

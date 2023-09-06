@@ -7,6 +7,7 @@ import Chat from "@/components/Chat";
 import Header from "@/components/Header";
 import Providers from "../login/providers";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Game | 42 Transcendence",
@@ -21,6 +22,7 @@ export default function RootPrivateLayout({
   return (
     <html lang="en">
       <body className="bg-black42-100 flex">
+        <Toaster />
         <Providers>
           <div className="flex flex-col md:flex-row">
             <Sidebar />

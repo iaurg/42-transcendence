@@ -52,7 +52,7 @@ export type MovePlayerData = {
   direction: string;
 };
 
-export type GameLayout = 'default' | 'sunlight' | 'moonlight' | 'dark';
+export type GameLayout = "default" | "sunlight" | "moonlight" | "dark";
 
 type GameContextType = {
   waitingPlayer2: boolean;
@@ -79,7 +79,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [clientId, setClientId] = useState("");
   const [gameData, setGameData] = useState({} as GameData);
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
-  const [gameLayout, setGameLayout] = useState<GameLayout>('default');
+  const [gameLayout, setGameLayout] = useState<GameLayout>("default");
 
   const socket = useRef<Socket | null>(null);
 
@@ -180,8 +180,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameAbandoned,
         gameFinishedData,
         gameData,
-        gameLayout, 
-        setGameLayout
+        gameLayout,
+        setGameLayout,
       }}
     >
       {children}

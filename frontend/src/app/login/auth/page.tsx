@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 // TODO: refactor states and input to be a client component, and use the client component here, also remove use client from top
 
@@ -22,6 +23,7 @@ export default function AuthPage() {
 
   const handleSubmit = () => {
     // Handle submission logic here
+    toast.success("Código validado com sucesso!");
     console.log("Submitted code:", code);
     router.push("/game");
   };
