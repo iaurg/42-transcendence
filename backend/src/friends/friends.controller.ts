@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UpdateFriendDto } from './dto/updateFriend.dto';
 import { FriendsService } from './friends.service';
 import { CreateFriendDto } from './dto/createFriend.dto';
@@ -10,7 +19,20 @@ export class FriendsController {
 
   @Post()
   async createFriend(@Body() createFriendDto: CreateFriendDto) {
-    return this.friendsService.createFriend(createFriendDto);
+    try {
+      return this.friendsService.createFriend(createFriendDto);
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_MODIFIED,
+          error: 'Friend not created',
+        },
+        HttpStatus.NOT_MODIFIED,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   @Get()
