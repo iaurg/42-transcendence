@@ -1,5 +1,5 @@
 type StatusTagProps = {
-  status: "online" | "offline" | "away";
+  status: "online" | "offline" | "away" | "busy";
 };
 
 export function StatusTag({ status }: StatusTagProps) {

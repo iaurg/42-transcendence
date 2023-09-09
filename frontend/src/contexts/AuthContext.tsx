@@ -27,7 +27,7 @@ export type User = {
   displayName: string;
   email: string;
   avatar: string;
-  status: string;
+  status: "online" | "offline" | "away" | "busy";
   victory: number;
   mfaEnabled: boolean;
 };
