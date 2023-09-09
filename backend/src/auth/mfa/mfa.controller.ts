@@ -40,10 +40,18 @@ export class MultiFactorAuthController {
   @Post('disable')
   async disableMfa(
     @Req() req: Request,
+    @Body() mfaPayload: MfaPayload,
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = req.user as User;
 
+    const isCodeValid = await this.mfaService.isCodeValid(
+      user,
+      mfaPayload.code,
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Invalid 2FA code');
+    }
     try {
       return await this.mfaService.disableMfa(user, res);
     } catch (error) {
