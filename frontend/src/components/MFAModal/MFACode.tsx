@@ -29,8 +29,8 @@ export default function MFACode({ handleStep }: MFACodeProps) {
         console.log(e);
       });
   };
+  const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
-  // TODO fix hardcoded URL
   return (
     <>
       <div className="mt-2"></div>
@@ -40,7 +40,7 @@ export default function MFACode({ handleStep }: MFACodeProps) {
           ""
         ) : (
           <img
-            src="http://localhost:3000/auth/2fa/generate"
+            src={`${baseURL}/auth/2fa/generate`}
             width={200}
             height={200}
             alt="QR Code"
