@@ -49,7 +49,6 @@ export function signOut() {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [payload, setPayload] = useState<TokenPayload>({} as TokenPayload);
   const [user, setUser] = useState<User>({} as User);
-  // TODO validate token
 
   useEffect(() => {
     const { accessToken } = nookies.get(null, "accesssToken");
