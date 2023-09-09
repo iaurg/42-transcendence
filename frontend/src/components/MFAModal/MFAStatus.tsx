@@ -1,15 +1,11 @@
-export default function MFAStatus({
-    status
-}: {
-    status: "enabled" | "disabled";
-}) {
-    let color = "";
+export default function MFAStatus({ status }: { status: boolean }) {
+  let color = "";
 
   switch (status) {
-    case "enabled":
+    case true:
       color = "bg-green-500";
       break;
-    case "disabled":
+    case false:
       color = "bg-red-500";
       break;
     default:
@@ -17,11 +13,11 @@ export default function MFAStatus({
       break;
   }
 
-    return(
-        <span
-        className={`inline-block px-2 py-0.5 text-xs font-semibold text-white ${color} rounded-full`}
-        >
-            Autenticação { status === "enabled" ? "ativada" : "desativada" }
-        </span>
-    )
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 text-xs font-semibold text-white ${color} rounded-full`}
+    >
+      Autenticação {status === true ? "ativada" : "desativada"}
+    </span>
+  );
 }

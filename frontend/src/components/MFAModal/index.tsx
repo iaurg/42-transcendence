@@ -1,16 +1,18 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Key } from "@phosphor-icons/react";
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import MFAStatus from "./MFAStatus";
 import MFAWelcome from "./MFAWelcome";
 import MFACode from "./MFACode";
 import MFASuccess from "./MFASuccess";
+import { AuthContext } from "@/contexts/AuthContext";
 
 // #TODO: implementar a lógica de autenticação de dois fatores baseada no Figma
 
 export default function MFAModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(0); // [0, 1, 2]
+  const { user } = useContext(AuthContext);
 
   function closeModal() {
     setIsOpen(false);
@@ -66,7 +68,7 @@ export default function MFAModal() {
                   >
                     Autenticação de dois fatores
                   </Dialog.Title>
-                  <MFAStatus status="disabled" />
+                  <MFAStatus status={user.mfaEnabled} />
                   {step === 0 ? (
                     <MFAWelcome handleStep={handleStep} />
                   ) : step === 1 ? (

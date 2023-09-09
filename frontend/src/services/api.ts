@@ -36,6 +36,7 @@ export function setupAPIClient(ctx: Context = undefined) {
         if (process.browser) {
           signOut();
         } else {
+          console.log("refresh token is invalid");
           return Promise.reject(new Error());
         }
       }
