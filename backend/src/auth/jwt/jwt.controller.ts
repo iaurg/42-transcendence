@@ -1,12 +1,18 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtAuthService } from './jwt.service';
 import { Request, Response } from 'express';
-import { RefreshTokenGuard } from './jwt.guard';
+import { AccessTokenGuard, RefreshTokenGuard } from './jwt.guard';
 import { User } from '@prisma/client';
 
 @Controller('auth/jwt')
 export class JwtAuthController {
   constructor(private jwtAuthService: JwtAuthService) {}
+
+  @UseGuards(AccessTokenGuard)
+  @Get('validate')
+  async validateToken() {
+    return { msg: 'Valid token' };
+  }
 
   @UseGuards(RefreshTokenGuard)
   @Get('refresh')

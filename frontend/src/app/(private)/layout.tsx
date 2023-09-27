@@ -5,7 +5,7 @@ import "../../styles/globals.css";
 import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import Header from "@/components/Header";
-import Providers from "../login/providers";
+import Providers from "../auth/providers";
 import { ChatProvider } from "@/contexts/ChatContext";
 
 export const metadata: Metadata = {

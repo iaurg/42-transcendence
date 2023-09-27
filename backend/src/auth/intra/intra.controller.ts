@@ -32,7 +32,7 @@ export class IntraController {
 
       await this.jwtAuthService.storeTokensInCookie(res, tokens);
 
-      res.redirect(`${this.configService.get('FRONTEND_URL')}/login/redirect`);
+      res.redirect(`${this.configService.get('FRONTEND_URL')}/auth/redirect`);
     } catch (error) {
       return error;
     }

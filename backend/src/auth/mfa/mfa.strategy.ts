@@ -30,7 +30,7 @@ export class MultiFactorAuthStrategy extends PassportStrategy(Strategy, '2fa') {
   async validate(payload: JwtPayload): Promise<User> {
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('User not found');
     }
 
     if (!user.mfaEnabled) {

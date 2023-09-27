@@ -1,19 +1,12 @@
-type StatusTagProps = {
-  status: "online" | "offline" | "away" | "busy";
-};
-
-export function StatusTag({ status }: StatusTagProps) {
+export default function MFAStatus({ status }: { status: boolean }) {
   let color = "";
 
   switch (status) {
-    case "online":
+    case true:
       color = "bg-green-500";
       break;
-    case "offline":
+    case false:
       color = "bg-red-500";
-      break;
-    case "away":
-      color = "bg-yellow-500";
       break;
     default:
       color = "bg-gray-500";
@@ -24,7 +17,7 @@ export function StatusTag({ status }: StatusTagProps) {
     <span
       className={`inline-block px-2 py-0.5 text-xs font-semibold text-white ${color} rounded-full`}
     >
-      {status}
+      Autenticação {status === true ? "ativada" : "desativada"}
     </span>
   );
 }

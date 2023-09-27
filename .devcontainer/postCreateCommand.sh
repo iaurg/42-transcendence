@@ -13,4 +13,4 @@ npm run prisma:generate
 npx prisma migrate dev --name init
 
 # Docker daemon setup
-chown node:node /var/run/docker.sock
+sudo chown node:node /var/run/docker.sock

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import Providers from "../auth/providers";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "42 Transcendence",
@@ -14,7 +14,7 @@ export default function RootLoginPublicLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

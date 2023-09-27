@@ -16,7 +16,7 @@ import { LobbyModule } from './lobby/lobby.module';
     }),
     UsersModule,
     PrismaModule,
-    // AuthModule,
+    AuthModule,
     ChatModule,
     GameModule,
     FriendsModule,
