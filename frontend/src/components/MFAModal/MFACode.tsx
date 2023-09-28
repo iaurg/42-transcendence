@@ -11,16 +11,16 @@ type MFACodeProps = {
 
 export default function MFACode({ handleStep }: MFACodeProps) {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const { user } = useContext(AuthContext);
+  const { user,setUser } = useContext(AuthContext);
 
   const handleSubmit = async () => {
     // Handle submission logic here
-    console.log("Submitted code:", code.join(""));
     const endpoint = user.mfaEnabled ? "/auth/2fa/disable" : "/auth/2fa/enable";
     await api
       .post(endpoint, { code: code.join("") }, { withCredentials: true })
       .then((r) => {
         if (r.status == 201) handleStep(2);
+        setUser({ ...user, mfaEnabled: !user.mfaEnabled });
       })
       .catch((e) => {
         toast.error("Código inválido", {
@@ -29,6 +29,7 @@ export default function MFACode({ handleStep }: MFACodeProps) {
         console.log(e);
       });
   };
+
   const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
   return (

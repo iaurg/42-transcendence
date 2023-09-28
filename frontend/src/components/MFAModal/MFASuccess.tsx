@@ -1,14 +1,10 @@
 import { AuthContext } from "@/contexts/AuthContext";
 import { useContext } from "react";
 
-type MFASuccessProps = {
-  handleStep: (step: number) => void;
-};
 
-export default function MFASuccess({ handleStep }: MFASuccessProps) {
-  const { user, setUser } = useContext(AuthContext);
-  // TODO solve infinite loop
-  setUser({ ...user, mfaEnabled: !user.mfaEnabled });
+export default function MFASuccess() {
+  const { user } = useContext(AuthContext);
+
   return (
     <>
       <div className="mt-2">
