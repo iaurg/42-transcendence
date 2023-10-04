@@ -45,6 +45,7 @@ enum FriendshipStatus {
   DECLINED
   BLOCKED
 }
+
 model Message {
   id        String   @id @default(uuid())
   user      User?    @relation(fields: [userLogin], references: [login])
