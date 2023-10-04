@@ -1,1 +1,1 @@
-{ "prettier.prettierPath": "./node_modules/prettier" }
+{ "prettier.prettierPath": "./backend/node_modules/prettier" }
