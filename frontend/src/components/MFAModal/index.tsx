@@ -74,7 +74,7 @@ export default function MFAModal() {
                   ) : step === 1 ? (
                     <MFACode handleStep={handleStep} />
                   ) : step === 2 ? (
-                    <MFASuccess handleStep={handleStep} />
+                    <MFASuccess />
                   ) : null}
                 </Dialog.Panel>
               </Transition.Child>
