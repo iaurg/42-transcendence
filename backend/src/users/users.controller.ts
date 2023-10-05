@@ -82,9 +82,4 @@ export class UsersController {
   update(@Param('login') login: string, @Body() updateUserDto: UpdateUserDto) {
     return this.service.update(login, updateUserDto);
   }
-
-  @Delete(':login')
-  remove(@Param('login') login: string) {
-    return this.service.remove(login);
-  }
 }

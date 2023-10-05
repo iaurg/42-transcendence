@@ -58,12 +58,4 @@ export class UsersService {
       },
     });
   }
-
-  async remove(login: string) {
-    return await this.prisma.user.delete({
-      where: {
-        login: login,
-      },
-    });
-  }
 }
