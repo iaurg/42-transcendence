@@ -1,4 +1,5 @@
 export class Player {
+  login: string;
   socketId: string;
   userId: string;
   x: number;
