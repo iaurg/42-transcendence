@@ -3,6 +3,7 @@ import { GameDto } from './dto/game.dto';
 import { GameMoveDto } from './dto/game.move';
 import { Player } from './dto/game.player.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class GameService {
@@ -125,27 +126,33 @@ export class GameService {
     return randomAngle;
   }
 
+  private findWinner(gameDto: GameDto) {
+    return gameDto.score.player1 > gameDto.score.player2 ? 1 : 2;
+  }
+
   private async storeGameResult(gameDto: GameDto) {
-    /*
-    const player1 = await this.prismaService.user.findFirst({
-      where: { id: gameDto.player1.userId },
+    let winner: User;
+
+    if (this.findWinner(gameDto) == 1) {
+      winner = await this.prismaService.user.findFirst({
+        where: { login: gameDto.player1.login },
+      });
+    } else {
+      winner = await this.prismaService.user.findFirst({
+        where: { login: gameDto.player2.login },
+      });
+    }
+
+    const updateUser = await this.prismaService.user.update({
+      where: {
+        login: winner.login,
+      },
+      data: {
+        victory: winner.victory + 1,
+      },
     });
 
-    const player2 = await this.prismaService.user.findFirst({
-      where: { id: gameDto.player2.userId },
-    });
-    */
-
-    //TODO: change to the real winner id from the database
-    const winner =
-      gameDto.score.player1 > gameDto.score.player2
-        ? gameDto.player1
-        : gameDto.player2;
-
-    //TODO: add the game result into the user leaderboard database
-    console.log(
-      `Winner: ${winner.socketId} with ${gameDto.score.player1} points`,
-    );
+    console.log(`Winner: ${updateUser.displayName}`);
   }
 
   isGameFinished(gameDto: GameDto): boolean {

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 export default function RootLoginRedirectPage() {
   const { payload: user, setPayload: setUser } = useContext(AuthContext);
   const router = useRouter();
+
   useEffect(() => {
     const { accessToken } = nookies.get(null, "accesssToken");
     if (accessToken) {
@@ -17,6 +18,7 @@ export default function RootLoginRedirectPage() {
       router.push("/login");
     }
   }, [setUser, router]);
+
   useEffect(() => {
     if (user.sub) {
       if (user.mfaEnabled) {
