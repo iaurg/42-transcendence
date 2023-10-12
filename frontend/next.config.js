@@ -8,6 +8,8 @@ const nextConfig = {
       bufferutil: "commonjs bufferutil",
     });
 
+    config.externals = [...config.externals, "canvas", "jsdom"];
+
     return config;
   },
 };
