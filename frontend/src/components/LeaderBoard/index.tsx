@@ -1,7 +1,7 @@
 "use client";
 import { useGetFollowers } from "@/services/queries/user/getUserFollowers";
 import { LeaderBoardCard } from "../LeaderBoardCard";
-import { use } from "react";
+import { User } from "@/types/user";
 
 export function LeaderBoard() {
   const { data, isLoading, isError } = useGetFollowers();
@@ -24,28 +24,17 @@ export function LeaderBoard() {
         </div>
       ) : (
         <>
-          {data?.map((user: any) => (
+          {data?.map((user: User) => (
             <LeaderBoardCard
-              key={user.node_id}
+              key={user.id}
               name={user.login}
-              avatar={user.avatar_url}
-              score={Math.round(user.id / 100000)}
+              avatar={user.avatar || ""}
+              score={user.victory}
               isFriend={user.login.includes("m")}
             />
           ))}
         </>
       )}
-      {/*
-      {fakeUsers.map((user) => (
-        <LeaderBoardCard
-          key={user.name}
-          name={user.name}
-          avatar={user.avatar}
-          score={user.score}
-          isFriend={user.isFriend}
-        />
-      ))}
-      */}
     </div>
   );
 }

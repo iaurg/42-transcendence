@@ -22,7 +22,7 @@ export function LeaderBoardCard({
         <div className="flex flex-row justify-between items-center">
           {avatar ? (
             <img
-              src={`${avatar}?u=${name}`}
+              src={`${avatar}`}
               width={40}
               height={40}
               className="rounded-full mr-3"
