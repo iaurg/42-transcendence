@@ -20,12 +20,19 @@ export function LeaderBoardCard({
     <div className="flex flex-row justify-between items-center py-3 bg-black42-200 p-4 rounded-lg w-full">
       <ProfilePopOver name={name} score={score}>
         <div className="flex flex-row justify-between items-center">
-          <img
-            src={`${avatar}?u=${name}`}
-            width={40}
-            height={40}
-            className="rounded-full mr-3"
-          />
+          {avatar ? (
+            <img
+              src={`${avatar}?u=${name}`}
+              width={40}
+              height={40}
+              className="rounded-full mr-3"
+            />
+          ) : (
+            <div className="rounded-full mr-3 bg-purple42-200 w-10 h-10 flex justify-center items-center">
+              <span className="text-white text-2xl">{name[0]}</span>
+            </div>
+          )}
+
           <div className="text-white text-lg mr-3">{name}</div>
           <StatusTag status="offline" />
         </div>
