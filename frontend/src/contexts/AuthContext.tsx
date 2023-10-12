@@ -1,6 +1,5 @@
 "use client";
 import nookies from "nookies";
-import jwt_decode from "jwt-decode";
 import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
 import { redirect } from "next/navigation";
