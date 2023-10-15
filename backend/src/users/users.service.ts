@@ -12,23 +12,13 @@ export class UsersService {
     return await this.prisma.user.findMany(args);
   }
 
-  async findOne(login: string, select: any = null): Promise<User | null> {
-    let args = {} as any;
-    if (select != null) {
-      args = {
-        where: {
-          login: login,
-        },
-        select: select,
-      };
-    } else {
-      args = {
-        where: {
-          login: login,
-        },
-      };
-    }
-    const user: User = await this.prisma.user.findUnique(args);
+  async findOne(login: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { login: login },
+    });
+
+    delete user.refreshToken;
+
     return user;
   }
 

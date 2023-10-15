@@ -15,7 +15,7 @@ import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 
-@Controller('user*')
+@Controller('users')
 export class UsersController {
   constructor(private service: UsersService) {}
 
@@ -24,22 +24,13 @@ export class UsersController {
   findMe(@Req() req: Request) {
     try {
       const user = req.user as User;
-      return this.service.findOne(user.login, {
-        login: true,
-        displayName: true,
-        email: true,
-        avatar: true,
-        status: true,
-        victory: true,
-        mfaEnabled: true,
-        createdAt: true,
-        updatedAt: true,
-      });
+      return this.service.findOne(user.login);
     } catch (error) {
       return error;
     }
   }
 
+  //TODO: implement a interceptor to remove refreshToken from response
   @Get()
   findAll() {
     return this.service.findAll({
@@ -59,17 +50,7 @@ export class UsersController {
 
   @Get(':login')
   findOne(@Param('login') login: string) {
-    return this.service.findOne(login, {
-      login: true,
-      displayName: true,
-      email: true,
-      avatar: true,
-      status: true,
-      victory: true,
-      mfaEnabled: true,
-      createdAt: true,
-      updatedAt: true,
-    });
+    return this.service.findOne(login);
   }
 
   @Post()
