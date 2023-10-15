@@ -10,6 +10,7 @@ import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
 import { GameMoveDto } from './dto/game.move';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -20,6 +21,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private gameService: GameService,
     private gameLobby: GameLobbyService,
+    private jwtService: JwtService,
   ) {
     // set paddle size
     this.gameService.PADDLE_HEIGHT = this.PADDLE_HEIGHT;
@@ -33,7 +35,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private gamesPlaying: Map<string, GameDto> = new Map();
 
   handleConnection(client: Socket) {
-    console.log(`Client ${client.id} connected`);
+    // Get user from cookie coming from client
+    const user = client.handshake.headers.cookie.split(';')[0].split('=')[1];
+
+    // Decode user from JWT
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    console.log(`Client ${decodedUser} connected`);
   }
 
   handleDisconnect(client: Socket) {
@@ -45,11 +53,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinGame')
   joinGame(client: Socket) {
-    if (this.gameLobby.joinPlayer1(client)) {
+    const user = client.handshake.headers.cookie.split(';')[0].split('=')[1];
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    if (this.gameLobby.joinPlayer1(client, decodedUser)) {
       console.log(`waiting Player 2`);
       client.emit('waitingPlayer2', `game_${client.id}`);
     } else {
-      const game = this.gameLobby.joinPlayer2(client);
+      const game = this.gameLobby.joinPlayer2(client, decodedUser);
       this.gamesPlaying[game.gameId] = game;
       this.gameService.restartBall(this.gamesPlaying[game.gameId]);
       this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);

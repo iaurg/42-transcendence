@@ -7,7 +7,7 @@ import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
-import { LobbyModule } from './lobby/lobby.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { LobbyModule } from './lobby/lobby.module';
     ChatModule,
     GameModule,
     FriendsModule,
-    LobbyModule,
+    LeaderboardModule,
   ],
   providers: [PrismaService],
 })

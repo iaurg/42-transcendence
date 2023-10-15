@@ -10,10 +10,11 @@ export class GameLobbyService {
   private CANVAS_WIDTH = 800;
   private CANVAS_HEIGHT = 600;
 
-  joinPlayer1(player: any): boolean {
+  joinPlayer1(player: any, login: string): boolean {
     if (this.lobby.length == 0) {
       const gameDto = this.initGame(player.id);
       this.lobby.push(gameDto);
+      gameDto.player1.login = login;
       console.log('player 1 joined');
       player.join(`game_${gameDto.player1.socketId}`);
       return true;
@@ -22,9 +23,10 @@ export class GameLobbyService {
     }
   }
 
-  joinPlayer2(player: any): GameDto {
+  joinPlayer2(player: any, login: string): GameDto {
     const gameDto = this.lobby[0];
     gameDto.player2 = {
+      login,
       socketId: player.id,
       userId: '',
       x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
@@ -43,6 +45,7 @@ export class GameLobbyService {
       gameId: `game_${player1Id}`,
       finished: false,
       player1: {
+        login: '',
         socketId: player1Id,
         userId: '',
         x: this.PLAYER_INITIAL_X,
