@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -14,8 +15,10 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 import { User } from '@prisma/client';
 import { Request } from 'express';
+import { RemoveUsersFieldsInterceptor } from 'src/interceptors/remove-users-fields/remove-users-fields.interceptor';
 
 @Controller('users')
+@UseInterceptors(RemoveUsersFieldsInterceptor)
 export class UsersController {
   constructor(private service: UsersService) {}
 
@@ -30,22 +33,9 @@ export class UsersController {
     }
   }
 
-  //TODO: implement a interceptor to remove refreshToken from response
   @Get()
   findAll() {
-    return this.service.findAll({
-      select: {
-        login: true,
-        displayName: true,
-        email: true,
-        avatar: true,
-        status: true,
-        victory: true,
-        mfaEnabled: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    return this.service.findAll();
   }
 
   @Get(':login')

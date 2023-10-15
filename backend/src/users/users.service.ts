@@ -8,16 +8,27 @@ import { User } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(args: any = {}) {
-    return await this.prisma.user.findMany(args);
+  async findAll() {
+    // return findMany without refreshToken on users
+    return await this.prisma.user.findMany({
+      select: {
+        login: true,
+        displayName: true,
+        email: true,
+        avatar: true,
+        status: true,
+        victory: true,
+        mfaEnabled: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
   async findOne(login: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { login: login },
     });
-
-    delete user.refreshToken;
 
     return user;
   }
