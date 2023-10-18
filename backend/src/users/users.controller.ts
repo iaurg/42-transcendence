@@ -36,8 +36,14 @@ export class UsersController {
   }
 
   @Get(':login')
-  findOne(@Param('login') login: string) {
-    return this.service.findOne(login);
+  async findOne(@Param('login') login: string) {
+    const user = await this.service.findOne(login);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
   }
 
   @Post()

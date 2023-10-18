@@ -9,7 +9,6 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    // return findMany without refreshToken on users
     return await this.prisma.user.findMany({
       select: {
         login: true,
