@@ -11,9 +11,11 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class RemoveUsersFieldsInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<User> {
-    // filter sensitive fields from user
     return next.handle().pipe(
       map((user) => {
+        if (!user) {
+          return user;
+        }
         delete user.refreshToken;
         delete user.mfaSecret;
         delete user.mfaEnabled;
