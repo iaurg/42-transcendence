@@ -21,11 +21,26 @@ model User {
   chats       ChatMember[]
   messages    Message[]
 }
+
+MatchHistory Schema
+model MatchHistory {
+  id Int @id @default(autoincrement())
+
+  winner       User   @relation(fields: [winnerId], references: [id], name: "winner")
+  winnerId     String 
+  winnerPoints Int
+
+  loser       User   @relation(fields: [loserId], references: [id], name: "loser")
+  loserId     String 
+  loserPoints Int
+
+  createdAt DateTime @default(now())
+}
 */
 
 async function main() {
   // create 50 users using faker
-  const users = Array.from({ length: 50 }).map(() => ({
+  const users: any = Array.from({ length: 50 }).map(() => ({
     login: faker.internet.userName(),
     displayName: faker.person.firstName(),
     email: faker.internet.email(),
@@ -37,6 +52,28 @@ async function main() {
 
   await prisma.user.createMany({
     data: users,
+  });
+
+  const createdUsers = await prisma.user.findMany({
+    select: {
+      id: true,
+    },
+  });
+
+  // create 50 match history
+  const getRandomUserId = () => {
+    return createdUsers[Math.floor(Math.random() * 50)].id;
+  };
+
+  const matchHistory = Array.from({ length: 50 }).map(() => ({
+    winnerId: getRandomUserId(),
+    winnerPoints: Math.floor(Math.random() * 5) + 5,
+    loserId: getRandomUserId(),
+    loserPoints: Math.floor(Math.random() * 5),
+  }));
+
+  await prisma.matchHistory.createMany({
+    data: matchHistory,
   });
 }
 
