@@ -6,5 +6,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Module({
   controllers: [MatchHistoryController],
   providers: [MatchHistoryService, PrismaService],
+  exports: [MatchHistoryService],
 })
 export class MatchHistoryModule {}
