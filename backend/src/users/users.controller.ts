@@ -7,69 +7,43 @@ import {
   Post,
   UseGuards,
   Req,
+  UseInterceptors,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { PatchUserDto } from './dto/patchUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 import { User } from '@prisma/client';
 import { Request } from 'express';
+import { RemoveUsersFieldsInterceptor } from 'src/interceptors/remove-users-fields/remove-users-fields.interceptor';
 
-@Controller('user*')
+@Controller('users')
+@UseGuards(AccessTokenGuard)
+@UseInterceptors(RemoveUsersFieldsInterceptor)
 export class UsersController {
   constructor(private service: UsersService) {}
 
-  @UseGuards(AccessTokenGuard)
   @Get('me')
-  findMe(@Req() req: Request) {
-    try {
-      const user = req.user as User;
-      return this.service.findOne(user.login, {
-        login: true,
-        displayName: true,
-        email: true,
-        avatar: true,
-        status: true,
-        victory: true,
-        mfaEnabled: true,
-        createdAt: true,
-        updatedAt: true,
-      });
-    } catch (error) {
-      return error;
-    }
+  findMe(@Req() request: Request & { user: User }) {
+    const { login } = request.user;
+    return this.service.findOne(login);
   }
 
   @Get()
   findAll() {
-    return this.service.findAll({
-      select: {
-        login: true,
-        displayName: true,
-        email: true,
-        avatar: true,
-        status: true,
-        victory: true,
-        mfaEnabled: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    return this.service.findAll();
   }
 
   @Get(':login')
-  findOne(@Param('login') login: string) {
-    return this.service.findOne(login, {
-      login: true,
-      displayName: true,
-      email: true,
-      avatar: true,
-      status: true,
-      victory: true,
-      mfaEnabled: true,
-      createdAt: true,
-      updatedAt: true,
-    });
+  async findOne(@Param('login') login: string) {
+    const user = await this.service.findOne(login);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
   }
 
   @Post()
@@ -78,7 +52,19 @@ export class UsersController {
   }
 
   @Patch(':login')
-  update(@Param('login') login: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Req() request: Request & { user: User },
+    @Param('login') login: string,
+    @Body() updateUserDto: PatchUserDto,
+  ) {
+    const { user } = request;
+
+    if (user.login !== login) {
+      throw new UnauthorizedException(
+        'You are not authorized to update this user',
+      );
+    }
+
     return this.service.update(login, updateUserDto);
   }
 }
