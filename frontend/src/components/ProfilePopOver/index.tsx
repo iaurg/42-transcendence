@@ -4,12 +4,14 @@ import { useState } from "react";
 import { usePopper } from "react-popper";
 
 type ProfilePopOverProps = {
+  id: string;
   name: string;
   children: React.ReactNode;
   score: number;
 };
 
 export default function ProfilePopOver({
+  id,
   name,
   children,
   score,
@@ -49,7 +51,7 @@ export default function ProfilePopOver({
             >
               Jogar
             </button>
-            <Link href={`/game/history/${name}`} passHref>
+            <Link href={`/game/history/${id}`} passHref>
               <button
                 type="button"
                 className="text-white bg-purple42-200 hover:bg-purple42-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none "
