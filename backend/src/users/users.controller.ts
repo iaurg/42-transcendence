@@ -15,7 +15,7 @@ import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 
-@Controller('user*')
+@Controller('users')
 export class UsersController {
   constructor(private service: UsersService) {}
 
@@ -60,6 +60,7 @@ export class UsersController {
   @Get(':login')
   findOne(@Param('login') login: string) {
     return this.service.findOne(login, {
+      id: true,
       login: true,
       displayName: true,
       email: true,
