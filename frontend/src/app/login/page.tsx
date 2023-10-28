@@ -1,9 +1,6 @@
-"use client";
-import { api } from "@/services/apiClient";
 import Image from "next/image";
 
 export default function LoginPage() {
-  //in the left a full height image background and in the right a login form
   return (
     <div className="flex flex-col h-screen md:flex-row">
       <div className="flex flex-col flex-1 bg-[url('/images/42-pong-login-page-bg.jpg')] bg-no-repeat bg-cover "></div>
