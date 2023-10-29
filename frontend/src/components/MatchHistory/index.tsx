@@ -2,8 +2,24 @@
 import { useGetUserMatchHistory } from "@/services/queries/match-history/getUserMatchHistory";
 import { MatchHistoryCard } from "../MatchHistoryCard";
 
+export type MatchType = {
+  id: string;
+  winnerId: string;
+  winnerPoints: number;
+  loserId: string;
+  loserPoints: number;
+  createdAt: string;
+  loser: {
+    login: string;
+  };
+  winner: {
+    login: string;
+  };
+};
+
 export default function MatchHistory({ id }: { id: string }) {
   const { data, isLoading, isError } = useGetUserMatchHistory(id);
+  const selectedUserId = id;
 
   return (
     <div
@@ -23,15 +39,23 @@ export default function MatchHistory({ id }: { id: string }) {
         </div>
       ) : (
         <>
-          {/* TODO: map and build card based on actual user, review all fields returned from API */}
-          {data?.map((match: any) => (
+          {data.length === 0 && (
+            <div className="flex flex-col flex-1 justify-center items-center">
+              <span className="text-white text-lg mt-4">
+                Nenhuma partida encontrada
+              </span>
+            </div>
+          )}
+          {data?.map((match: MatchType) => (
             <MatchHistoryCard
               key={match.id}
-              enemy={match.enemy}
-              date={match.date}
-              result={match.winnerPoints}
-              victory={match.winnerPoints}
-              login={"jorge"}
+              id={selectedUserId}
+              winnerId={match.winnerId}
+              winnerPoints={match.winnerPoints}
+              winnerLogin={match.winner.login}
+              loserPoints={match.loserPoints}
+              loserLogin={match.loser.login}
+              createdAt={match.createdAt}
             />
           ))}
         </>
