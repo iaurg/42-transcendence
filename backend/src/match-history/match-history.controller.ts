@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { MatchHistoryService } from './match-history.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
+import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 
-//TODO: add auth guard
 @Controller('match-history')
+@UseGuards(AccessTokenGuard)
 export class MatchHistoryController {
   constructor(private readonly matchHistoryService: MatchHistoryService) {}
 
