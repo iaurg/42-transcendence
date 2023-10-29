@@ -55,6 +55,20 @@ export class MatchHistoryService {
           },
         ],
       },
+      include: {
+        winner: {
+          select: {
+            login: true,
+            avatar: true,
+          },
+        },
+        loser: {
+          select: {
+            login: true,
+            avatar: true,
+          },
+        },
+      },
     });
 
     // if no matchs found, return an empty array
