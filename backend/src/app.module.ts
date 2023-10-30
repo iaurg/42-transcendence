@@ -8,6 +8,7 @@ import { GameModule } from './game/game.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
     GameModule,
     FriendsModule,
     LeaderboardModule,
+    AvatarUploadModule,
   ],
   providers: [PrismaService],
 })
