@@ -1,5 +1,4 @@
 services:
-
   api:
     build:
       context: ./backend
@@ -8,6 +7,7 @@ services:
       target: development
     volumes:
       - ./backend:/usr/src/app
+      - avatars:/usr/src/app/uploads
     env_file:
       - ./.env
     environment:
@@ -64,6 +64,7 @@ services:
 
 volumes:
   transcendence-postgres:
+  avatars:
 networks:
   backend:
     driver: bridge
