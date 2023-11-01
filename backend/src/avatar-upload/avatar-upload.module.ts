@@ -4,6 +4,7 @@ import { AvatarUploadController } from './avatar-upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as crypto from 'crypto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import * as crypto from 'crypto';
     }),
   ],
   controllers: [AvatarUploadController],
-  providers: [AvatarUploadService],
+  providers: [AvatarUploadService, PrismaService],
 })
 export class AvatarUploadModule {}
