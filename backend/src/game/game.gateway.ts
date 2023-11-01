@@ -36,6 +36,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     // Get user from cookie coming from client
+    // TODO: not trust into user given by cookie, check if token is valid
     const user = client.handshake.headers.cookie.split(';')[0].split('=')[1];
 
     // Decode user from JWT
