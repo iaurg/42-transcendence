@@ -1,21 +1,20 @@
 import {
   Controller,
-  Get,
   Post,
-  Body,
   Patch,
-  Param,
   Delete,
   UseInterceptors,
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AvatarUploadService } from './avatar-upload.service';
-import { CreateAvatarUploadDto } from './dto/create-avatar-upload.dto';
-import { UpdateAvatarUploadDto } from './dto/update-avatar-upload.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
+import { User } from '@prisma/client';
 
 const fileValidators = [
   new MaxFileSizeValidator({
@@ -26,41 +25,45 @@ const fileValidators = [
 ];
 
 @Controller('avatar-upload')
+@UseGuards(AccessTokenGuard)
 export class AvatarUploadController {
   constructor(private readonly avatarUploadService: AvatarUploadService) {}
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   create(
-    @Body() createAvatarUploadDto: CreateAvatarUploadDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: fileValidators,
       }),
     )
     file: Express.Multer.File,
+    @Req() request: Request & { user: User },
   ) {
-    return {
-      createAvatarUploadDto,
-      file: file.originalname,
-    };
+    const { id } = request.user;
+
+    return this.avatarUploadService.create(id, file);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.avatarUploadService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @Patch()
   update(
-    @Param('id') id: string,
-    @Body() updateAvatarUploadDto: UpdateAvatarUploadDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: fileValidators,
+      }),
+    )
+    file: Express.Multer.File,
+    @Req() request: Request & { user: User },
   ) {
-    return this.avatarUploadService.update(+id, updateAvatarUploadDto);
+    const { id } = request.user;
+
+    return this.avatarUploadService.update(id, file);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.avatarUploadService.remove(+id);
+  @Delete()
+  remove(@Req() request: Request & { user: User }) {
+    const { id } = request.user;
+
+    return this.avatarUploadService.remove(id);
   }
 }
