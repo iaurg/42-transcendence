@@ -55,7 +55,7 @@ describe('ChatGateway', () => {
     const getChatByIdSpy = jest.spyOn(chatService, 'getChatById');
     const addUserToChatSpy = jest.spyOn(chatService, 'addUserToChat');
     const joinChatSpy = jest.spyOn(chatGateway, 'joinChat');
-    await chatGateway.joinChat(login, chatDto, client);
+    await chatGateway.joinChat(chatDto, client);
 
     expect(getChatByIdSpy).toBeCalledWith(chatId);
     expect(addUserToChatSpy).toBeCalledWith(login, chatId);
