@@ -21,6 +21,7 @@ type ChatContextType = {
   handleCloseChat: (chatId: number) => void;
   setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
   validationRequired: boolean;
+  user: User;
 };
 
 type ChatProviderProps = {
@@ -37,6 +38,10 @@ export type Chat = {
   owner: string;
 };
 
+export type User = {
+  login: string;
+};
+
 export type ChatList = Chat[];
 
 export const ChatContext = createContext<ChatContextType>(
@@ -48,6 +53,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [showElement, setShowElement] = useState<Elements>("showChannels");
   const [selectedChat, setSelectedChat] = useState<Chat>({} as Chat);
   const [chatList, setChatList] = useState<ChatList>([]);
+  const [user, setUser] = useState<User>({} as User);
   const [isLoading, setIsLoading] = useState(true);
   const [validationRequired, setValidationRequired] = useState(true);
 
@@ -68,6 +74,10 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   useEffect(() => {
     // Connect to the Socket.IO server
     chatService.connect();
+    chatService.socket?.on("userLogin", (user: User) => {
+      console.log(`Current user login: ${user.login}`);
+      setUser(() => user);
+    });
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
       setChatList(() => newChatList);
@@ -132,6 +142,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         handleCloseChat,
         setValidationRequired,
         validationRequired,
+        user,
       }}
     >
       {children}

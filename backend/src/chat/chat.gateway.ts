@@ -59,6 +59,7 @@ export class ChatGateway
   ) {
     const { chatId, content } = messageDto;
     const login = client.handshake.auth?.user?.login;
+    client.emit('userLogin', client.handshake.auth?.user);
     const member = await this.chatService.getMemberFromChat(chatId, login);
     if (!member) {
       client.emit('error', { error: 'You are not a member of this chat' });
@@ -558,6 +559,7 @@ export class ChatGateway
         .then((user) => {
           socket.handshake.auth['user'] = user;
           console.log(`User ${socket.handshake.auth['user'].login} connected`);
+          socket.emit('userLogin', user);
           next();
         })
         .catch((err) => {
