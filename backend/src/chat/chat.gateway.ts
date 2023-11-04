@@ -7,42 +7,36 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+import { ParseIntPipe } from '@nestjs/common';
 import {
-  ExecutionContext,
-  ParseIntPipe,
-  createParamDecorator,
-} from '@nestjs/common';
-import { ChatDto, ChatMessageDto, NewChatDto, InviteChatDto } from './dto';
+  ChatDto,
+  ChatMessageDto,
+  NewChatDto,
+  InviteChatDto,
+  TokenPayload,
+} from './dto';
 
 import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 
 interface ConnectedUsers {
   [key: number]: Socket;
 }
 
-export const SocketUser = createParamDecorator(
-  (data: string, ctx: ExecutionContext) => {
-    // eslint-disable-line @typescript-eslint/no-unused-vars
-    // const client = ctx.switchToWs().getClient<Socket>();
-    // const user = client.handshake.auth?.user;
-
-    // return data ? user?.[data] : user;
-    const user = {
-      login: 'caio',
-    };
-
-    return user[data];
-  },
-);
-
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private jwtService: JwtService,
+    private usersService: UsersService,
+  ) {}
   private connectedUsers: ConnectedUsers = {};
 
   @WebSocketServer()
@@ -60,11 +54,12 @@ export class ChatGateway
 
   @SubscribeMessage('message')
   async createMessage(
-    @SocketUser('login') login: any,
     @MessageBody() messageDto: ChatMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
     const { chatId, content } = messageDto;
+    const login = client.handshake.auth?.user?.login;
+    client.emit('userLogin', client.handshake.auth?.user);
     const member = await this.chatService.getMemberFromChat(chatId, login);
     if (!member) {
       client.emit('error', { error: 'You are not a member of this chat' });
@@ -119,11 +114,11 @@ export class ChatGateway
 
   @SubscribeMessage('createChat')
   async createChat(
-    @SocketUser('login') login: string,
     @MessageBody() chatDto: NewChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     const { chatName, chatType, password } = chatDto;
+    const login = client.handshake.auth?.user?.login;
     if (chatType === 'PUBLIC' && password) {
       client.emit('error', { error: 'Public chat cannot have password' });
       return;
@@ -157,11 +152,11 @@ export class ChatGateway
 
   @SubscribeMessage('createPrivateChat')
   async createPrivateChat(
-    @SocketUser('login') login: string,
     @MessageBody() privateChat: InviteChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     const { guestList } = privateChat;
+    const login = client.handshake.auth?.user?.login;
     const createdChat = await this.chatService.createPrivateChat(
       login,
       guestList,
@@ -190,7 +185,6 @@ export class ChatGateway
   // You already have to exist in this chat but cannot join the socket
   @SubscribeMessage('joinChat')
   async joinChat(
-    @SocketUser('login') login: string,
     @MessageBody() chatDto: ChatDto,
     @ConnectedSocket() client: Socket,
   ) {
@@ -215,6 +209,7 @@ export class ChatGateway
         return;
       }
     }
+    const login = client.handshake.auth?.user?.login;
     const addedUser = await this.chatService.addUserToChat(login, chatId);
     if (!addedUser) {
       client.emit('joinChat', { message: 'User is already in chat', chat });
@@ -227,10 +222,10 @@ export class ChatGateway
 
   @SubscribeMessage('leaveChat')
   async leaveChat(
-    @SocketUser('login') login: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
+    const login = client.handshake.auth?.user?.login;
     const you = await this.chatService.getMemberFromChat(chatId, login);
     await this.chatService.removeUserFromChat(login, chatId);
     client.leave(`chat:${chatId}`);
@@ -290,7 +285,6 @@ export class ChatGateway
   // WARNING: This method should not be invoked by the client
   @SubscribeMessage('deleteChat')
   async deleteChat(
-    @SocketUser('login') login: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
@@ -300,6 +294,7 @@ export class ChatGateway
       client.emit('error', { error: 'Chat not found' });
       return;
     }
+    const login = client.handshake.auth?.user?.login;
     const member = await this.chatService.getMemberFromChat(chatId, login);
     if (!member || member.role === 'MEMBER') {
       client.emit('error', {
@@ -331,11 +326,11 @@ export class ChatGateway
   // TODO: Drop this rule and replace it by an invite event
   @SubscribeMessage('addToChat')
   async addToChat(
-    @SocketUser('login') login: string,
     @MessageBody() inviteChat: InviteChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     const { chatId, guestList } = inviteChat;
+    const login = client.handshake.auth?.user?.login;
     const updatedChat = await this.chatService.addUsersToChat(
       chatId,
       guestList,
@@ -360,11 +355,11 @@ export class ChatGateway
 
   @SubscribeMessage('giveAdmin')
   async giveAdmin(
-    @SocketUser('login') login: string,
     @MessageBody() users: InviteChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     const { chatId, guestList } = users;
+    const login = client.handshake.auth?.user?.login;
     for (const user of guestList) {
       if (await this.notValidAction('giveAdmin', chatId, login, user, client)) {
         return;
@@ -384,11 +379,11 @@ export class ChatGateway
 
   @SubscribeMessage('kickMember')
   async kickMember(
-    @SocketUser('login') login: string,
     @MessageBody('user') user: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
+    const login = client.handshake.auth?.user?.login;
     if (await this.notValidAction('kickMember', chatId, login, user, client)) {
       return;
     }
@@ -434,11 +429,11 @@ export class ChatGateway
 
   @SubscribeMessage('banMember')
   async banMember(
-    @SocketUser('login') login: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @MessageBody('user') user: string,
     @ConnectedSocket() client: Socket,
   ) {
+    const login = client.handshake.auth?.user?.login;
     if (await this.notValidAction('banMember', chatId, login, user, client)) {
       return;
     }
@@ -462,11 +457,11 @@ export class ChatGateway
 
   @SubscribeMessage('muteMember')
   async muteMember(
-    @SocketUser('login') login: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @MessageBody('user') user: string,
     @ConnectedSocket() client: Socket,
   ) {
+    const login = client.handshake.auth?.user?.login;
     if (await this.notValidAction('muteMember', chatId, login, user, client)) {
       return;
     }
@@ -483,11 +478,11 @@ export class ChatGateway
 
   @SubscribeMessage('unmuteMember')
   async unmuteMember(
-    @SocketUser('login') login: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @MessageBody('user') user: string,
     @ConnectedSocket() client: Socket,
   ) {
+    const login = client.handshake.auth?.user?.login;
     if (
       await this.notValidAction('unmuteMember', chatId, login, user, client)
     ) {
@@ -513,7 +508,9 @@ export class ChatGateway
     const chat = await this.chatService.verifyChatPassword(chatId, password);
 
     if (!chat) {
-      return client.emit('verifyPassword', { error: 'Error handling the request' });
+      return client.emit('verifyPassword', {
+        error: 'Error handling the request',
+      });
     }
     return client.emit('verifyPassword', { message: 'Password is correct' });
   }
@@ -536,11 +533,11 @@ export class ChatGateway
   }
   // TODO:
   async handleConnection(@ConnectedSocket() client: Socket) {
-    // const login = client.handshake.auth?.user?.login;
+    const login = client.handshake.auth?.user?.login;
     // TODO: remove this hardcoded user id
-    const login = 'caio';
     if (!login) {
       client.emit('connected', { error: 'User not found' });
+      client.disconnect();
       return;
     }
     this.connectedUsers[login] = client;
@@ -556,7 +553,30 @@ export class ChatGateway
     }
   }
 
-  afterInit(server: any) {
-    // ...
+  afterInit(_: Server) {
+    this.server.use((socket, next) => {
+      this.validateConnection(socket)
+        .then((user) => {
+          socket.handshake.auth['user'] = user;
+          console.log(`User ${socket.handshake.auth['user'].login} connected`);
+          socket.emit('userLogin', user);
+          next();
+        })
+        .catch((err) => {
+          return next(new Error(err));
+        });
+    });
+  }
+
+  private validateConnection(client: Socket) {
+    const token = client.handshake.headers.cookie.split(';')[0].split('=')[1];
+    try {
+      const payload = this.jwtService.verify<TokenPayload>(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      return this.usersService.findOne(payload.sub);
+    } catch {
+      throw new WsException('Token invalid or expired');
+    }
   }
 }

@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
+import { MatchHistoryModule } from './match-history/match-history.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
     FriendsModule,
     LeaderboardModule,
     AvatarUploadModule,
+    MatchHistoryModule,
   ],
   providers: [PrismaService],
 })

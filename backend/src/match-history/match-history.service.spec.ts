@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LeaderboardService } from './leaderboard.service';
+import { MatchHistoryService } from './match-history.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 
-describe('LeaderboardService', () => {
-  let service: LeaderboardService;
+describe('MatchHistoryService', () => {
+  let service: MatchHistoryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,12 +14,12 @@ describe('LeaderboardService', () => {
         ConfigService,
         AuthService,
         UsersService,
-        LeaderboardService,
+        MatchHistoryService,
         PrismaService,
       ],
     }).compile();
 
-    service = module.get<LeaderboardService>(LeaderboardService);
+    service = module.get<MatchHistoryService>(MatchHistoryService);
   });
 
   it('should be defined', () => {

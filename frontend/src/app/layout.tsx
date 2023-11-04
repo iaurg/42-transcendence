@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 // These styles apply to every route in the application
 import "../styles/globals.css";

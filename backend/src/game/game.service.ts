@@ -4,10 +4,14 @@ import { GameMoveDto } from './dto/game.move';
 import { Player } from './dto/game.player.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
+import { MatchHistoryService } from 'src/match-history/match-history.service';
 
 @Injectable()
 export class GameService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private matchHistoryService: MatchHistoryService,
+  ) {}
 
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
@@ -130,7 +134,7 @@ export class GameService {
     return gameDto.score.player1 > gameDto.score.player2 ? 1 : 2;
   }
 
-  private async storeGameResult(gameDto: GameDto) {
+  private async updatePlayerVictory(gameDto: GameDto) {
     let winner: User;
 
     if (this.findWinner(gameDto) == 1) {
@@ -143,7 +147,7 @@ export class GameService {
       });
     }
 
-    const updateUser = await this.prismaService.user.update({
+    await this.prismaService.user.update({
       where: {
         login: winner.login,
       },
@@ -151,8 +155,36 @@ export class GameService {
         victory: winner.victory + 1,
       },
     });
+  }
 
-    console.log(`Winner: ${updateUser.displayName}`);
+  private async registerMatchHistory(gameDto: GameDto) {
+    let winner: Player, loser: Player;
+    let winnerPoints: number, loserPoints: number;
+
+    if (this.findWinner(gameDto) == 1) {
+      winner = gameDto.player1;
+      loser = gameDto.player2;
+      winnerPoints = gameDto.score.player1;
+      loserPoints = gameDto.score.player2;
+    } else {
+      winner = gameDto.player2;
+      loser = gameDto.player1;
+      winnerPoints = gameDto.score.player2;
+      loserPoints = gameDto.score.player1;
+    }
+
+    await this.matchHistoryService.create({
+      winnerId: winner.userId,
+      loserId: loser.userId,
+      winnerPoints,
+      loserPoints,
+    });
+  }
+
+  private async storeGameResult(gameDto: GameDto) {
+    await this.updatePlayerVictory(gameDto);
+
+    await this.registerMatchHistory(gameDto);
   }
 
   isGameFinished(gameDto: GameDto): boolean {

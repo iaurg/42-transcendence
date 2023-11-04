@@ -1,3 +1,4 @@
+import { ChatContext } from "@/contexts/ChatContext";
 import { Popover } from "@headlessui/react";
 import {
   Crown,
@@ -5,7 +6,7 @@ import {
   Prohibit,
   SignOut,
 } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { usePopper } from "react-popper";
 
 type ChatUsersChannelPopOverProps = {
@@ -13,13 +14,13 @@ type ChatUsersChannelPopOverProps = {
   children: React.ReactNode;
 };
 
-type chatMemberRole = "OWNER" | "ADMIN" | "MEMBER"
+type chatMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 
 export interface ChatMember {
-  id: number
-  chatId: number
-  userLogin: string
-  role: chatMemberRole
+  id: number;
+  chatId: number;
+  userLogin: string;
+  role: chatMemberRole;
 }
 
 export default function ChatUsersChannelPopOver({
@@ -34,6 +35,12 @@ export default function ChatUsersChannelPopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "left",
   });
+
+  // import user from useContext but rename it as currentUser
+  const { user: currentUser } = useContext(ChatContext);
+  console.log(users);
+  const otherUsers = users.filter(user => user.userLogin !== currentUser.login);
+
   return (
     <Popover className="absolute">
       <Popover.Button ref={setReferenceElement} className="outline-none">
@@ -47,7 +54,7 @@ export default function ChatUsersChannelPopOver({
         {...attributes.popper}
       >
         <div className="p-3">
-          {users.map((user) => (
+          {otherUsers.map((user) => (
             <div
               className="flex items-center space-x-4 mb-4 justify-between"
               key={user.id}

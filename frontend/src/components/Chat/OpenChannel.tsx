@@ -11,7 +11,7 @@ interface Message {
 }
 
 export function OpenChannel() {
-  const { selectedChat, handleCloseChat, setShowElement, validationRequired, setValidationRequired } = useContext(ChatContext);
+  const { selectedChat, handleCloseChat, setShowElement, validationRequired, setValidationRequired, user } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -149,7 +149,7 @@ export function OpenChannel() {
           <div
             key={message.id}
             // TODO: Implement user context to compare user login with message user
-            className={`${message.userLogin === 'caio'
+            className={`${message.userLogin === user.login
               ? "text-white bg-purple42-200 self-end"
               : "text-white bg-black42-300 self-start"
               } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
