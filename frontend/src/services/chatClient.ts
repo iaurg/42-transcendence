@@ -1,7 +1,6 @@
-import { io, Socket } from 'socket.io-client';
+import { io, Socket } from "socket.io-client";
 
 class ChatService {
-
   public socket: Socket | null;
 
   constructor() {
@@ -14,15 +13,15 @@ class ChatService {
         transports: ["websocket", "polling", "flashsocket"],
       });
     }
-  };
+  }
 
-  public disconnect (): void {
+  public disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
     }
     this.socket = null;
     console.log("Disconnected from the WebSocket server");
-  };
+  }
 }
 
 const chatService = new ChatService();

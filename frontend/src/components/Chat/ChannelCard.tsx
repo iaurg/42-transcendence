@@ -8,7 +8,7 @@ type ChannelCardProps = {
 };
 
 export default function ChannelCard({ chat }: ChannelCardProps) {
-  const { setShowElement, setSelectedChat } = useContext(ChatContext);
+  const { setShowElement, setSelectedChat, user } = useContext(ChatContext);
   const handleDeleteChannel = () => {
     chatService.socket?.emit("deleteChat", { chatId: chat.id });
   };
@@ -30,11 +30,11 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
         </span>
         <div className="flex ml-1 space-x-1">
           {chat.chatType === 'PROTECTED' && <Lock color="white" size={12} />}
-          {chat.owner === 'caio' && <Crown className="text-orange42-500" size={12} />}
+          {chat.owner === user.login && <Crown className="text-orange42-500" size={12} />}
         </div>
       </div>
       <div className="flex space-x-5 items-center">
-        {chat.owner === 'caio' && (
+        {chat.owner === user.login && (
           <TrashSimple
             className="text-red-400 cursor-pointer"
             size={18}

@@ -10,7 +10,7 @@ npm install -g @nestjs/cli
 npm run prisma:generate
 
 # Generate Prisma Migrations
-npx prisma migrate dev --name init
+npx prisma db push --force-reset && npx prisma db seed
 
 # Docker daemon setup
 sudo chown node:node /var/run/docker.sock
