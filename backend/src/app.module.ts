@@ -11,6 +11,8 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 import { MatchHistoryModule } from './match-history/match-history.module';
 import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -27,6 +29,10 @@ import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
     AvatarUploadModule,
     MatchHistoryModule,
     AvatarUploadModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/avatars',
+    }),
   ],
   providers: [PrismaService],
 })
