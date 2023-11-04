@@ -57,7 +57,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           withCredentials: true,
         })
         .then((response) => {
-          console.log("response", response);
           setUser(response.data);
         })
         .catch((error) => {

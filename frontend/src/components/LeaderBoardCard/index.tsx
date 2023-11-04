@@ -5,6 +5,7 @@ import ProfilePopOver from "../ProfilePopOver";
 import UserAvatar from "../UserAvatar";
 
 type LeaderBoardCardProps = {
+  id: string;
   name: string;
   avatar: string;
   score: number;
@@ -12,6 +13,7 @@ type LeaderBoardCardProps = {
 };
 
 export function LeaderBoardCard({
+  id,
   name,
   avatar,
   score,
@@ -19,7 +21,7 @@ export function LeaderBoardCard({
 }: LeaderBoardCardProps) {
   return (
     <div className="flex flex-row justify-between items-center py-3 bg-black42-200 p-4 rounded-lg w-full">
-      <ProfilePopOver name={name} score={score}>
+      <ProfilePopOver name={name} score={score} id={id}>
         <div className="flex flex-row justify-between items-center">
           <UserAvatar imageUrl={avatar} login={name} />
           <div className="text-white text-lg mx-3">{name}</div>

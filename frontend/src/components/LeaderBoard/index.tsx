@@ -1,10 +1,10 @@
 "use client";
-import { useGetFollowers } from "@/services/queries/user/getUserFollowers";
 import { LeaderBoardCard } from "../LeaderBoardCard";
 import { User } from "@/types/user";
+import { useGetLeaderboard } from "@/services/queries/leaderboard/getLeaderboard";
 
 export function LeaderBoard() {
-  const { data, isLoading, isError } = useGetFollowers();
+  const { data, isLoading, isError } = useGetLeaderboard();
 
   return (
     <div
@@ -27,6 +27,7 @@ export function LeaderBoard() {
           {data?.map((user: User) => (
             <LeaderBoardCard
               key={user.id}
+              id={user.id}
               name={user.login}
               avatar={user.avatar || ""}
               score={user.victory}

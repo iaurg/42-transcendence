@@ -14,13 +14,13 @@ type ChatUsersChannelPopOverProps = {
   children: React.ReactNode;
 };
 
-type chatMemberRole = "OWNER" | "ADMIN" | "MEMBER"
+type chatMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 
 export interface ChatMember {
-  id: number
-  chatId: number
-  userLogin: string
-  role: chatMemberRole
+  id: number;
+  chatId: number;
+  userLogin: string;
+  role: chatMemberRole;
 }
 
 export default function ChatUsersChannelPopOver({
@@ -35,10 +35,12 @@ export default function ChatUsersChannelPopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "left",
   });
+
   // import user from useContext but rename it as currentUser
   const { user: currentUser } = useContext(ChatContext);
   console.log(users);
   const otherUsers = users.filter(user => user.userLogin !== currentUser.login);
+
   return (
     <Popover className="absolute">
       <Popover.Button ref={setReferenceElement} className="outline-none">

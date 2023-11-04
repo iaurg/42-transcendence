@@ -8,14 +8,17 @@ import { parseCookies } from "nookies";
 type Context = undefined | GetServerSidePropsContext;
 
 export function setupAPIClient(ctx: Context = undefined) {
-  const cookies = parseCookies(ctx);
-
   const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL });
 
   api.interceptors.request.use(
     (config) => {
       const { accessToken } = nookies.get(null, "accesssToken");
       const payload: TokenPayload = jwt_decode(accessToken);
+
+      if (accessToken) {
+        config.headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
       return config;
     },
 

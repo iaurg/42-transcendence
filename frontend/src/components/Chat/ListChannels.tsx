@@ -1,6 +1,5 @@
 import { Plus } from "@phosphor-icons/react";
 import ChannelCard from "./ChannelCard";
-import { useGetUser } from "@/services/queries/user/getUser";
 import { Chat, ChatContext } from "@/contexts/ChatContext";
 import { useContext } from "react";
 
@@ -9,7 +8,6 @@ type ListChannelsProps = {
 };
 
 export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
-
   const { isLoading, chatList } = useContext(ChatContext);
 
   return (
@@ -36,10 +34,7 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
         >
           {chatList?.map((channel: Chat) => (
             // TODO: add user context for chat owner
-            <ChannelCard
-              key={channel.id}
-              chat={channel}
-            />
+            <ChannelCard key={channel.id} chat={channel} />
           ))}
         </div>
       )}
