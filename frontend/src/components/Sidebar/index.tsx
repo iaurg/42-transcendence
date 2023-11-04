@@ -2,8 +2,13 @@
 import { Play, SignOut, Trophy } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
+import UserAvatar from "../UserAvatar";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useContext } from "react";
 
 export default function Sidebar() {
+  const { user } = useContext(AuthContext);
+
   return (
     <div className="flex flex-col h-screen max-wd-[93] bg-black42-300">
       <div className="flex flex-col flex-1 justify-between items-center">
@@ -38,7 +43,7 @@ export default function Sidebar() {
         </div>
         <ul className="flex flex-col space-y-5 items-center justify-center pb-4">
           <li>
-            <img src="https://bigheads.io/svg" width={48} height={48} />
+            <UserAvatar imageUrl={user.avatar} login={user.displayName} />
           </li>
           <li>
             <Link
