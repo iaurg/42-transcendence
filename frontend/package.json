@@ -1,43 +1,50 @@
 {
-  "name": "transcendence-frontend",
-  "version": "0.1.0",
+  "name": "frontend",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "next dev --port 9090",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write src"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.15",
     "@phosphor-icons/react": "^2.0.9",
     "@tanstack/react-query": "^4.29.13",
     "@tanstack/react-query-devtools": "^4.29.13",
-    "@types/node": "18.15.11",
-    "@types/react": "18.0.33",
-    "@types/react-dom": "18.0.11",
     "axios": "^1.4.0",
     "eslint": "8.38.0",
     "eslint-config-next": "^13.5.4",
     "jwt-decode": "^3.1.2",
     "konva": "^9.2.0",
-    "next": "^14.0.0",
-    "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.44.3",
     "react-hot-toast": "^2.4.1",
     "react-konva": "^18.2.9",
     "react-popper": "^2.3.0",
-    "socket.io-client": "^4.6.2",
-    "typescript": "5.0.4"
+    "react-router-dom": "^6.18.0",
+    "socket.io-client": "^4.6.2"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.24",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "postcss": "^8.4.31",
     "prettier": "^2.8.8",
     "tailwind-scrollbar": "^3.0.4",
-    "tailwindcss": "^3.3.2"
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-tsconfig-paths": "^4.2.1"
   }
 }

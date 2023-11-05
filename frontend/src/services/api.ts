@@ -1,16 +1,14 @@
 import { TokenPayload, signOut } from "@/contexts/AuthContext";
 import axios, { AxiosError } from "axios";
-import nookies from "nookies";
-import { GetServerSidePropsContext } from "next";
 
-type Context = undefined | GetServerSidePropsContext;
-
-export function setupAPIClient(ctx: Context = undefined) {
+export function setupAPIClient() {
   const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL });
 
   api.interceptors.request.use(
     (config) => {
-      const { accessToken } = nookies.get(null, "accesssToken");
+      const { accessToken } = {
+        accessToken: "accessToken",
+      };
 
       if (accessToken) {
         config.headers["Authorization"] = `Bearer ${accessToken}`;

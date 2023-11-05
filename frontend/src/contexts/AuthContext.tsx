@@ -1,8 +1,5 @@
-"use client";
-import nookies from "nookies";
 import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
-import { redirect } from "next/navigation";
 
 type AuthContextType = {
   payload: TokenPayload;
@@ -40,9 +37,10 @@ export const AuthContext = createContext<AuthContextType>(
 );
 
 export function signOut() {
-  nookies.destroy(null, "accesssToken");
-  nookies.destroy(null, "refreshToken");
-  redirect("/login");
+  // TODO: get cookies from browser and redirect to /login
+  // nookies.destroy(null, "accesssToken");
+  // nookies.destroy(null, "refreshToken");
+  // redirect("/login");
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -50,7 +48,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User>({} as User);
 
   useEffect(() => {
-    const { accessToken } = nookies.get(null, "accesssToken");
+    const { accessToken } = {
+      accessToken: "fake",
+    };
+
     if (accessToken) {
       api
         .get(`/users/me`, {
