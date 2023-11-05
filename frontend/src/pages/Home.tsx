@@ -1,5 +1,6 @@
 import logoPong from "@/assets/images/logo-pong.png";
 import pongBanner from "@/assets/images/42-pong-home.png";
+import { NavLink } from "react-router-dom";
 
 export function Home() {
   return (
@@ -21,12 +22,12 @@ export function Home() {
               Jogue com seus amigos e mostre quem é o melhor jogador de pong de
               todos os tempos!
             </p>
-            <a
-              href="/login"
+            <NavLink
+              to="/login"
               className="bg-purple42-200 hover:bg-purple42-300 text-white font-bold py-2 px-4 rounded-lg mt-8 transition-all text-center w-full md:w-fit"
             >
               Quero jogar
-            </a>
+            </NavLink>
           </div>
         </div>
         <div className="flex flex-col flex-1">

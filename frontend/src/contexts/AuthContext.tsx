@@ -1,5 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
+import { redirect } from "react-router-dom";
+import Cookies from "js-cookie";
 
 type AuthContextType = {
   payload: TokenPayload;
@@ -38,20 +40,17 @@ export const AuthContext = createContext<AuthContextType>(
 
 export function signOut() {
   // TODO: get cookies from browser and redirect to /login
-  // nookies.destroy(null, "accesssToken");
-  // nookies.destroy(null, "refreshToken");
-  // redirect("/login");
+  Cookies.remove("accessToken");
+  Cookies.remove("refreshToken");
+  redirect("/login");
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [payload, setPayload] = useState<TokenPayload>({} as TokenPayload);
   const [user, setUser] = useState<User>({} as User);
+  const accessToken = Cookies.get("accessToken");
 
   useEffect(() => {
-    const { accessToken } = {
-      accessToken: "fake",
-    };
-
     if (accessToken) {
       api
         .get(`/users/me`, {
@@ -67,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } else {
       signOut();
     }
-  }, [setPayload]);
+  }, [setPayload, accessToken]);
 
   return (
     <AuthContext.Provider

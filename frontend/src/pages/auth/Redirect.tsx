@@ -2,22 +2,22 @@ import { AuthContext, TokenPayload } from "@/contexts/AuthContext";
 import { useContext, useEffect } from "react";
 import jwt_decode from "jwt-decode";
 import { redirect } from "react-router-dom";
+import Cookies from "js-cookie";
 
-export default function RootLoginRedirectPage() {
+export default function Redirect() {
   const { payload: user, setPayload: setUser } = useContext(AuthContext);
+  const accessToken = Cookies.get("accessToken");
 
   useEffect(() => {
-    const { accessToken } = {
-      accessToken: "fake",
-    };
-
     if (accessToken) {
       const payload: TokenPayload = jwt_decode(accessToken);
-      if (payload) setUser(payload);
+      if (payload) {
+        setUser(payload);
+      }
     } else {
       redirect("/login");
     }
-  }, [setUser]);
+  }, [setUser, accessToken]);
 
   useEffect(() => {
     if (user.sub) {

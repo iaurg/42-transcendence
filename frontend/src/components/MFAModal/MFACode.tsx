@@ -11,7 +11,7 @@ type MFACodeProps = {
 
 export default function MFACode({ handleStep }: MFACodeProps) {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const { user,setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
 
   const handleSubmit = async () => {
     // Handle submission logic here
@@ -30,7 +30,7 @@ export default function MFACode({ handleStep }: MFACodeProps) {
       });
   };
 
-  const baseURL = process.env.NEXT_PUBLIC_API_URL;
+  const baseURL = import.meta.env.VITE_PUBLIC_API_URL;
 
   return (
     <>
