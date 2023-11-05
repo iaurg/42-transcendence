@@ -10,7 +10,6 @@ import { FriendsModule } from './friends/friends.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 import { MatchHistoryModule } from './match-history/match-history.module';
-import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -26,7 +25,6 @@ import { join } from 'path';
     GameModule,
     FriendsModule,
     LeaderboardModule,
-    AvatarUploadModule,
     MatchHistoryModule,
     AvatarUploadModule,
     ServeStaticModule.forRoot({
