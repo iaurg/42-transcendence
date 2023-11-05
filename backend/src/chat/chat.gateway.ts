@@ -569,7 +569,8 @@ export class ChatGateway
   }
 
   private validateConnection(client: Socket) {
-    const token = client.handshake.headers.cookie.split(';')[0].split('=')[1];
+    const token = client.handshake.auth.token;
+
     try {
       const payload = this.jwtService.verify<TokenPayload>(token, {
         secret: process.env.JWT_SECRET,

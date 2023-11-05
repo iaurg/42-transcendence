@@ -36,7 +36,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     // Get user from cookie coming from client
-    const user = client.handshake.headers.cookie.split(';')[0].split('=')[1];
+    const user = client.handshake.auth.token;
 
     // Decode user from JWT
     const decodedUser = this.jwtService.decode(user).sub;
@@ -53,7 +53,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinGame')
   joinGame(client: Socket) {
-    const user = client.handshake.headers.cookie.split(';')[0].split('=')[1];
+    const user = client.handshake.auth.token;
     const decodedUser = this.jwtService.decode(user).sub;
 
     if (this.gameLobby.joinPlayer1(client, decodedUser)) {
