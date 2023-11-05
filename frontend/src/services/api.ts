@@ -1,9 +1,7 @@
 import { TokenPayload, signOut } from "@/contexts/AuthContext";
 import axios, { AxiosError } from "axios";
 import nookies from "nookies";
-import jwt_decode from "jwt-decode";
 import { GetServerSidePropsContext } from "next";
-import { parseCookies } from "nookies";
 
 type Context = undefined | GetServerSidePropsContext;
 
@@ -13,7 +11,6 @@ export function setupAPIClient(ctx: Context = undefined) {
   api.interceptors.request.use(
     (config) => {
       const { accessToken } = nookies.get(null, "accesssToken");
-      const payload: TokenPayload = jwt_decode(accessToken);
 
       if (accessToken) {
         config.headers["Authorization"] = `Bearer ${accessToken}`;
