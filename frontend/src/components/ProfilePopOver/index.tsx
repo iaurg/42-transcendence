@@ -1,7 +1,7 @@
 import { Popover } from "@headlessui/react";
-import Link from "next/link";
 import { useState } from "react";
 import { usePopper } from "react-popper";
+import { NavLink } from "react-router-dom";
 
 type ProfilePopOverProps = {
   id: string;
@@ -51,14 +51,14 @@ export default function ProfilePopOver({
             >
               Jogar
             </button>
-            <Link href={`/game/history/${id}`} passHref>
+            <NavLink to={`/game/history/${id}`}>
               <button
                 type="button"
                 className="text-white bg-purple42-200 hover:bg-purple42-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none "
               >
                 Histórico
               </button>
-            </Link>
+            </NavLink>
           </div>
           <p className="text-base font-semibold leading-none text-white">
             <a href="#">{name}</a>

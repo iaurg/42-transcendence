@@ -1,4 +1,3 @@
-"use client";
 import { LeaderBoardCard } from "../LeaderBoardCard";
 import { User } from "@/types/user";
 import { useGetLeaderboard } from "@/services/queries/leaderboard/getLeaderboard";

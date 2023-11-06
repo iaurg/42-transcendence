@@ -6,6 +6,9 @@ import { AuthPage } from "./pages/auth/Mfa";
 import Redirect from "./pages/auth/Redirect";
 import { useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
+import { NotFound } from "./pages/404";
+import { GameLayout } from "./layouts/GameLayout";
+import { HomeGame } from "./pages/game/Home";
 
 export function Router() {
   const { user } = useContext(AuthContext);
@@ -17,8 +20,10 @@ export function Router() {
 
     return (
       <Routes>
-        <Route path="/game">
-          <Route path="/game" element={<div>Game</div>} />
+        <Route path="/game" element={<GameLayout />}>
+          <Route path="/game" element={<HomeGame />} />
+          {/* route to game history with uuid */}
+          <Route path="/game/history/:uuid" element={<HomeGame />} />
         </Route>
       </Routes>
     );
@@ -34,6 +39,7 @@ export function Router() {
         <Route path="/auth/2fa" element={<AuthPage />} />
         <Route path="/auth/redirect" element={<Redirect />} />
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

@@ -1,0 +1,24 @@
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import { Outlet } from "react-router-dom";
+
+export function GameLayout() {
+  return (
+    <div className="bg-black42-100 flex">
+      <div className="flex flex-col md:flex-row">
+        <Sidebar />
+      </div>
+      <div className="flex flex-col flex-1 py-4 mx-4">
+        <Header />
+        <Outlet />
+      </div>
+      <div className="flex flex-col">
+        {/*
+        <ChatProvider>
+          <Chat />
+        </ChatProvider>
+        */}
+      </div>
+    </div>
+  );
+}
