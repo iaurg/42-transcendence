@@ -7,7 +7,6 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
-  FileTypeValidator,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -21,7 +20,6 @@ const fileValidators = [
     // 1MB
     maxSize: 1024 * 1024,
   }),
-  new FileTypeValidator({ fileType: /image\/(png|jpg|gif)/ }),
 ];
 
 @Controller('avatar-upload')

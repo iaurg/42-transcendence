@@ -12,6 +12,7 @@ import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 import { MatchHistoryModule } from './match-history/match-history.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 
 @Module({
   imports: [
