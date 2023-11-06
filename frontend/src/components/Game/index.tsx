@@ -1,4 +1,3 @@
-"use client";
 import { GameContext, GameData } from "@/contexts/GameContext";
 import { useContext } from "react";
 import { Stage, Layer, Rect, Circle, Line } from "react-konva";
@@ -12,9 +11,7 @@ type ColoredPaddleProps = {
 };
 
 const ColoredRect = ({ x, y, width, height, color }: ColoredPaddleProps) => {
-  return <Rect x={x} y={y} width={width} height={height} fill={
-    color
-  } />;
+  return <Rect x={x} y={y} width={width} height={height} fill={color} />;
 };
 
 type GameProps = {
@@ -56,24 +53,24 @@ export default function Game({ data }: GameProps) {
       width={800}
       height={600}
       style={{
-        backgroundColor: 
-          gameLayouts[gameLayout].backgroundColor,
+        backgroundColor: gameLayouts[gameLayout].backgroundColor,
         borderRadius: "10px",
       }}
     >
       <Layer>
-        <ColoredRect key={data.player1.id} x={data.player1.x} y={data.player1.y} width={data.player1.width} height={data.player1.height}
-          color={
-            gameLayouts[gameLayout].paddleColor
-          }
+        <ColoredRect
+          key={data.player1.id}
+          x={data.player1.x || 0}
+          y={data.player1.y || 0}
+          width={data.player1.width}
+          height={data.player1.height}
+          color={gameLayouts[gameLayout].paddleColor}
         />
         <Circle
           x={data.ball.x}
           y={data.ball.y}
           radius={data.ball.radius}
-          fill={
-            gameLayouts[gameLayout].ballColor
-          }
+          fill={gameLayouts[gameLayout].ballColor}
           shadowBlur={5}
           zIndex={3}
         />
@@ -81,16 +78,19 @@ export default function Game({ data }: GameProps) {
           x={data.canvas.width / 2}
           y={0}
           points={[0, 0, 0, data.canvas.height]}
-          stroke={
-            gameLayouts[gameLayout].lineColor
-          }
+          stroke={gameLayouts[gameLayout].lineColor}
           strokeWidth={2}
           dash={[15, 10]}
           zIndex={2}
         />
-        <ColoredRect key={data.player2.id}  x={data.player2.x} y={data.player2.y} width={data.player2.width} height={data.player2.height} color={
-            gameLayouts[gameLayout].paddleColor
-        } />
+        <ColoredRect
+          key={data.player2.id}
+          x={data.player2.x}
+          y={data.player2.y}
+          width={data.player2.width}
+          height={data.player2.height}
+          color={gameLayouts[gameLayout].paddleColor}
+        />
       </Layer>
     </Stage>
   );

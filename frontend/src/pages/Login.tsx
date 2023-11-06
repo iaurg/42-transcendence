@@ -1,6 +1,6 @@
 import logoPong from "@/assets/images/logo-pong.png";
 
-export function Login() {
+export function LoginPage() {
   return (
     <div className="flex flex-col h-screen md:flex-row">
       <div className="flex flex-col flex-1 bg-[url('./42-pong-login-page-bg.jpg')] bg-no-repeat bg-cover "></div>

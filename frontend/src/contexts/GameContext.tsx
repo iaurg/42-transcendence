@@ -1,7 +1,7 @@
 "use client";
+import Cookies from "js-cookie";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
-import nookies from "nookies";
 
 /**
  * Backend websocket events
@@ -86,7 +86,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
   useEffect(() => {
     // Listen for the 'connect' event
-    const { accessToken } = nookies.get(null, "accesssToken");
+    const accessToken = Cookies.get("accessToken");
 
     socket.current = io("http://localhost:3000/game", {
       auth: {

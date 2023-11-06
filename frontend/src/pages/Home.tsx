@@ -2,7 +2,7 @@ import logoPong from "@/assets/images/logo-pong.png";
 import pongBanner from "@/assets/images/42-pong-home.png";
 import { NavLink } from "react-router-dom";
 
-export function Home() {
+export function HomePage() {
   return (
     <div className="max-w-screen-xl m-auto">
       <div className="flex flex-col h-screen md:flex-row">
