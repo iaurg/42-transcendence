@@ -1,6 +1,6 @@
-import { signOut } from "@/contexts/AuthContext";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
+import { redirect } from "react-router-dom";
 
 export function setupAPIClient() {
   const api = axios.create({ baseURL: import.meta.env.VITE_PUBLIC_API_URL });
@@ -17,7 +17,9 @@ export function setupAPIClient() {
     },
 
     function (error) {
-      signOut();
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
+      redirect("/");
       return Promise.reject(error);
     }
   );
@@ -30,7 +32,9 @@ export function setupAPIClient() {
       if (error.response?.status === 401) {
         // TODO refresh if access token is invalid
         // TODO if refresh token is invalid, logout and delete cookies
-        signOut();
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
+        redirect("/");
         console.log("refresh token is invalid");
         return Promise.reject(new Error());
       }

@@ -1,6 +1,6 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 type AuthContextType = {
@@ -8,6 +8,7 @@ type AuthContextType = {
   setPayload: React.Dispatch<React.SetStateAction<TokenPayload>>;
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User>>;
+  signOut: () => void;
 };
 
 export type TokenPayload = {
@@ -38,17 +39,19 @@ export const AuthContext = createContext<AuthContextType>(
   {} as AuthContextType
 );
 
-export function signOut() {
-  // TODO: get cookies from browser and redirect to /login
-  Cookies.remove("accessToken");
-  Cookies.remove("refreshToken");
-  redirect("/login");
-}
-
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [payload, setPayload] = useState<TokenPayload>({} as TokenPayload);
   const [user, setUser] = useState<User>({} as User);
   const accessToken = Cookies.get("accessToken");
+  const navigate = useNavigate();
+
+  const signOut = useCallback(() => {
+    // TODO: get cookies from browser and redirect to /login
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
+    setUser({} as User);
+    navigate("/login");
+  }, [navigate]);
 
   useEffect(() => {
     if (accessToken) {
@@ -58,6 +61,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         })
         .then((response) => {
           setUser(response.data);
+          if (!user.id) {
+            navigate("/game");
+          }
         })
         .catch((error) => {
           console.log("error", error);
@@ -66,7 +72,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } else {
       signOut();
     }
-  }, [setPayload, accessToken]);
+  }, [setPayload, accessToken, signOut, navigate, user.id]);
 
   return (
     <AuthContext.Provider
@@ -75,6 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setPayload,
         user,
         setUser,
+        signOut,
       }}
     >
       {children}
