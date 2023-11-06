@@ -1,12 +1,13 @@
 import { AuthContext, TokenPayload } from "@/contexts/AuthContext";
 import { useContext, useEffect } from "react";
 import jwt_decode from "jwt-decode";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 export default function Redirect() {
   const { payload: user, setPayload: setUser } = useContext(AuthContext);
   const accessToken = Cookies.get("accessToken");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (accessToken) {
@@ -15,19 +16,21 @@ export default function Redirect() {
         setUser(payload);
       }
     } else {
-      redirect("/login");
+      navigate("/login");
     }
-  }, [setUser, accessToken]);
+  }, [setUser, accessToken, navigate]);
 
   useEffect(() => {
+    console.log("redirect accesstoken", user);
+
     if (user.sub) {
       if (user.mfaEnabled) {
-        redirect("/auth/2fa");
+        navigate("/auth/2fa");
       } else {
-        redirect("/game");
+        navigate("/login");
       }
     }
-  }, [user]);
+  }, [user, navigate]);
 
   return (
     <div>

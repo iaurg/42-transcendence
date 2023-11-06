@@ -6,7 +6,11 @@ import logoPong from "@/assets/images/logo-icon-pong.png";
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
-  const { user } = useContext(AuthContext);
+  const { user, signOut } = useContext(AuthContext);
+
+  const handleSignOut = () => {
+    signOut();
+  };
 
   return (
     <div className="flex flex-col h-screen max-wd-[93] bg-black42-300">
@@ -45,13 +49,13 @@ export default function Sidebar() {
             <UserAvatar imageUrl={user.avatar} login={user.displayName} />
           </li>
           <li>
-            <NavLink
-              to="/"
+            <button
+              onClick={handleSignOut}
               className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
             >
               <SignOut color="white" size={32} />
-            </NavLink>
+            </button>
           </li>
         </ul>
       </div>

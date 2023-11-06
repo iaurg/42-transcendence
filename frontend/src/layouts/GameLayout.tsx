@@ -1,8 +1,16 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { Outlet } from "react-router-dom";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useContext } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
 export function GameLayout() {
+  const { user } = useContext(AuthContext);
+
+  if (!user.id) {
+    return <Navigate to="/login" />;
+  }
+
   return (
     <div className="bg-black42-100 flex">
       <div className="flex flex-col md:flex-row">
