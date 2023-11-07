@@ -1,4 +1,3 @@
-"use client";
 import chatService from "@/services/chatClient";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -68,8 +67,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   };
 
   const timeout = (delay: number) => {
-    return new Promise(res => setTimeout(res, delay));
-  }
+    return new Promise((res) => setTimeout(res, delay));
+  };
 
   useEffect(() => {
     // Connect to the Socket.IO server
@@ -88,7 +87,9 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     });
 
     chatService.socket?.on("deleteChat", (deletedChat: any) => {
-      setChatList((chatList) => chatList.filter((chat: Chat) => chat.id !== deletedChat.chatId));
+      setChatList((chatList) =>
+        chatList.filter((chat: Chat) => chat.id !== deletedChat.chatId)
+      );
     });
 
     chatService.socket?.emit("listChats");
@@ -125,7 +126,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     setValidationRequired(true);
     setShowElement("showChannels");
     setIsLoading(false);
-  }
+  };
 
   return (
     <ChatContext.Provider

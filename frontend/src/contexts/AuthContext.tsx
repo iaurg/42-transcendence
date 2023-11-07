@@ -42,7 +42,6 @@ export const AuthContext = createContext<AuthContextType>(
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [payload, setPayload] = useState<TokenPayload>({} as TokenPayload);
   const [user, setUser] = useState<User>({} as User);
-  const accessToken = Cookies.get("accessToken");
   const navigate = useNavigate();
 
   const signOut = useCallback(() => {
@@ -50,10 +49,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
     setUser({} as User);
-    navigate("/login");
+    navigate("/");
   }, [navigate]);
 
   useEffect(() => {
+    const accessToken = Cookies.get("accessToken");
+
     if (accessToken) {
       api
         .get(`/users/me`, {
@@ -72,7 +73,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } else {
       signOut();
     }
-  }, [setPayload, accessToken, signOut, navigate, user.id]);
+  }, []);
 
   return (
     <AuthContext.Provider

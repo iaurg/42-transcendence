@@ -1,6 +1,8 @@
+import Chat from "@/components/Chat";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { AuthContext } from "@/contexts/AuthContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
@@ -21,11 +23,9 @@ export function GameLayout() {
         <Outlet />
       </div>
       <div className="flex flex-col">
-        {/*
         <ChatProvider>
           <Chat />
         </ChatProvider>
-        */}
       </div>
     </div>
   );

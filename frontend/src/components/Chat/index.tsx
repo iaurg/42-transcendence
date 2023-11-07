@@ -1,4 +1,3 @@
-"use client";
 import { CaretUp, ChatsCircle, Users } from "@phosphor-icons/react";
 import { useContext } from "react";
 import { ListChannels } from "./ListChannels";

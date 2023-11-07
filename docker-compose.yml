@@ -53,7 +53,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - /app/.next
     ports:
       - "8000:3000"
     restart: always
