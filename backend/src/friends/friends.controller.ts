@@ -1,15 +1,12 @@
 import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
-import { UpdateFriendDto } from './dto/updateFriend.dto';
 import { FriendsService } from './friends.service';
-import { CreateFriendDto } from './dto/createFriend.dto';
-import { DeleteFriendDto } from './dto/deleteFriend.dto';
 
 @Controller('friends')
 export class FriendsController {
   constructor(private friendsService: FriendsService) {}
 
   @Post()
-  async createFriend(@Body() createFriendDto: CreateFriendDto) {
+  async createFriend(@Body() createFriendDto: any) {
     return this.friendsService.createFriend(createFriendDto);
   }
 
@@ -19,12 +16,12 @@ export class FriendsController {
   }
 
   @Put()
-  async updateFriendStatus(@Body() updateFriendDto: UpdateFriendDto) {
+  async updateFriendStatus(@Body() updateFriendDto: any) {
     return this.friendsService.updateFriendStatus(updateFriendDto);
   }
 
   @Delete()
-  async deleteFriend(@Body() deleteFriendDto: DeleteFriendDto) {
+  async deleteFriend(@Body() deleteFriendDto: any) {
     return this.friendsService.deleteFriend(deleteFriendDto);
   }
 }

@@ -15,6 +15,13 @@ enum UserStatus {
   BUSY
 }
 
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
 model User {
   id           String         @id @default(uuid())
   login        String         @unique
@@ -23,7 +30,6 @@ model User {
   avatar       String?
   status       UserStatus     @default(ONLINE)
   victory      Int            @default(0)
-  friends      Friend[]       @relation("Friendship")
   refreshToken String?
   mfaEnabled   Boolean        @default(false)
   mfaSecret    String?
@@ -33,33 +39,34 @@ model User {
   messages     Message[]
   winner       MatchHistory[] @relation(name: "winner")
   loser        MatchHistory[] @relation(name: "loser")
+  friends      Friendship[]   @relation(name: "user")
+  friendOf     Friendship[]   @relation(name: "friend")
+}
+
+model Friendship {
+  id        String              @id @default(uuid())
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], name: "user")
+  userId    String
+  friend    User             @relation(fields: [friendId], references: [id], name: "friend")
+  friendId  String
+  status    FriendshipStatus @default(PENDING)
+
+  @@unique([userId, friendId], name: "userId_friendId")
 }
 
 model MatchHistory {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   winner       User   @relation(fields: [winnerId], references: [id], name: "winner")
-  winnerId     String 
+  winnerId     String
   winnerPoints Int
 
   loser       User   @relation(fields: [loserId], references: [id], name: "loser")
-  loserId     String 
+  loserId     String
   loserPoints Int
 
   createdAt DateTime @default(now())
-}
-
-model Friend {
-  id     String           @id @default(uuid())
-  status FriendshipStatus
-  users  User[]           @relation("Friendship")
-}
-
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-  BLOCKED
 }
 
 model Message {
