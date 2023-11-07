@@ -167,7 +167,7 @@ export default function PlayPage() {
           }}
           ref={canvasRef}
         >
-          <Game data={gameData} />
+          {gameData.player1 && gameData.player2 && <Game data={gameData} />}
         </div>
       </div>
     </>
