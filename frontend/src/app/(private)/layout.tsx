@@ -30,7 +30,11 @@ export default function RootPrivateLayout({
             <Header />
             {children}
           </div>
-          <div className="flex flex-col"></div>
+          <div className="flex flex-col">
+            <ChatProvider>
+              <Chat />
+            </ChatProvider>
+          </div>
         </Providers>
         <Toaster />
       </body>
