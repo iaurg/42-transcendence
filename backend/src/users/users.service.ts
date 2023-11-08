@@ -58,7 +58,6 @@ export class UsersService {
       where: { login: login },
       data: {
         displayName: updateUserDto.displayName,
-        avatar: updateUserDto.avatar,
         status: updateUserDto.status,
         updatedAt: new Date(),
       },
