@@ -39,21 +39,12 @@ model User {
   messages     Message[]
   winner       MatchHistory[] @relation(name: "winner")
   loser        MatchHistory[] @relation(name: "loser")
-  friends      Friendship[]   @relation(name: "user")
-  friendOf     Friendship[]   @relation(name: "friend")
+  friends    User[]    @relation("UserFriends")
+
+  // to satisfy prisma's requirements; we won't access it directly.
+  symmetricFriends  User[] @relation("UserFriends")
 }
 
-model Friendship {
-  id        String              @id @default(uuid())
-  createdAt DateTime         @default(now())
-  user      User             @relation(fields: [userId], references: [id], name: "user")
-  userId    String
-  friend    User             @relation(fields: [friendId], references: [id], name: "friend")
-  friendId  String
-  status    FriendshipStatus @default(PENDING)
-
-  @@unique([userId, friendId], name: "userId_friendId")
-}
 
 model MatchHistory {
   id String @id @default(uuid())

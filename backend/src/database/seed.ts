@@ -104,16 +104,6 @@ async function main() {
   await prisma.matchHistory.createMany({
     data: matchHistory,
   });
-
-  // create 50 friendship
-  const friendship = Array.from({ length: 50 }).map(() => ({
-    userId: getRandomUserId(),
-    friendId: getRandomUserId(),
-  }));
-
-  await prisma.friendship.createMany({
-    data: friendship,
-  });
 }
 
 main()
