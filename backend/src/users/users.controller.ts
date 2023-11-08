@@ -51,20 +51,17 @@ export class UsersController {
     return this.service.create(createUserDto);
   }
 
-  @Patch(':login')
+  @Patch()
   update(
     @Req() request: Request & { user: User },
-    @Param('login') login: string,
     @Body() updateUserDto: PatchUserDto,
   ) {
     const { user } = request;
 
-    if (user.login !== login) {
-      throw new UnauthorizedException(
-        'You are not authorized to update this user',
-      );
+    if (!user.login) {
+      throw new UnauthorizedException('User not found.');
     }
 
-    return this.service.update(login, updateUserDto);
+    return this.service.update(user.login, updateUserDto);
   }
 }
