@@ -12,7 +12,7 @@ export class LeaderboardService {
         victory: 'desc',
       },
       select: {
-        login: true,
+        displayName: true,
         victory: true,
         avatar: true,
         id: true,
@@ -27,7 +27,7 @@ export class LeaderboardService {
         id: id,
       },
       select: {
-        login: true,
+        displayName: true,
         victory: true,
         avatar: true,
       },
