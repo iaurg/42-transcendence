@@ -44,12 +44,14 @@ export class UsersService {
   }
 
   async update(login: string, updateUserDto: UpdateUserDto) {
-    const displayName = await this.prisma.user.findFirst({
-      where: { displayName: updateUserDto.displayName },
-    });
+    if (updateUserDto.displayName) {
+      const displayName = await this.prisma.user.findFirst({
+        where: { displayName: updateUserDto.displayName },
+      });
 
-    if (displayName) {
-      throw new BadRequestException('Display name already in use');
+      if (displayName) {
+        throw new BadRequestException('Display name already taken');
+      }
     }
 
     return await this.prisma.user.update({
