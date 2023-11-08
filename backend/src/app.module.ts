@@ -10,9 +10,9 @@ import { FriendsModule } from './friends/friends.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { AvatarUploadModule } from './avatar-upload/avatar-upload.module';
 import { MatchHistoryModule } from './match-history/match-history.module';
-import { LoggerModule } from 'nestjs-pino';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
