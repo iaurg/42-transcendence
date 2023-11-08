@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { ParseIntPipe } from '@nestjs/common';
+import { Logger, ParseIntPipe } from '@nestjs/common';
 import {
   ChatDto,
   ChatMessageDto,
@@ -38,6 +38,7 @@ export class ChatGateway
     private usersService: UsersService,
   ) {}
   private connectedUsers: ConnectedUsers = {};
+  private readonly logger = new Logger(ChatGateway.name);
 
   @WebSocketServer()
   server: Server;
@@ -563,6 +564,7 @@ export class ChatGateway
           next();
         })
         .catch((err) => {
+          this.logger.error(err);
           return next(new Error(err));
         });
     });
@@ -576,6 +578,7 @@ export class ChatGateway
       });
       return this.usersService.findOne(payload.sub);
     } catch {
+      this.logger.error('Token invalid or expired');
       throw new WsException('Token invalid or expired');
     }
   }
