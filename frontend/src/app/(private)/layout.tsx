@@ -37,6 +37,7 @@ export default function RootPrivateLayout({
           </div>
           <Toaster />
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

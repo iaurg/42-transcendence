@@ -1,98 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateFriendDto } from './dto/createFriend.dto';
-import { UpdateFriendDto } from './dto/updateFriend.dto';
-import { DeleteFriendDto } from './dto/deleteFriend.dto';
+import { CreateFriendDto } from './dto/createFriendDto';
+import { DeleteFriendDto } from './dto/deleteFriendDto';
 
 @Injectable()
 export class FriendsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-  async findRelationship(user1Id, user2Id) {
-    return await this.prismaService.friend.findFirst({
-      where: {
-        AND: [
-          { users: { some: { id: user1Id } } },
-          { users: { some: { id: user2Id } } },
-        ],
-      },
+  async createFriend(userId: string, createFriendDto: CreateFriendDto) {
+    const friendship = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { friends: { where: { id: createFriendDto.friend_id } } },
     });
-  }
 
-  async createFriend(createFriendDto: CreateFriendDto) {
-    const existingFriendship = await this.findRelationship(
-      createFriendDto.userId,
-      createFriendDto.friendId,
-    );
-
-    if (existingFriendship) {
-      return existingFriendship;
+    if (friendship.friends.length > 0) {
+      throw new NotAcceptableException('Friendship already exists');
     }
-    const friendRequest = await this.prismaService.friend.create({
-      data: {
-        status: 'PENDING',
-        users: {
-          connect: [
-            { id: createFriendDto.userId },
-            { id: createFriendDto.friendId },
-          ],
-        },
-      },
+
+    const friendUser = await this.prisma.user.findUnique({
+      where: { id: createFriendDto.friend_id },
     });
-    return friendRequest;
+
+    if (!friendUser) {
+      throw new NotFoundException('Friend not found');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { friends: { connect: [{ id: createFriendDto.friend_id }] } },
+    });
+
+    await this.prisma.user.update({
+      where: { id: createFriendDto.friend_id },
+      data: { friends: { connect: [{ id: userId }] } },
+    });
+
+    return {
+      message: 'Friend added',
+      friend: friendUser,
+    };
   }
 
   async getFriends(userId: string) {
-    const friendships = await this.prismaService.friend.findMany({
-      where: {
-        users: {
-          some: {
-            id: userId,
-          },
-        },
-        status: 'ACCEPTED',
-      },
-      select: {
-        users: {
-          where: {
-            id: {
-              not: userId
-            }
-          }
-        }
-      },
+    const friends = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { friends: true },
     });
 
-    return friendships;
+    return friends;
   }
 
-  async updateFriendStatus(updateFriendDto: UpdateFriendDto) {
-    const relationShip = await this.findRelationship(
-      updateFriendDto.friendId,
-      updateFriendDto.userId,
-    );
-    return await this.prismaService.friend.update({
-      where: {
-        id: relationShip.id,
-      },
-      data: {
-        status: updateFriendDto.friendshipStatus,
-      },
+  async deleteFriend(userId: string, deleteFriendDto: DeleteFriendDto) {
+    const friendship = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { friends: { where: { id: deleteFriendDto.friend_id } } },
     });
-  }
 
-  async deleteFriend(deleteFriendDto: DeleteFriendDto) {
-    const relationShip = await this.findRelationship(
-      deleteFriendDto.friendId,
-      deleteFriendDto.userId,
-    );
-    if (!relationShip) {
-      return relationShip;
+    if (friendship.friends.length === 0) {
+      throw new NotFoundException('Friendship not found');
     }
-    return await this.prismaService.friend.delete({
-      where: {
-        id: relationShip.id,
-      },
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { friends: { disconnect: [{ id: deleteFriendDto.friend_id }] } },
     });
+
+    await this.prisma.user.update({
+      where: { id: deleteFriendDto.friend_id },
+      data: { friends: { disconnect: [{ id: userId }] } },
+    });
+
+    return {
+      message: 'Friend deleted',
+    };
   }
 }
