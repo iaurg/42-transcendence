@@ -12,11 +12,11 @@ export function UserInfo() {
     <div className="flex justify-between items-center">
       <div className="flex items-center space-x-3">
         <div>
-          <UserAvatar imageUrl={user.avatar} login={user.displayName} />
+          <UserAvatar imageUrl={user.avatar || ""} login={user.displayName} />
         </div>
         <div className="text-white">
           <div className="text-lg">{user.displayName}</div>{" "}
-          <StatusTag status={user.status} />
+          <StatusTag user={user} />
         </div>
         <EditUserModal />
         <MFAModal />
