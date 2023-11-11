@@ -6,15 +6,18 @@ import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
   app.useLogger(app.get(Logger));
 
   // Set up cookie parser
   app.use(cookieParser());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
     }),
   );
+
   app.enableCors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
