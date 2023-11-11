@@ -77,6 +77,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       console.log(`Current user login: ${user.login}`, user);
       setUser(() => user);
       queryClient.invalidateQueries(["user_status", user.id]);
+      queryClient.invalidateQueries(["friends"]);
     });
 
     // Listen for incoming messages recursively every 10 seconds
