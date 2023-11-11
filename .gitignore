@@ -110,5 +110,7 @@ postgres/
 
 # Migrations
 **/database/migrations/*
-
 data
+
+# Local Uploads
+/backend/uploads/*
