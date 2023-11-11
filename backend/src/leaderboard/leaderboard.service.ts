@@ -12,10 +12,12 @@ export class LeaderboardService {
         victory: 'desc',
       },
       select: {
+        displayName: true,
         login: true,
         victory: true,
         avatar: true,
         id: true,
+        status: true,
       },
     });
   }
