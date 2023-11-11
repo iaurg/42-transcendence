@@ -72,22 +72,19 @@ export class ChatGateway
       }
     }
 
-    // change user status to offline
     await this.usersService.updateUserStatus(id, 'OFFLINE');
   }
 
   // TODO:
   async handleConnection(@ConnectedSocket() client: Socket) {
     const { login, id } = client.handshake.auth?.user;
-
-    // TODO: remove this hardcoded user id
+    this.logger.debug(`Connection handle`);
     if (!login) {
       client.emit('connected', { error: 'User not found' });
       client.disconnect();
       return;
     }
 
-    // change user status to online
     await this.usersService.updateUserStatus(id, 'ONLINE');
 
     this.connectedUsers[login] = client;
