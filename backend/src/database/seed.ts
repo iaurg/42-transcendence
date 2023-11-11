@@ -3,26 +3,55 @@ import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
-/* User Schema
+/* Schemas
+
+enum UserStatus {
+  ONLINE
+  OFFLINE
+  AWAY
+  BUSY
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
 model User {
-  id           String     @id @default(uuid())
-  login        String     @unique
+  id           String         @id @default(uuid())
+  login        String         @unique
   displayName  String
   email        String
   avatar       String?
-  status       UserStatus @default(ONLINE)
-  victory      Int        @default(0)
-  friends      Friend[]   @relation("Friendship")
+  status       UserStatus     @default(ONLINE)
+  victory      Int            @default(0)
   refreshToken String?
-  mfaEnabled   Boolean    @default(false)
+  mfaEnabled   Boolean        @default(false)
   mfaSecret    String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  chats       ChatMember[]
-  messages    Message[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  chats        ChatMember[]
+  messages     Message[]
+  winner       MatchHistory[] @relation(name: "winner")
+  loser        MatchHistory[] @relation(name: "loser")
+  friends      Friendship[]   @relation(name: "user")
+  friendOf     Friendship[]   @relation(name: "friend")
 }
 
-MatchHistory Schema
+model Friendship {
+  id        Int              @id @default(autoincrement())
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], name: "user")
+  userId    String
+  friend    User             @relation(fields: [friendId], references: [id], name: "friend")
+  friendId  String
+  status    FriendshipStatus @default(PENDING)
+
+  @@unique([userId, friendId], name: "userId_friendId")
+}
+
 model MatchHistory {
   id Int @id @default(autoincrement())
 
