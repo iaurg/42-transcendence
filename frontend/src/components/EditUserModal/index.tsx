@@ -1,8 +1,10 @@
 import { AuthContext } from "@/contexts/AuthContext";
+import { api } from "@/services/apiClient";
 import { Dialog, Transition } from "@headlessui/react";
 import { PencilSimple } from "@phosphor-icons/react";
 import { Fragment, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export default function EditUserModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +23,21 @@ export default function EditUserModal() {
     setIsOpen(true);
   }
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = async (data: any) => {
+    // create a new form data and append the data, send to api
+    const formData = new FormData();
+    formData.append("file", data.avatar[0]);
+
+    await api
+      .post("/avatar-upload", formData)
+      .then(() => {
+        toast.success("Avatar atualizado com sucesso!");
+        setIsOpen(false);
+      })
+      .catch(() => {
+        toast.error("Erro ao atualizar avatar!");
+      });
+  };
 
   return (
     <>
@@ -68,7 +84,7 @@ export default function EditUserModal() {
                     <div className="flex flex-row space-x-8 items-center">
                       {user.avatar ? (
                         <img
-                          src={user.avatar}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/avatars/${user.avatar}`}
                           alt="Avatar"
                           className="rounded-full w-24 h-24"
                         />
@@ -90,7 +106,7 @@ export default function EditUserModal() {
                         className="bg-black42-400 text-white rounded-lg p-2 placeholder-gray-700"
                         placeholder="Nome de usuário"
                         {...register("username", {
-                          required: true,
+                          required: false,
                         })}
                       />
                       {errors.username && (

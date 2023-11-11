@@ -8,7 +8,7 @@ export default function UserAvatar({ imageUrl, login }: UserAvatarProps) {
     // TODO: change to next/image when all urls comes from our server
     return (
       <img
-        src={`${imageUrl}`}
+        src={`${process.env.NEXT_PUBLIC_API_URL}/avatars/${imageUrl}`}
         alt="avatar"
         width={40}
         height={40}
