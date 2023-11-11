@@ -45,6 +45,7 @@ export default function FriendCard({
           } w-2 h-2 rounded-full`}
         ></div>
       </div>
+
       <div className="flex space-x-5 items-center">
         <EnvelopeSimple className="text-purple42-200" size={18} />
         <Sword className="text-purple42-200" size={18} />
