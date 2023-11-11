@@ -30,6 +30,11 @@ export class UsersController {
     return this.service.findOne(login);
   }
 
+  @Get('status/:id')
+  findStatus(@Param('id') id: string) {
+    return this.service.getUserStatus(id);
+  }
+
   @Get()
   findAll() {
     return this.service.findAll();
