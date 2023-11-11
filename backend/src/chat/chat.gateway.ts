@@ -32,6 +32,8 @@ interface ConnectedUsers {
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer() server: Server;
+
   constructor(
     private chatService: ChatService,
     private jwtService: JwtService,
@@ -40,8 +42,21 @@ export class ChatGateway
   private connectedUsers: ConnectedUsers = {};
   private readonly logger = new Logger(ChatGateway.name);
 
-  @WebSocketServer()
-  server: Server;
+  afterInit() {
+    this.server.use((socket, next) => {
+      this.validateConnection(socket)
+        .then((user) => {
+          socket.handshake.auth['user'] = user;
+          console.log(`User ${socket.handshake.auth['user'].login} connected`);
+          socket.emit('userLogin', user);
+          next();
+        })
+        .catch((err) => {
+          this.logger.error(err);
+          return next(new Error(err));
+        });
+    });
+  }
 
   async addConnectedUsersToChat(chatId: number) {
     const users = await this.chatService.getUsersByChatId(chatId);
@@ -62,10 +77,12 @@ export class ChatGateway
     const login = client.handshake.auth?.user?.login;
     client.emit('userLogin', client.handshake.auth?.user);
     const member = await this.chatService.getMemberFromChat(chatId, login);
+
     if (!member) {
       client.emit('error', { error: 'You are not a member of this chat' });
       return;
     }
+
     if (member.status !== 'ACTIVE') {
       client.emit('error', { error: 'You are not allowed to send messages' });
       return;
@@ -552,22 +569,6 @@ export class ChatGateway
     for (const chat of chats) {
       client.join(`chat:${chat.id.toString()}`);
     }
-  }
-
-  afterInit(_: Server) {
-    this.server.use((socket, next) => {
-      this.validateConnection(socket)
-        .then((user) => {
-          socket.handshake.auth['user'] = user;
-          console.log(`User ${socket.handshake.auth['user'].login} connected`);
-          socket.emit('userLogin', user);
-          next();
-        })
-        .catch((err) => {
-          this.logger.error(err);
-          return next(new Error(err));
-        });
-    });
   }
 
   private validateConnection(client: Socket) {
