@@ -64,6 +64,12 @@ export class ChatGateway
   async handleConnection(@ConnectedSocket() client: Socket) {
     this.logger.debug(`Connection handle`);
 
+    if (!client.handshake.auth?.token) {
+      client.emit('connected', { error: 'Token not found' });
+      client.disconnect();
+      return;
+    }
+
     const { login, id } = await this.validateConnection(client);
 
     if (!login) {
@@ -90,6 +96,12 @@ export class ChatGateway
 
   private validateConnection(client: Socket) {
     const token = client.handshake.auth.token;
+
+    if (!token) {
+      client.emit('connected', { error: 'Token not found' });
+      client.disconnect();
+      return;
+    }
 
     try {
       const payload = this.jwtService.verify<TokenPayload>(token, {
