@@ -42,27 +42,12 @@ export class ChatGateway
   private connectedUsers: ConnectedUsers = {};
   private readonly logger = new Logger(ChatGateway.name);
 
-  afterInit() {
-    this.logger.debug('Initialized chat gateway');
-    this.server.use((socket, next) => {
-      this.validateConnection(socket)
-        .then((user) => {
-          socket.handshake.auth['user'] = user;
-          socket.emit('userLogin', user);
-          next();
-        })
-        .catch((err) => {
-          this.logger.error(
-            `Failed to authenticate user: ${socket.handshake.auth?.user?.login}`,
-            err,
-          );
-          return next(new Error(err));
-        });
-    });
+  afterInit(server: Server) {
+    this.logger.log('Initialized server');
   }
 
   async handleDisconnect(client: Socket) {
-    const { id } = client.handshake.auth?.user;
+    const { id } = await this.validateConnection(client);
 
     for (const userId in this.connectedUsers) {
       if (this.connectedUsers[userId] === client) {
@@ -77,8 +62,10 @@ export class ChatGateway
 
   // TODO:
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const { login, id } = client.handshake.auth?.user;
     this.logger.debug(`Connection handle`);
+
+    const { login, id } = await this.validateConnection(client);
+
     if (!login) {
       client.emit('connected', { error: 'User not found' });
       client.disconnect();
@@ -111,7 +98,6 @@ export class ChatGateway
       return this.usersService.findOne(payload.sub);
     } catch {
       this.logger.error('Token invalid or expired');
-      throw new WsException('Token invalid or expired');
     }
   }
 

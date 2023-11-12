@@ -14,7 +14,7 @@ import { chatMemberRole, chatType } from '@prisma/client';
 // create a new chat in the database using post request
 // get all chats from the database using get request
 
-@Controller('chat*')
+@Controller('chat')
 export class ChatController {
   constructor(private chatService: ChatService) {}
 
