@@ -9,6 +9,7 @@ interface Message {
   id: number;
   content: string;
   userLogin: string;
+  userId: string;
 }
 
 export function OpenChannel() {
@@ -29,14 +30,16 @@ export function OpenChannel() {
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
   });
+
   chatService.socket?.on("message", (message: Message) => {
     setMessages([...messages, message]);
   });
+
   chatService.socket?.on("listMembers", (members: ChatMember[]) => {
     setNumberOfUsersInChat(members.length);
     setUsers(members);
   });
-  console.log(messages);
+
   chatService.socket?.on("verifyPassword", (response: any) => {
     if (response.error) {
       setError("password", {
@@ -163,7 +166,10 @@ export function OpenChannel() {
             } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
           >
             <span className="font-semibold">
-              <Link href={`/game/history/`}>{message.userLogin}</Link>:{" "}
+              <Link href={`/game/history/${message.userId}`}>
+                {message.userLogin}
+              </Link>
+              :{" "}
             </span>
             {message.content}
           </div>
