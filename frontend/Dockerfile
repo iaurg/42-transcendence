@@ -1,13 +1,12 @@
-FROM node:18
+FROM node:20
 
 WORKDIR /usr/src/app/client
 
 COPY . .
 
-RUN npm install
-RUN npm build
+RUN yarn install
+RUN yarn build
 
-EXPOSE 9090
+EXPOSE 3000
 
-CMD [ "npm", "run", "start", "--port", "9090" ]
-
+CMD [ "yarn", "start" ]

@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Install dependencies
-cd backend/ && npm i
-
-# Install NestJS CLI
-npm install -g @nestjs/cli
-
 # Generate Prisma Client
 npx prisma generate
 
