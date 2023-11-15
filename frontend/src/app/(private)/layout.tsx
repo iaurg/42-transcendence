@@ -35,6 +35,7 @@ export default function RootPrivateLayout({
               <Chat />
             </ChatProvider>
           </div>
+          <Toaster />
         </Providers>
         <Toaster />
       </body>
