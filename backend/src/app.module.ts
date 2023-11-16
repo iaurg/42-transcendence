@@ -18,10 +18,15 @@ import { join } from 'path';
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
         transport: {
           target: 'pino-pretty',
           options: {
             singleLine: true,
+            levelFirst: true,
+            colorize: true,
+            // translateTime for São Paulo timezone into a pretty format
+            translateTime: 'SYS:dd/mm/yyyy HH:MM:ss',
           },
         },
       },
