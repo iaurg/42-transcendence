@@ -47,10 +47,12 @@ export class JwtAuthService {
 
   async generateJwt(user: User, mfaAuthenticated = false) {
     const payload = this.generatePayload(user, mfaAuthenticated);
+
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.accessTokenExpiration,
       secret: this.configService.get('JWT_SECRET'),
     });
+
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: this.refreshTokenExpiration,
       secret: this.configService.get('JWT_SECRET'),

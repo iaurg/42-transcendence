@@ -29,7 +29,7 @@ export class LeaderboardService {
         id: id,
       },
       select: {
-        login: true,
+        displayName: true,
         victory: true,
         avatar: true,
       },

@@ -1,5 +1,6 @@
 import { AuthContext } from "@/contexts/AuthContext";
 import { api } from "@/services/apiClient";
+import { queryClient } from "@/services/queryClient";
 import { Dialog, Transition } from "@headlessui/react";
 import { PencilSimple } from "@phosphor-icons/react";
 import { Fragment, useContext, useState } from "react";
@@ -8,6 +9,7 @@ import toast from "react-hot-toast";
 
 export default function EditUserModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(AuthContext);
   const {
     register,
@@ -25,18 +27,45 @@ export default function EditUserModal() {
 
   const onSubmit = async (data: any) => {
     // create a new form data and append the data, send to api
-    const formData = new FormData();
-    formData.append("file", data.avatar[0]);
+    if (data.username) {
+      setIsLoading(true);
+      await api
+        .patch("/users", {
+          displayName: data.username,
+        })
+        .then(() => {
+          toast.success("Nome de usuário atualizado com sucesso!");
+          queryClient.invalidateQueries(["users"]);
+        })
+        .catch((error) => {
+          toast.error(
+            `Erro ao atualizar nome de usuário: ${error.response.data.message}`
+          );
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setIsOpen(false);
+        });
+    }
 
-    await api
-      .post("/avatar-upload", formData)
-      .then(() => {
-        toast.success("Avatar atualizado com sucesso!");
-        setIsOpen(false);
-      })
-      .catch(() => {
-        toast.error("Erro ao atualizar avatar!");
-      });
+    if (data.avatar.length > 0) {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("file", data.avatar[0]);
+
+      await api
+        .post("/avatar-upload", formData)
+        .then(() => {
+          toast.success("Avatar atualizado com sucesso!");
+        })
+        .catch(() => {
+          toast.error("Erro ao atualizar avatar!");
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setIsOpen(false);
+        });
+    }
   };
 
   return (
@@ -118,8 +147,30 @@ export default function EditUserModal() {
                     <button
                       type="submit"
                       className="bg-purple42-300 text-white rounded-lg p-2 w-full"
+                      disabled={isLoading}
                     >
-                      Salvar alterações
+                      {isLoading ? (
+                        <svg
+                          className="animate-spin h-5 w-5 mr-3"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                          />
+                        </svg>
+                      ) : (
+                        <span>Atualizar</span>
+                      )}
                     </button>
                   </form>
                 </Dialog.Panel>

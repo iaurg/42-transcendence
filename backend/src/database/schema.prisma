@@ -64,6 +64,7 @@ model Message {
   id        String   @id @default(uuid())
   user      User?    @relation(fields: [userLogin], references: [login])
   userLogin String?
+  userId    String?  
   createdAt DateTime @default(now())
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    Int

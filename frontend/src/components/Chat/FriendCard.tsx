@@ -3,6 +3,7 @@ import { queryClient } from "@/services/queryClient";
 import { UserStatus } from "@/types/user";
 import { EnvelopeSimple, Sword, UserMinus } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 type FriendCardProps = {
@@ -45,7 +46,12 @@ export default function FriendCard({
           } w-2 h-2 rounded-full`}
         ></div>
       </div>
-
+      <Link
+        href={`/game/history/${id}`}
+        className="flex space-x-2 items-center"
+      >
+        {displayName}
+      </Link>
       <div className="flex space-x-5 items-center">
         <EnvelopeSimple className="text-purple42-200" size={18} />
         <Sword className="text-purple42-200" size={18} />

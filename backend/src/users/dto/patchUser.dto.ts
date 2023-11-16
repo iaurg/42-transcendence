@@ -5,10 +5,6 @@ export class PatchUserDto {
   @IsOptional()
   displayName?: string;
 
-  @IsString()
-  @IsOptional()
-  avatar?: string;
-
   @IsBoolean()
   @IsOptional()
   mfaEnabled?: boolean;
