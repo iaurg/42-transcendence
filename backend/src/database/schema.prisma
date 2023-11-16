@@ -15,6 +15,13 @@ enum UserStatus {
   BUSY
 }
 
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
 model User {
   id           String         @id @default(uuid())
   login        String         @unique
@@ -23,7 +30,6 @@ model User {
   avatar       String?
   status       UserStatus     @default(ONLINE)
   victory      Int            @default(0)
-  friends      Friend[]       @relation("Friendship")
   refreshToken String?
   mfaEnabled   Boolean        @default(false)
   mfaSecret    String?
@@ -33,39 +39,32 @@ model User {
   messages     Message[]
   winner       MatchHistory[] @relation(name: "winner")
   loser        MatchHistory[] @relation(name: "loser")
+  friends    User[]    @relation("UserFriends")
+
+  // to satisfy prisma's requirements; we won't access it directly.
+  symmetricFriends  User[] @relation("UserFriends")
 }
 
+
 model MatchHistory {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   winner       User   @relation(fields: [winnerId], references: [id], name: "winner")
-  winnerId     String 
+  winnerId     String
   winnerPoints Int
 
   loser       User   @relation(fields: [loserId], references: [id], name: "loser")
-  loserId     String 
+  loserId     String
   loserPoints Int
 
   createdAt DateTime @default(now())
-}
-
-model Friend {
-  id     String           @id @default(uuid())
-  status FriendshipStatus
-  users  User[]           @relation("Friendship")
-}
-
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-  BLOCKED
 }
 
 model Message {
   id        String   @id @default(uuid())
   user      User?    @relation(fields: [userLogin], references: [login])
   userLogin String?
+  userId    String?  
   createdAt DateTime @default(now())
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    Int

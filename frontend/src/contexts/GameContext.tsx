@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
+import nookies from "nookies";
 
 /**
  * Backend websocket events
@@ -52,7 +53,7 @@ export type MovePlayerData = {
   direction: string;
 };
 
-export type GameLayout = 'default' | 'sunlight' | 'moonlight' | 'dark';
+export type GameLayout = "default" | "sunlight" | "moonlight" | "dark";
 
 type GameContextType = {
   waitingPlayer2: boolean;
@@ -79,13 +80,18 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [clientId, setClientId] = useState("");
   const [gameData, setGameData] = useState({} as GameData);
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
-  const [gameLayout, setGameLayout] = useState<GameLayout>('default');
+  const [gameLayout, setGameLayout] = useState<GameLayout>("default");
 
   const socket = useRef<Socket | null>(null);
 
   useEffect(() => {
     // Listen for the 'connect' event
+    const { accessToken } = nookies.get(null, "accesssToken");
+
     socket.current = io("http://localhost:3000/game", {
+      auth: {
+        token: accessToken,
+      },
       transports: ["websocket", "polling", "flashsocket"],
     });
 
@@ -180,8 +186,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameAbandoned,
         gameFinishedData,
         gameData,
-        gameLayout, 
-        setGameLayout
+        gameLayout,
+        setGameLayout,
       }}
     >
       {children}

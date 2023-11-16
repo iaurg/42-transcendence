@@ -1,19 +1,28 @@
-import { ChatContext, ChatList } from "@/contexts/ChatContext";
+import { ChatContext } from "@/contexts/ChatContext";
 import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
 interface Message {
   id: number;
   content: string;
   userLogin: string;
+  userId: string;
 }
 
 export function OpenChannel() {
-  const { selectedChat, handleCloseChat, setShowElement, validationRequired, setValidationRequired, user } = useContext(ChatContext);
+  const {
+    selectedChat,
+    handleCloseChat,
+    setShowElement,
+    validationRequired,
+    setValidationRequired,
+    user,
+  } = useContext(ChatContext);
   // List messages from the websocket
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
@@ -21,9 +30,11 @@ export function OpenChannel() {
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
   });
+
   chatService.socket?.on("message", (message: Message) => {
     setMessages([...messages, message]);
   });
+
   chatService.socket?.on("listMembers", (members: ChatMember[]) => {
     setNumberOfUsersInChat(members.length);
     setUsers(members);
@@ -33,7 +44,7 @@ export function OpenChannel() {
     if (response.error) {
       setError("password", {
         type: "manual",
-        message: "Senha incorreta"
+        message: "Senha incorreta",
       });
       return;
     }
@@ -43,7 +54,7 @@ export function OpenChannel() {
   const handleSendMessage = () => {
     chatService.socket?.emit("message", {
       chatId: selectedChat.id,
-      content: message
+      content: message,
     });
 
     setMessage("");
@@ -58,7 +69,7 @@ export function OpenChannel() {
 
   type FormInputs = {
     password: string;
-  }
+  };
 
   const {
     register,
@@ -87,7 +98,10 @@ export function OpenChannel() {
             className="cursor-pointer"
             color="white"
             size={20}
-            onClick={() => { setShowElement("showChannels"); setValidationRequired(true); }}
+            onClick={() => {
+              setShowElement("showChannels");
+              setValidationRequired(true);
+            }}
           />
         </div>
         <div className="flex flex-col flex-1 justify-center bg-black42-300 my-4">
@@ -100,9 +114,7 @@ export function OpenChannel() {
                 {...register("password", { required: true })}
               />
               {errors.password && (
-                <span className="text-red-600 text-xs">
-                  Senha incorreta
-                </span>
+                <span className="text-red-600 text-xs">Senha incorreta</span>
               )}
             </div>
 
@@ -115,16 +127,14 @@ export function OpenChannel() {
           </form>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-8">
         <div className="flex items-center">
-          <ChatUsersChannelPopOver
-            users={users}
-          >
+          <ChatUsersChannelPopOver users={users}>
             <div className="flex space-x-1 items-center">
               <span className="text-xs">({numberOfUsersInChat})</span>
               <UsersThree className="text-white" size={20} />
@@ -149,12 +159,18 @@ export function OpenChannel() {
           <div
             key={message.id}
             // TODO: Implement user context to compare user login with message user
-            className={`${message.userLogin === user.login
-              ? "text-white bg-purple42-200 self-end"
-              : "text-white bg-black42-300 self-start"
-              } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
+            className={`${
+              message.userLogin === user.login
+                ? "text-white bg-purple42-200 self-end"
+                : "text-white bg-black42-300 self-start"
+            } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
           >
-            <span className="font-semibold">{message.userLogin}: </span>
+            <span className="font-semibold">
+              <Link href={`/game/history/${message.userId}`}>
+                {message.userLogin}
+              </Link>
+              :{" "}
+            </span>
             {message.content}
           </div>
         ))}

@@ -60,7 +60,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(response.data);
         })
         .catch((error) => {
-          console.log("error", error);
           signOut();
         });
     } else {
