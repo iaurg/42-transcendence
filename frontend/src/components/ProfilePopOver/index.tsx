@@ -1,6 +1,10 @@
+import { api } from "@/services/apiClient";
+import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { usePopper } from "react-popper";
 
 type ProfilePopOverProps = {
@@ -25,6 +29,23 @@ export default function ProfilePopOver({
     placement: "right",
   });
 
+  const addFriendMutation = useMutation({
+    mutationFn: (friendData: any) => {
+      return api.post("/friends", friendData);
+    },
+    onSuccess: () => {
+      toast.success("Amigo adicionado com sucesso!");
+      queryClient.invalidateQueries(["friends"]);
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao adicionar amigo: ${error.response.data.message}`);
+    },
+  });
+
+  const handleAddFriend = () => {
+    addFriendMutation.mutate({ friend_id: id });
+  };
+
   return (
     <Popover className="relative">
       <Popover.Button ref={setReferenceElement} className="outline-none">
@@ -42,6 +63,7 @@ export default function ProfilePopOver({
             <button
               type="button"
               className="text-white bg-purple42-200 hover:bg-purple42-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none "
+              onClick={handleAddFriend}
             >
               Add amigo
             </button>

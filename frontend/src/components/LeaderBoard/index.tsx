@@ -28,10 +28,11 @@ export function LeaderBoard() {
             <LeaderBoardCard
               key={user.id}
               id={user.id}
-              name={user.login}
+              name={user.displayName}
               avatar={user.avatar || ""}
               score={user.victory}
-              isFriend={user.login.includes("m")}
+              //TODO: create functional logic
+              isFriend={false}
             />
           ))}
         </>

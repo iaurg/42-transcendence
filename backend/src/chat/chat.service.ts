@@ -20,6 +20,12 @@ export class ChatService {
     chatId: number,
     content: string,
   ): Promise<Message> {
+    const userId = await this.prisma.user.findUnique({
+      where: {
+        login: userLogin,
+      },
+    });
+
     const createdMessage = await this.prisma.message.create({
       data: {
         content,
@@ -33,6 +39,7 @@ export class ChatService {
             login: userLogin,
           },
         },
+        userId: userId.id,
       },
     });
 

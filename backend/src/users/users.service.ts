@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -44,17 +44,22 @@ export class UsersService {
   }
 
   async update(login: string, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.displayName) {
+      const displayName = await this.prisma.user.findFirst({
+        where: { displayName: updateUserDto.displayName },
+      });
+
+      if (displayName) {
+        throw new BadRequestException('Display name already taken');
+      }
+    }
+
     return await this.prisma.user.update({
       where: { login: login },
       data: {
         displayName: updateUserDto.displayName,
-        avatar: updateUserDto.avatar,
         status: updateUserDto.status,
-        victory: updateUserDto.victory,
         updatedAt: new Date(),
-        refreshToken: updateUserDto.refreshToken,
-        mfaSecret: updateUserDto.mfaSecret,
-        mfaEnabled: updateUserDto.mfaEnabled,
       },
     });
   }

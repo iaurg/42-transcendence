@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import nookies from "nookies";
 
 class ChatService {
   public socket: Socket | null;
@@ -9,7 +10,12 @@ class ChatService {
 
   public connect(): void {
     if (!this.socket) {
+      const { accessToken } = nookies.get(null, "accesssToken");
+
       this.socket = io("http://localhost:3000/chat", {
+        auth: {
+          token: accessToken,
+        },
         transports: ["websocket", "polling", "flashsocket"],
       });
     }
