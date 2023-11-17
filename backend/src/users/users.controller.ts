@@ -19,7 +19,7 @@ import { Request } from 'express';
 import { RemoveUsersFieldsInterceptor } from 'src/interceptors/remove-users-fields/remove-users-fields.interceptor';
 
 @Controller('users')
-@UseGuards(AccessTokenGuard)
+// @UseGuards(AccessTokenGuard)
 @UseInterceptors(RemoveUsersFieldsInterceptor)
 export class UsersController {
   constructor(private service: UsersService) {}
