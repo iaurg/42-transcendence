@@ -1,11 +1,11 @@
 import { ChatContext } from "@/contexts/ChatContext";
-import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
 import {
+  Boot,
   Crown,
-  MicrophoneSlash,
+  Medal,
+  PencilSimpleSlash,
   Prohibit,
-  SignOut,
 } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import { useContext, useState } from "react";
@@ -103,14 +103,20 @@ export default function ChatUsersChannelPopOver({
             >
               <div>{user.userLogin}</div>
               <div className="flex items-center space-x-2">
-                <Crown
+                {user.role === 'OWNER' ?? <Crown
+                  className="cursor-pointer text-orange42-500"
+                  size={20}
+                  aria-label="Channel Owner"
+                  alt="Channel Owner"
+                />}
+                <Medal
                   className="cursor-pointer text-orange42-500"
                   size={20}
                   aria-label="Promote to Owner"
                   alt="Promote to Owner"
                   onClick={() => handlepromoteToAdmin(user)}
                 />
-                <MicrophoneSlash
+                <PencilSimpleSlash
                   className="cursor-pointer text-purple42-200"
                   size={20}
                   aria-label="Mute user"
@@ -124,7 +130,7 @@ export default function ChatUsersChannelPopOver({
                   alt="Ban user"
                   onClick={() => handleBanUser(user)}
                 />
-                <SignOut
+                <Boot
                   className="cursor-pointer"
                   size={20}
                   aria-label="Kick user"
