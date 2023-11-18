@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Chat, PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
@@ -56,11 +56,11 @@ model MatchHistory {
   id Int @id @default(autoincrement())
 
   winner       User   @relation(fields: [winnerId], references: [id], name: "winner")
-  winnerId     String 
+  winnerId     String
   winnerPoints Int
 
   loser       User   @relation(fields: [loserId], references: [id], name: "loser")
-  loserId     String 
+  loserId     String
   loserPoints Int
 
   createdAt DateTime @default(now())
@@ -73,7 +73,7 @@ async function main() {
     login: faker.internet.userName(),
     displayName: faker.person.firstName(),
     email: faker.internet.email(),
-    avatar: faker.image.avatar(),
+    avatar: "",
     victory: Math.floor(Math.random() * 100),
     mfaEnabled: false,
     mfaSecret: 'secret',
@@ -86,13 +86,48 @@ async function main() {
   const createdUsers = await prisma.user.findMany({
     select: {
       id: true,
+      login: true,
     },
   });
+
+  const getRandomUserLogin = () => {
+    return createdUsers[Math.floor(Math.random() * 50)].login;
+  };
+
+
+  // create 3 chats with 3 members each
+  const chats: any = Array.from({ length: 3 }).map(() => ({
+    name: faker.hacker.adjective(),
+    chatType: 'PUBLIC',
+    owner: getRandomUserLogin(),
+  }));
+
+  await prisma.chat.createMany({
+    data: chats,
+  });
+
+  const createdChats = await prisma.chat.findMany({
+    select: {
+      id: true,
+    },
+  });
+
 
   // create 50 match history
   const getRandomUserId = () => {
     return createdUsers[Math.floor(Math.random() * 50)].id;
   };
+
+  // Add 3 members to each chat
+  const chatMembers: any = Array.from({ length: 9 }).map(() => ({
+    chatId: createdChats[Math.floor(Math.random() * 3)].id,
+    userLogin: getRandomUserLogin(),
+    role: 'MEMBER',
+  }));
+
+  await prisma.chatMember.createMany({
+    data: chatMembers,
+  });
 
   const matchHistory = Array.from({ length: 50 }).map(() => ({
     winnerId: getRandomUserId(),

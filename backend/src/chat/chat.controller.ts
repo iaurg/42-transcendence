@@ -27,11 +27,12 @@ export class ChatController {
   ): Promise<boolean> {
     const you = await this.chatService.getMemberFromChat(chatId, login);
     const member = await this.chatService.getMemberFromChat(chatId, user);
-
+    // Me and him must exist in the database
     if (!you || !member) {
       this.logger.error('Unable to find user or member');
       return true;
     }
+    // I cannot be the member I want to mute, I cannot be member to mute, I cannot mute an admin nor the owner
     if (you === member || you.role === 'MEMBER' || member.role !== 'MEMBER') {
       this.logger.error('You are not allowed to mute this user');
       return true;

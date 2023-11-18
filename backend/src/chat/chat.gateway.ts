@@ -323,26 +323,27 @@ export class ChatGateway
     }
   }
 
-  @SubscribeMessage('promoteToOwner')
-  async promoteToOwner(
+  @SubscribeMessage('promoteToAdmin')
+  async promoteToAdmin(
     @MessageBody('user') user: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
     @ConnectedSocket() client: Socket,
   ) {
     const login = client.handshake.auth?.user?.login;
     if (
-      await this.notValidAction('promoteToOwner', chatId, login, user, client)
+      await this.notValidAction('promoteToAdmin', chatId, login, user, client)
     ) {
       return;
     }
-    const updatedChat = await this.chatService.giveOwner(chatId, user);
+    const updatedChat = await this.chatService.giveAdmin(chatId, [user]);
     // demote the current user to admin
-    const demotedChat = await this.chatService.giveAdmin(chatId, [login]);
-    if (!updatedChat || !demotedChat) {
-      client.emit('promoteToOwner', { error: 'Failed to promote user' });
+    if (!updatedChat) {
+      this.logger.error("Failed to promote user")
+      client.emit('promoteToAdmin', { error: 'Failed to promote user' });
       return;
     }
-    client.emit('promoteToOwner', {
+    this.logger.log(`You promoted ${user} to owner of chat ${chatId}`)
+    client.emit('promoteToAdmin', {
       message: `You promoted ${user} to owner of chat ${chatId}`,
     });
   }
@@ -441,10 +442,12 @@ export class ChatGateway
     const member = await this.chatService.getMemberFromChat(chatId, user);
 
     if (!you || !member) {
+      this.logger.error("User not found");
       client.emit(event, { error: 'User not found' });
       return true;
     }
     if (you === member || you.role === 'MEMBER' || member.role !== 'MEMBER') {
+      this.logger.error("You are not allowed to do this action");
       client.emit(event, { error: 'You are not allowed to do this action' });
       return true;
     }
@@ -598,13 +601,13 @@ export class ChatGateway
     const token = client.handshake.auth.token;
 
     try {
-      // const payload = this.jwtService.verify<TokenPayload>(token, {
-      //   secret: process.env.JWT_SECRET,
-      // });
-      return this.usersService.findOne('admin');
+      const payload = this.jwtService.verify<TokenPayload>(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      return this.usersService.findOne(payload.sub);
     } catch {
       this.logger.error('Token invalid or expired');
-      // throw new WsException('Token invalid or expired');
+      throw new WsException('Token invalid or expired');
     }
   }
 }

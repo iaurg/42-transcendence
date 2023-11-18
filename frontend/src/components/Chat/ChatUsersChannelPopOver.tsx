@@ -43,14 +43,14 @@ export default function ChatUsersChannelPopOver({
   const { user: currentUser } = useContext(ChatContext);
   const otherUsers = users.filter(user => user.userLogin !== currentUser.login);
 
-  const promoteToOwnerMutation = useMutation({
+  const promoteToAdminMutation = useMutation({
     mutationFn: (user: any) => {
-      chatService.socket?.emit("promoteToOwner", { chatId: user.chatId, user: user.userLogin });
+      chatService.socket?.emit("promoteToAdmin", { chatId: user.chatId, user: user.userLogin });
       return user;
     }
   });
-  const handlePromoteToOwner = (user: ChatMember) => {
-    promoteToOwnerMutation.mutate(user);
+  const handlepromoteToAdmin = (user: ChatMember) => {
+    promoteToAdminMutation.mutate(user);
   }
 
   const muteUserMutation = useMutation({
@@ -108,7 +108,7 @@ export default function ChatUsersChannelPopOver({
                   size={20}
                   aria-label="Promote to Owner"
                   alt="Promote to Owner"
-                  onClick={() => handlePromoteToOwner(user)}
+                  onClick={() => handlepromoteToAdmin(user)}
                 />
                 <MicrophoneSlash
                   className="cursor-pointer text-purple42-200"
