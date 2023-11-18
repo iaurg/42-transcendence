@@ -580,7 +580,6 @@ export class ChatGateway
       client.join(`chat:${chat.id.toString()}`);
     }
   }
-
   afterInit(_: Server) {
     this.server.use((socket, next) => {
       this.validateConnection(socket)
@@ -592,7 +591,6 @@ export class ChatGateway
         })
         .catch((err) => {
           this.logger.error(err);
-          return next(new Error(err));
         });
     });
   }
