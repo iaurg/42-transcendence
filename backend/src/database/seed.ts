@@ -79,8 +79,8 @@ async function main() {
     mfaSecret: 'secret',
   }));
   // TODO: change to your user when testing
-  users[0].login = 'vwildner';
-  users[0].displayName = 'Victor Wildner';
+  // users[0].login = 'vwildner';
+  // users[0].displayName = 'Victor Wildner';
 
   await prisma.user.createMany({
     data: users,

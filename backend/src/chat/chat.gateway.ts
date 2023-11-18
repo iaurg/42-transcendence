@@ -342,9 +342,9 @@ export class ChatGateway
       client.emit('promoteToAdmin', { error: 'Failed to promote user' });
       return;
     }
-    this.logger.log(`You promoted ${user} to owner of chat ${chatId}`)
+    this.logger.log(`You promoted ${user} to admin of chat ${chatId}`)
     client.emit('promoteToAdmin', {
-      message: `You promoted ${user} to owner of chat ${chatId}`,
+      message: `You promoted ${user} to admin of chat ${chatId}`,
     });
   }
 

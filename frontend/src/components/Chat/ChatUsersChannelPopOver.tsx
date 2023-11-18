@@ -43,6 +43,7 @@ export default function ChatUsersChannelPopOver({
   const { user: currentUser } = useContext(ChatContext);
   const otherUsers = users.filter(user => user.userLogin !== currentUser.login);
   const myUserList = users.filter(user => user.userLogin === currentUser.login);
+  const myUser = myUserList[0] || null;
   const promoteToAdminMutation = useMutation({
     mutationFn: (user: any) => {
       chatService.socket?.emit("promoteToAdmin", { chatId: user.chatId, user: user.userLogin });
@@ -96,15 +97,16 @@ export default function ChatUsersChannelPopOver({
         {...attributes.popper}
       >
         <div className="p-3">
+          {/*TODO: Find a way to remove this validation without breaking the database seed*/}
           {
             myUserList.length === 1 &&
             <div
               className="flex items-center space-x-4 mb-4 justify-between"
-              key={myUserList[0].id}
+              key={myUser.id}
             >
-              <div>{myUserList[0].userLogin}</div>
+              <div>{myUser.userLogin}</div>
               <div className="flex items-center space-x-2">
-                {myUserList[0].role === 'OWNER' && <Crown
+                {myUser.role === 'OWNER' && <Crown
                   className="cursor-pointer text-orange42-500"
                   size={20}
                   aria-label="Channel Owner"
@@ -127,13 +129,14 @@ export default function ChatUsersChannelPopOver({
                   aria-label="Channel Owner"
                   alt="Channel Owner"
                 />}
-                <Medal
-                  className="cursor-pointer text-orange42-500"
-                  size={20}
-                  aria-label="Promote to Admin"
-                  alt="Promote to Admin"
-                  onClick={() => handlepromoteToAdmin(user)}
-                />
+                {myUserList[0] && myUserList[0].role === 'OWNER' &&
+                  <Medal
+                    className="cursor-pointer text-orange42-500"
+                    size={20}
+                    aria-label="Promote to Admin"
+                    alt="Promote to Admin"
+                    onClick={() => handlepromoteToAdmin(user)}
+                  />}
                 <PencilSimpleSlash
                   className="cursor-pointer text-purple42-200"
                   size={20}

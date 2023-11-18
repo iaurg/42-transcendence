@@ -26,6 +26,7 @@ export function OpenChannel() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
@@ -38,6 +39,7 @@ export function OpenChannel() {
   chatService.socket?.on("listMembers", (members: ChatMember[]) => {
     setNumberOfUsersInChat(members.length);
     setUsers(members);
+    setIsLoading(false);
   });
 
   chatService.socket?.on("verifyPassword", (response: any) => {
@@ -129,6 +131,13 @@ export function OpenChannel() {
       </div>
     );
   }
+  if (isLoading)
+    return (
+      <div className="flex flex-col flex-1 justify-center items-center">
+        <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
+        <span className="text-white text-lg mt-4">Carregando...</span>
+      </div>
+    )
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -159,11 +168,10 @@ export function OpenChannel() {
           <div
             key={message.id}
             // TODO: Implement user context to compare user login with message user
-            className={`${
-              message.userLogin === user.login
-                ? "text-white bg-purple42-200 self-end"
-                : "text-white bg-black42-300 self-start"
-            } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
+            className={`${message.userLogin === user.login
+              ? "text-white bg-purple42-200 self-end"
+              : "text-white bg-black42-300 self-start"
+              } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
           >
             <span className="font-semibold">
               <Link href={`/game/history/${message.userId}`}>
