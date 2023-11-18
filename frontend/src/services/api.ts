@@ -16,6 +16,10 @@ export function setupAPIClient(ctx: Context = undefined) {
         config.headers["Authorization"] = `Bearer ${accessToken}`;
       }
 
+      // add ngrok-skip-browser-warning
+      // https://ngrok.com/docs#global-configuration
+      config.headers["ngrok-skip-browser-warning"] = "true";
+
       return config;
     },
 
