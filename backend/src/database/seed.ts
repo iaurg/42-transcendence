@@ -91,7 +91,7 @@ async function main() {
   });
 
   const getRandomUserLogin = () => {
-    return createdUsers[Math.floor(Math.random() * 50)].login;
+    return createdUsers[Math.floor(Math.random() * 49) + 1].login;
   };
 
 
@@ -99,7 +99,7 @@ async function main() {
   const chats: any = Array.from({ length: 3 }).map(() => ({
     name: faker.hacker.adjective(),
     chatType: 'PUBLIC',
-    owner: getRandomUserLogin(),
+    owner: createdUsers[0].login,
   }));
 
   await prisma.chat.createMany({
@@ -125,8 +125,20 @@ async function main() {
     role: 'MEMBER',
   }));
 
+
   await prisma.chatMember.createMany({
     data: chatMembers,
+  });
+
+  // Add the chat owner to each chat
+  const chatOwners: any = Array.from({ length: 3 }).map((_, index) => ({
+    chatId: createdChats[index].id,
+    userLogin: createdUsers[0].login,
+    role: 'OWNER',
+  }));
+
+  await prisma.chatMember.createMany({
+    data: chatOwners,
   });
 
   const matchHistory = Array.from({ length: 50 }).map(() => ({

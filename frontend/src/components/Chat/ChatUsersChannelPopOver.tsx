@@ -103,7 +103,7 @@ export default function ChatUsersChannelPopOver({
             >
               <div>{user.userLogin}</div>
               <div className="flex items-center space-x-2">
-                {user.role === 'OWNER' ?? <Crown
+                {user.role === 'OWNER' && <Crown
                   className="cursor-pointer text-orange42-500"
                   size={20}
                   aria-label="Channel Owner"
