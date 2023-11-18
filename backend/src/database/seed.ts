@@ -78,7 +78,7 @@ async function main() {
     mfaEnabled: false,
     mfaSecret: 'secret',
   }));
-
+  // TODO: change to your user when testing
   users[0].login = 'vwildner';
   users[0].displayName = 'Victor Wildner';
 
