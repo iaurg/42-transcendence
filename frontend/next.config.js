@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
+const path = require("path");
+
 const nextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   output: "standalone",
+  experimental: {
+    outputFileTracingRoot: path.join(__dirname, "../../"),
+  },
   webpack: (config) => {
     config.externals.push({
       "utf-8-validate": "commonjs utf-8-validate",
