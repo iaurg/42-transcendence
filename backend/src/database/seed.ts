@@ -69,7 +69,7 @@ model MatchHistory {
 
 async function main() {
   // create 50 users using faker
-  const users: any = Array.from({ length: 50 }).map(() => ({
+  let users: any = Array.from({ length: 50 }).map(() => ({
     login: faker.internet.userName(),
     displayName: faker.person.firstName(),
     email: faker.internet.email(),
@@ -78,6 +78,9 @@ async function main() {
     mfaEnabled: false,
     mfaSecret: 'secret',
   }));
+
+  users[0].login = 'vwildner';
+  users[0].displayName = 'Victor Wildner';
 
   await prisma.user.createMany({
     data: users,

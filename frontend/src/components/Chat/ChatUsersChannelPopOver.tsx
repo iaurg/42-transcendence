@@ -42,7 +42,7 @@ export default function ChatUsersChannelPopOver({
   // import user from useContext but rename it as currentUser
   const { user: currentUser } = useContext(ChatContext);
   const otherUsers = users.filter(user => user.userLogin !== currentUser.login);
-
+  const myUserList = users.filter(user => user.userLogin === currentUser.login);
   const promoteToAdminMutation = useMutation({
     mutationFn: (user: any) => {
       chatService.socket?.emit("promoteToAdmin", { chatId: user.chatId, user: user.userLogin });
@@ -96,6 +96,24 @@ export default function ChatUsersChannelPopOver({
         {...attributes.popper}
       >
         <div className="p-3">
+          {
+            myUserList.length === 1 &&
+            <div
+              className="flex items-center space-x-4 mb-4 justify-between"
+              key={myUserList[0].id}
+            >
+              <div>{myUserList[0].userLogin}</div>
+              <div className="flex items-center space-x-2">
+                {myUserList[0].role === 'OWNER' && <Crown
+                  className="cursor-pointer text-orange42-500"
+                  size={20}
+                  aria-label="Channel Owner"
+                  alt="Channel Owner"
+                />}
+
+              </div>
+            </div>
+          }
           {otherUsers.map((user) => (
             <div
               className="flex items-center space-x-4 mb-4 justify-between"
@@ -112,8 +130,8 @@ export default function ChatUsersChannelPopOver({
                 <Medal
                   className="cursor-pointer text-orange42-500"
                   size={20}
-                  aria-label="Promote to Owner"
-                  alt="Promote to Owner"
+                  aria-label="Promote to Admin"
+                  alt="Promote to Admin"
                   onClick={() => handlepromoteToAdmin(user)}
                 />
                 <PencilSimpleSlash
