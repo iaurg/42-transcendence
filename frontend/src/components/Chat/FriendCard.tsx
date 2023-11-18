@@ -39,19 +39,18 @@ export default function FriendCard({
   return (
     <div className="bg-black42-200 flex justify-between rounded-lg items-center p-3 my-1">
       <div className="flex justify-between items-center cursor-pointer gap-2">
-        <div className="flex space-x-2 items-center">{displayName}</div>
+        <Link
+          href={`/game/history/${id}`}
+          className="flex space-x-2 items-center"
+        >
+          <div className="flex space-x-2 items-center">{displayName}</div>
+        </Link>
         <div
           className={`${
             status === "ONLINE" ? "bg-green-500" : "bg-gray-500"
           } w-2 h-2 rounded-full`}
         ></div>
       </div>
-      <Link
-        href={`/game/history/${id}`}
-        className="flex space-x-2 items-center"
-      >
-        {displayName}
-      </Link>
       <div className="flex space-x-5 items-center">
         <EnvelopeSimple className="text-purple42-200" size={18} />
         <Sword className="text-purple42-200" size={18} />
