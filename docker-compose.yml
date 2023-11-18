@@ -1,55 +1,40 @@
 services:
-  api:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      # Only build the api for the development environment
-      target: development
     volumes:
       - ./backend:/usr/src/app
       - avatars:/usr/src/app/uploads
     env_file:
       - ./.env
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?schema=public"
-    command: npm run start:dev
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?schema=public"
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
+      - database
     networks:
-      - backend
+      - transcendence
 
-  postgres:
+  database:
     image: postgres:latest
     restart: always
     ports:
       - "5432:5432"
     volumes:
-      - ~/$USER/transcendence-postgres:/var/lib/postgresql/data
+      - ./data/pg:/var/lib/postgresql/data
     networks:
-      - backend
+      - transcendence
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  dbadmin:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    networks:
-      - backend
-    depends_on:
-      - postgres
-
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      # Only build the api for the development environment
-      target: development
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -58,13 +43,13 @@ services:
       - "8000:3000"
     restart: always
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
     networks:
-      - backend
+      - transcendence
 
 volumes:
   transcendence-postgres:
   avatars:
 networks:
-  backend:
+  transcendence:
     driver: bridge
