@@ -339,13 +339,38 @@ export class ChatGateway
     // demote the current user to admin
     if (!updatedChat) {
       this.logger.error("Failed to promote user")
-      client.emit('promoteToAdmin', { error: 'Failed to promote user' });
       return;
     }
     this.logger.log(`You promoted ${user} to admin of chat ${chatId}`)
-    client.emit('promoteToAdmin', {
-      message: `You promoted ${user} to admin of chat ${chatId}`,
-    });
+  }
+
+  @SubscribeMessage('demoteToMember')
+  async demoteToMember(
+    @MessageBody('user') user: string,
+    @MessageBody('chatId', new ParseIntPipe()) chatId: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const member = await this.chatService.getMemberFromChat(chatId, user);
+    const you = await this.chatService.getMemberFromChat(chatId, user);
+    if (!member || !you) {
+      this.logger.error("User not found")
+      return;
+    }
+    if (you.role !== 'OWNER') {
+      this.logger.error("Only the chat owner can demote admins")
+      return;
+    }
+    if (member.role !== 'ADMIN') {
+      this.logger.error("You cannot demote non-admin users")
+      return;
+    }
+    const updatedChat = await this.chatService.giveMember(chatId, [user]);
+    // demote the current user to admin
+    if (!updatedChat) {
+      this.logger.error("Failed to demote user")
+      return;
+    }
+    this.logger.log(`You demoted ${user} to member of chat ${chatId}`)
   }
 
   // TODO: Add rule, if you are banned you cannot invite people to this chat

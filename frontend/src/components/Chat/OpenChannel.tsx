@@ -1,6 +1,6 @@
 import { ChatContext } from "@/contexts/ChatContext";
 import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,8 @@ export function OpenChannel() {
     validationRequired,
     setValidationRequired,
     user,
+    update,
+    setUpdate,
   } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState("");
@@ -27,6 +29,7 @@ export function OpenChannel() {
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
@@ -36,11 +39,15 @@ export function OpenChannel() {
     setMessages([...messages, message]);
   });
 
-  chatService.socket?.on("listMembers", (members: ChatMember[]) => {
-    setNumberOfUsersInChat(members.length);
-    setUsers(members);
-    setIsLoading(false);
-  });
+  useEffect(() => {
+    chatService.socket?.on("listMembers", (members: ChatMember[]) => {
+      const currentMembers = members.filter((member) => member.status !== "BANNED");
+      setNumberOfUsersInChat(currentMembers.length);
+      setUsers(currentMembers);
+      setIsLoading(false);
+      setUpdate(false);
+    });
+  }, [update]);
 
   chatService.socket?.on("verifyPassword", (response: any) => {
     if (response.error) {
@@ -199,7 +206,7 @@ export function OpenChannel() {
         />
         <button
           className="bg-purple42-200 text-white rounded-lg p-3 placeholder-gray-700 absolute z-10 right-4"
-          onClick={() => handleSendMessage()}
+          onClick={() => handleSendMessage()} /*TODO: Check if other users are receiving the message */
         >
           <PaperPlaneTilt size={20} color="white" />
         </button>
