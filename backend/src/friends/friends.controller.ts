@@ -4,14 +4,12 @@ import {
   Delete,
   Get,
   Post,
-  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 import { User } from '@prisma/client';
-import { create } from 'domain';
 import { CreateFriendDto } from './dto/createFriendDto';
 import { DeleteFriendDto } from './dto/deleteFriendDto';
 

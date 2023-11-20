@@ -1,4 +1,4 @@
-import { Chat, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
@@ -69,11 +69,11 @@ model MatchHistory {
 
 async function main() {
   // create 50 users using faker
-  let users: any = Array.from({ length: 50 }).map(() => ({
+  const users: any = Array.from({ length: 50 }).map(() => ({
     login: faker.internet.userName(),
     displayName: faker.person.firstName(),
     email: faker.internet.email(),
-    avatar: "",
+    avatar: '',
     victory: Math.floor(Math.random() * 100),
     mfaEnabled: false,
     mfaSecret: 'secret',
@@ -97,7 +97,6 @@ async function main() {
     return createdUsers[Math.floor(Math.random() * 49) + 1].login;
   };
 
-
   // create 3 chats with 3 members each
   const chats: any = Array.from({ length: 3 }).map(() => ({
     name: faker.hacker.adjective(),
@@ -115,7 +114,6 @@ async function main() {
     },
   });
 
-
   // create 50 match history
   const getRandomUserId = () => {
     return createdUsers[Math.floor(Math.random() * 50)].id;
@@ -127,7 +125,6 @@ async function main() {
     userLogin: getRandomUserLogin(),
     role: 'MEMBER',
   }));
-
 
   await prisma.chatMember.createMany({
     data: chatMembers,

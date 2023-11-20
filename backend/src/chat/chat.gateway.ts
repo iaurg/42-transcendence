@@ -76,34 +76,6 @@ export class ChatGateway
     await this.usersService.updateUserStatus(id, 'OFFLINE');
   }
 
-  // TODO:
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    const { login, id } = client.handshake.auth?.user;
-
-    // TODO: remove this hardcoded user id
-    if (!login) {
-      client.emit('connected', { error: 'User not found' });
-      client.disconnect();
-      return;
-    }
-
-    // change user status to online
-    await this.usersService.updateUserStatus(id, 'ONLINE');
-
-    this.connectedUsers[login] = client;
-    client.emit('connected', { message: `You are connected as ${login}` });
-
-    // const allChats = await this.chatService.listChats();
-    const chats = await this.chatService.listChatsByUserLogin(login);
-
-    // TODO: Remove this after implementing chat rooms
-    for (const chat of chats) {
-      client.join(`chat:${chat.id.toString()}`);
-    }
-
-    this.logger.log(`User ${login} connected`);
-  }
-
   private validateConnection(client: Socket) {
     const token = client.handshake.auth.token;
 
@@ -415,39 +387,38 @@ export class ChatGateway
     const updatedChat = await this.chatService.giveAdmin(chatId, [user]);
     // demote the current user to admin
     if (!updatedChat) {
-      this.logger.error("Failed to promote user")
+      this.logger.error('Failed to promote user');
       return;
     }
-    this.logger.log(`You promoted ${user} to admin of chat ${chatId}`)
+    this.logger.log(`You promoted ${user} to admin of chat ${chatId}`);
   }
 
   @SubscribeMessage('demoteToMember')
   async demoteToMember(
     @MessageBody('user') user: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
-    @ConnectedSocket() client: Socket,
   ) {
     const member = await this.chatService.getMemberFromChat(chatId, user);
     const you = await this.chatService.getMemberFromChat(chatId, user);
     if (!member || !you) {
-      this.logger.error("User not found")
+      this.logger.error('User not found');
       return;
     }
     if (you.role !== 'OWNER') {
-      this.logger.error("Only the chat owner can demote admins")
+      this.logger.error('Only the chat owner can demote admins');
       return;
     }
     if (member.role !== 'ADMIN') {
-      this.logger.error("You cannot demote non-admin users")
+      this.logger.error('You cannot demote non-admin users');
       return;
     }
     const updatedChat = await this.chatService.giveMember(chatId, [user]);
     // demote the current user to admin
     if (!updatedChat) {
-      this.logger.error("Failed to demote user")
+      this.logger.error('Failed to demote user');
       return;
     }
-    this.logger.log(`You demoted ${user} to member of chat ${chatId}`)
+    this.logger.log(`You demoted ${user} to member of chat ${chatId}`);
   }
 
   // TODO: Add rule, if you are banned you cannot invite people to this chat
@@ -544,12 +515,12 @@ export class ChatGateway
     const member = await this.chatService.getMemberFromChat(chatId, user);
 
     if (!you || !member) {
-      this.logger.error("User not found");
+      this.logger.error('User not found');
       client.emit(event, { error: 'User not found' });
       return true;
     }
     if (you === member || you.role === 'MEMBER' || member.role !== 'MEMBER') {
-      this.logger.error("You are not allowed to do this action");
+      this.logger.error('You are not allowed to do this action');
       client.emit(event, { error: 'You are not allowed to do this action' });
       return true;
     }
@@ -652,62 +623,30 @@ export class ChatGateway
     return numberOfUsers;
   }
 
-  handleDisconnect(client: Socket) {
-    for (const userId in this.connectedUsers) {
-      if (this.connectedUsers[userId] === client) {
-        delete this.connectedUsers[userId];
-        console.log(`User ${userId} disconnected`);
-        break;
-      }
-    }
-  }
-  // TODO:
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const login = client.handshake.auth?.user?.login;
+    const { login, id } = client.handshake.auth?.user;
+
     // TODO: remove this hardcoded user id
     if (!login) {
       client.emit('connected', { error: 'User not found' });
       client.disconnect();
       return;
     }
+
+    // change user status to online
+    await this.usersService.updateUserStatus(id, 'ONLINE');
+
     this.connectedUsers[login] = client;
     client.emit('connected', { message: `You are connected as ${login}` });
-    const allChats = await this.chatService.listChats();
+
+    // const allChats = await this.chatService.listChats();
     const chats = await this.chatService.listChatsByUserLogin(login);
-    console.log(
-      `User ${login} joined ${chats.length}/${allChats.length} chats`,
-    );
+
     // TODO: Remove this after implementing chat rooms
     for (const chat of chats) {
       client.join(`chat:${chat.id.toString()}`);
     }
-  }
-  afterInit(_: Server) {
-    this.server.use((socket, next) => {
-      this.validateConnection(socket)
-        .then((user) => {
-          socket.handshake.auth['user'] = user;
-          console.log(`User ${socket.handshake.auth['user'].login} connected`);
-          socket.emit('userLogin', user);
-          next();
-        })
-        .catch((err) => {
-          this.logger.error(err);
-        });
-    });
-  }
 
-  private validateConnection(client: Socket) {
-    const token = client.handshake.auth.token;
-
-    try {
-      const payload = this.jwtService.verify<TokenPayload>(token, {
-        secret: process.env.JWT_SECRET,
-      });
-      return this.usersService.findOne(payload.sub);
-    } catch {
-      this.logger.error('Token invalid or expired');
-      throw new WsException('Token invalid or expired');
-    }
+    this.logger.log(`User ${login} connected`);
   }
 }

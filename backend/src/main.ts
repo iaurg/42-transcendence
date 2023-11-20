@@ -18,7 +18,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin:[
+    origin: [
       process.env.FRONTEND_URL,
       'http://localhost:3000',
       'http://42transcendence.me',
@@ -26,7 +26,7 @@ async function bootstrap() {
       'http://api.42transcendence.me',
       'https://42transcendence.me',
       'https://www.42transcendence.me',
-      'https://api.42transcendence.me'
+      'https://api.42transcendence.me',
     ],
     credentials: true,
   });
