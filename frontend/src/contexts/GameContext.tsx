@@ -88,7 +88,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     // Listen for the 'connect' event
     const { accessToken } = nookies.get(null, "accesssToken");
 
-    socket.current = io("http://localhost:3000/game", {
+    socket.current = io(`${process.env.NEXT_PUBLIC_API_URL}/game`, {
       auth: {
         token: accessToken,
       },
