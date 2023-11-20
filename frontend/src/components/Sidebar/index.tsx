@@ -43,7 +43,7 @@ export default function Sidebar() {
         </div>
         <ul className="flex flex-col space-y-5 items-center justify-center pb-4">
           <li>
-            <UserAvatar imageUrl={user.avatar} login={user.displayName} />
+            <UserAvatar imageUrl={user.avatar || ""} login={user.displayName} />
           </li>
           <li>
             <Link

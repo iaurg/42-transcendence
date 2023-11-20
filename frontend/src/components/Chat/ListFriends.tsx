@@ -28,7 +28,13 @@ export function ListFriends() {
           </div>
         ) : (
           data?.friends.map((user: User) => (
-            <FriendCard key={user.id} displayName={user.displayName} id={user.id} />
+            <FriendCard
+              key={user.id}
+              displayName={user.displayName}
+              id={user.id}
+              status={user.status}
+            />
+
           ))
         )}
       </div>

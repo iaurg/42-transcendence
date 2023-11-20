@@ -32,6 +32,8 @@ interface ConnectedUsers {
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer() server: Server;
+
   constructor(
     private chatService: ChatService,
     private jwtService: JwtService,
@@ -40,8 +42,81 @@ export class ChatGateway
   private connectedUsers: ConnectedUsers = {};
   private readonly logger = new Logger(ChatGateway.name);
 
-  @WebSocketServer()
-  server: Server;
+  afterInit() {
+    this.logger.debug('Initialized chat gateway');
+    this.server.use((socket, next) => {
+      this.validateConnection(socket)
+        .then((user) => {
+          socket.handshake.auth['user'] = user;
+          socket.emit('userLogin', user);
+          next();
+        })
+        .catch((err) => {
+          this.logger.error(
+            `Failed to authenticate user: ${socket.handshake.auth?.user?.login}`,
+            err,
+          );
+          return next(new Error(err));
+        });
+    });
+  }
+
+  async handleDisconnect(client: Socket) {
+    const { id } = client.handshake.auth?.user;
+
+    for (const userId in this.connectedUsers) {
+      if (this.connectedUsers[userId] === client) {
+        delete this.connectedUsers[userId];
+        this.logger.log(`User ${userId} disconnected`);
+        break;
+      }
+    }
+
+    // change user status to offline
+    await this.usersService.updateUserStatus(id, 'OFFLINE');
+  }
+
+  // TODO:
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    const { login, id } = client.handshake.auth?.user;
+
+    // TODO: remove this hardcoded user id
+    if (!login) {
+      client.emit('connected', { error: 'User not found' });
+      client.disconnect();
+      return;
+    }
+
+    // change user status to online
+    await this.usersService.updateUserStatus(id, 'ONLINE');
+
+    this.connectedUsers[login] = client;
+    client.emit('connected', { message: `You are connected as ${login}` });
+
+    // const allChats = await this.chatService.listChats();
+    const chats = await this.chatService.listChatsByUserLogin(login);
+
+    // TODO: Remove this after implementing chat rooms
+    for (const chat of chats) {
+      client.join(`chat:${chat.id.toString()}`);
+    }
+
+    this.logger.log(`User ${login} connected`);
+  }
+
+  private validateConnection(client: Socket) {
+    const token = client.handshake.auth.token;
+
+    try {
+      const payload = this.jwtService.verify<TokenPayload>(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      return this.usersService.findOne(payload.sub);
+    } catch {
+      this.logger.error('Token invalid or expired');
+      throw new WsException('Token invalid or expired');
+    }
+  }
 
   async addConnectedUsersToChat(chatId: number) {
     const users = await this.chatService.getUsersByChatId(chatId);
@@ -62,10 +137,12 @@ export class ChatGateway
     const login = client.handshake.auth?.user?.login;
     client.emit('userLogin', client.handshake.auth?.user);
     const member = await this.chatService.getMemberFromChat(chatId, login);
+
     if (!member) {
       client.emit('error', { error: 'You are not a member of this chat' });
       return;
     }
+
     if (member.status !== 'ACTIVE') {
       client.emit('error', { error: 'You are not allowed to send messages' });
       return;
