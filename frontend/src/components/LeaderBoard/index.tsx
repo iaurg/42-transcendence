@@ -27,12 +27,9 @@ export function LeaderBoard() {
           {data?.map((user: User) => (
             <LeaderBoardCard
               key={user.id}
-              id={user.id}
-              name={user.displayName}
-              avatar={user.avatar || ""}
               score={user.victory}
-              //TODO: create functional logic
-              isFriend={false}
+              isFriend={user.login.includes("m")}
+              user={user}
             />
           ))}
         </>

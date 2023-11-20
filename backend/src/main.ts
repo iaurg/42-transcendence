@@ -10,6 +10,7 @@ async function bootstrap() {
 
   // Set up cookie parser
   app.use(cookieParser());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
