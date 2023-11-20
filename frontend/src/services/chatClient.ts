@@ -12,7 +12,7 @@ class ChatService {
     if (!this.socket) {
       const { accessToken } = nookies.get(null, "accesssToken");
 
-      this.socket = io("http://localhost:3000/chat", {
+      this.socket = io(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
         auth: {
           token: accessToken,
         },
