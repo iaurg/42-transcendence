@@ -1,16 +1,16 @@
-FROM node:18-alpine
+FROM node:latest
 
 WORKDIR /usr/src/app/server
-ENV NODE_ENV=production
 
+# Copy the rest of your application
 COPY . .
 
-# Install nestjs cli
-RUN npm install -g @nestjs/cli
+# Install dependencies
 RUN npm install
+
+# Build your application
 RUN npm run build
 
 EXPOSE 3000
 
 CMD [ "npm", "run", "start:docker" ]
-
