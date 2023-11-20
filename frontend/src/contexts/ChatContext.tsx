@@ -1,5 +1,7 @@
 "use client";
 import chatService from "@/services/chatClient";
+import { queryClient } from "@/services/queryClient";
+import { User } from "@/types/user";
 import React, { createContext, useEffect, useState } from "react";
 
 type Elements =
@@ -38,10 +40,6 @@ export type Chat = {
   owner: string;
 };
 
-export type User = {
-  login: string;
-};
-
 export type ChatList = Chat[];
 
 export const ChatContext = createContext<ChatContextType>(
@@ -68,16 +66,20 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   };
 
   const timeout = (delay: number) => {
-    return new Promise(res => setTimeout(res, delay));
-  }
+    return new Promise((res) => setTimeout(res, delay));
+  };
 
   useEffect(() => {
     // Connect to the Socket.IO server
     chatService.connect();
+
     chatService.socket?.on("userLogin", (user: User) => {
-      console.log(`Current user login: ${user.login}`);
+      console.log(`Current user login: ${user.login}`, user);
       setUser(() => user);
+      queryClient.invalidateQueries(["user_status", user.id]);
+      queryClient.invalidateQueries(["friends"]);
     });
+
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
       setChatList(() => newChatList);
@@ -88,7 +90,9 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     });
 
     chatService.socket?.on("deleteChat", (deletedChat: any) => {
-      setChatList((chatList) => chatList.filter((chat: Chat) => chat.id !== deletedChat.chatId));
+      setChatList((chatList) =>
+        chatList.filter((chat: Chat) => chat.id !== deletedChat.chatId)
+      );
     });
 
     chatService.socket?.emit("listChats");
@@ -125,7 +129,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     setValidationRequired(true);
     setShowElement("showChannels");
     setIsLoading(false);
-  }
+  };
 
   return (
     <ChatContext.Provider

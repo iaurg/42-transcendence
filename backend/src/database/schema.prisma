@@ -28,7 +28,7 @@ model User {
   displayName  String
   email        String
   avatar       String?
-  status       UserStatus     @default(ONLINE)
+  status       UserStatus     @default(OFFLINE)
   victory      Int            @default(0)
   refreshToken String?
   mfaEnabled   Boolean        @default(false)

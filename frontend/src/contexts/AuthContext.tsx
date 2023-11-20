@@ -3,6 +3,7 @@ import nookies from "nookies";
 import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
 import { redirect } from "next/navigation";
+import { User } from "@/types/user";
 
 type AuthContextType = {
   payload: TokenPayload;
@@ -18,17 +19,6 @@ export type TokenPayload = {
   mfaAuthenticated: boolean;
   iat: number;
   exp: number;
-};
-
-export type User = {
-  id: string;
-  login: string;
-  displayName: string;
-  email: string;
-  avatar: string;
-  status: "online" | "offline" | "away" | "busy";
-  victory: number;
-  mfaEnabled: boolean;
 };
 
 type AuthProviderProps = {
