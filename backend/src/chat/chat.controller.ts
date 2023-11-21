@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   ParseIntPipe,
   Post,
   Query,
@@ -17,6 +18,28 @@ import { chatMemberRole, chatType } from '@prisma/client';
 @Controller('chat*')
 export class ChatController {
   constructor(private chatService: ChatService) {}
+  private readonly logger = new Logger('chat.controller');
+
+  async notValidAction(
+    chatId: number,
+    login: string,
+    user: string,
+  ): Promise<boolean> {
+    const you = await this.chatService.getMemberFromChat(chatId, login);
+    const member = await this.chatService.getMemberFromChat(chatId, user);
+    // Me and him must exist in the database
+    if (!you || !member) {
+      this.logger.error('Unable to find user or member');
+      return true;
+    }
+    // I cannot be the member I want to mute, I cannot be member to mute, I cannot mute an admin nor the owner
+    if (you === member || you.role === 'MEMBER' || member.role !== 'MEMBER') {
+      this.logger.error('You are not allowed to mute this user');
+      return true;
+    }
+
+    return false;
+  }
 
   @Post('/create')
   async createChat(
@@ -95,6 +118,35 @@ export class ChatController {
     const messages = await this.chatService.listMessagesByChatId(chatId);
 
     return messages;
+  }
+
+  @Post('/mute')
+  async muteMember(
+    @Body('chatId') chatId: number,
+    @Body('login') login: string,
+    @Body('user') user: string,
+  ) {
+    if (await this.notValidAction(chatId, login, user)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'You are not allowed to mute this user',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    const updatedChat = await this.chatService.muteUserFromChat(chatId, user);
+
+    if (!updatedChat) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_MODIFIED,
+          error: 'Unable to handle this action',
+        },
+        HttpStatus.NOT_MODIFIED,
+      );
+    }
+    return updatedChat;
   }
 
   @Post('/ban')

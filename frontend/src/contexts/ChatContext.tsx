@@ -24,6 +24,8 @@ type ChatContextType = {
   setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
   validationRequired: boolean;
   user: User;
+  update: boolean;
+  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type ChatProviderProps = {
@@ -54,6 +56,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [user, setUser] = useState<User>({} as User);
   const [isLoading, setIsLoading] = useState(true);
   const [validationRequired, setValidationRequired] = useState(true);
+  const [update, setUpdate] = useState(false);
 
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
@@ -147,6 +150,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         setValidationRequired,
         validationRequired,
         user,
+        update,
+        setUpdate,
       }}
     >
       {children}
