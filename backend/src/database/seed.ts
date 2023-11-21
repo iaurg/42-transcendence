@@ -56,11 +56,11 @@ model MatchHistory {
   id Int @id @default(autoincrement())
 
   winner       User   @relation(fields: [winnerId], references: [id], name: "winner")
-  winnerId     String 
+  winnerId     String
   winnerPoints Int
 
   loser       User   @relation(fields: [loserId], references: [id], name: "loser")
-  loserId     String 
+  loserId     String
   loserPoints Int
 
   createdAt DateTime @default(now())
@@ -73,17 +73,42 @@ async function main() {
     login: faker.internet.userName(),
     displayName: faker.person.firstName(),
     email: faker.internet.email(),
-    avatar: faker.image.avatar(),
+    avatar: '',
     victory: Math.floor(Math.random() * 100),
     mfaEnabled: false,
     mfaSecret: 'secret',
   }));
+  // TODO: change to your user when testing
+  // users[0].login = 'vwildner';
+  // users[0].displayName = 'Victor Wildner';
 
   await prisma.user.createMany({
     data: users,
   });
 
   const createdUsers = await prisma.user.findMany({
+    select: {
+      id: true,
+      login: true,
+    },
+  });
+
+  const getRandomUserLogin = () => {
+    return createdUsers[Math.floor(Math.random() * 49) + 1].login;
+  };
+
+  // create 3 chats with 3 members each
+  const chats: any = Array.from({ length: 3 }).map(() => ({
+    name: faker.hacker.adjective(),
+    chatType: 'PUBLIC',
+    owner: createdUsers[0].login,
+  }));
+
+  await prisma.chat.createMany({
+    data: chats,
+  });
+
+  const createdChats = await prisma.chat.findMany({
     select: {
       id: true,
     },
@@ -93,6 +118,28 @@ async function main() {
   const getRandomUserId = () => {
     return createdUsers[Math.floor(Math.random() * 50)].id;
   };
+
+  // Add 3 members to each chat
+  const chatMembers: any = Array.from({ length: 9 }).map(() => ({
+    chatId: createdChats[Math.floor(Math.random() * 3)].id,
+    userLogin: getRandomUserLogin(),
+    role: 'MEMBER',
+  }));
+
+  await prisma.chatMember.createMany({
+    data: chatMembers,
+  });
+
+  // Add the chat owner to each chat
+  const chatOwners: any = Array.from({ length: 3 }).map((_, index) => ({
+    chatId: createdChats[index].id,
+    userLogin: createdUsers[0].login,
+    role: 'OWNER',
+  }));
+
+  await prisma.chatMember.createMany({
+    data: chatOwners,
+  });
 
   const matchHistory = Array.from({ length: 50 }).map(() => ({
     winnerId: getRandomUserId(),

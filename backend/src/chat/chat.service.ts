@@ -479,6 +479,56 @@ export class ChatService {
     }
   }
 
+  async giveMember(chatId: number, guestList: string[]): Promise<Chat> {
+    try {
+      // First make sure that every member in the guest list is actually a member of the chat
+      const existingUsers = await this.prisma.chatMember.findMany({
+        where: {
+          chatId,
+          userLogin: {
+            in: guestList,
+          },
+        },
+      });
+      if (
+        existingUsers.some(
+          (existingUser) => existingUser.role === chatMemberRole.OWNER,
+        )
+      ) {
+        console.log(`Some users in the guest list are chat owners`);
+        return null;
+      }
+      if (existingUsers.length !== guestList.length) {
+        console.log(
+          `Some users in the guest list are not members of chat ${chatId}`,
+        );
+        return null;
+      }
+      const updatedChat = await this.prisma.chat.update({
+        where: {
+          id: chatId,
+        },
+        data: {
+          users: {
+            updateMany: guestList.map((guest) => ({
+              where: {
+                userLogin: guest,
+              },
+              data: {
+                role: chatMemberRole.MEMBER,
+              },
+            })),
+          },
+        },
+      });
+
+      return updatedChat;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
   async banUserFromChat(chatId: number, member: string): Promise<Chat> {
     try {
       const updatedChat = await this.prisma.chat.update({
