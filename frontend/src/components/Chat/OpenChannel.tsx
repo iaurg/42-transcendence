@@ -1,5 +1,5 @@
 import { ChatContext } from "@/contexts/ChatContext";
-import { PaperPlaneTilt, UsersThree, XCircle } from "@phosphor-icons/react";
+import { PaperPlaneTilt, PencilSimpleSlash, UsersThree, XCircle } from "@phosphor-icons/react";
 import { useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
@@ -29,7 +29,8 @@ export function OpenChannel() {
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const myUserList = users.filter(usr => usr.userLogin === user.login);
+  const myUser = myUserList[0] || null;
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
@@ -61,6 +62,8 @@ export function OpenChannel() {
   });
 
   const handleSendMessage = () => {
+    if (myUser && myUser.status === 'MUTED')
+      return;
     chatService.socket?.emit("message", {
       chatId: selectedChat.id,
       content: message,
@@ -204,13 +207,13 @@ export function OpenChannel() {
             }
           }}
         />
-        <button
+        < button
           className="bg-purple42-200 text-white rounded-lg p-3 placeholder-gray-700 absolute z-10 right-4"
           onClick={() => handleSendMessage()} /*TODO: Check if other users are receiving the message */
         >
-          <PaperPlaneTilt size={20} color="white" />
+          {myUser && myUser.status !== 'MUTED' ? <PaperPlaneTilt size={20} color="white" /> : <PencilSimpleSlash alt="Muted user" size={20} color="gray" />}
         </button>
       </div>
-    </div>
+    </div >
   );
 }

@@ -43,6 +43,7 @@ export default function ChatUsersChannelPopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "left",
   });
+  
   // import user from useContext but rename it as currentUser
   const { user: currentUser, setUpdate } = useContext(ChatContext);
 
@@ -247,7 +248,6 @@ export default function ChatUsersChannelPopOver({
                       />
                     ) /*TODO: Make this command responsive */
                 }
-
                 {
                   user.role !== "MEMBER" && (
                     <Medal
