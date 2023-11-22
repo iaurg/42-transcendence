@@ -44,7 +44,7 @@ export default function ChatUsersChannelPopOver({
     placement: "left",
   });
   // import user from useContext but rename it as currentUser
-  const { user: currentUser, update, setUpdate } = useContext(ChatContext);
+  const { user: currentUser, setUpdate } = useContext(ChatContext);
   const otherUsers = users.filter(user => user.userLogin !== currentUser.login);
   const myUserList = users.filter(user => user.userLogin === currentUser.login);
   const myUser = myUserList[0] || null;
@@ -183,7 +183,7 @@ export default function ChatUsersChannelPopOver({
                     size={20}
                     aria-label="Promote to Admin"
                     alt="Promote to Admin"
-                    onClick={() => { handlepromoteToAdmin(user); }}
+                    onClick={() => handlepromoteToAdmin(user)}
                   /> /*TODO: Make this command responsive */}
                 {myUserList[0] && myUserList[0].role === 'OWNER' && user.role === 'ADMIN' &&
                   <ArrowFatLineDown
@@ -191,7 +191,7 @@ export default function ChatUsersChannelPopOver({
                     size={20}
                     aria-label="Demote to User"
                     alt="Demote to User"
-                    onClick={() => { handleDemoteToMember(user); }}
+                    onClick={() => handleDemoteToMember(user)}
                   /> /*TODO: Make this command responsive */}
 
                 {user.role !== 'MEMBER' &&
