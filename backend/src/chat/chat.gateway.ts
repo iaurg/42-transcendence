@@ -397,9 +397,11 @@ export class ChatGateway
   async demoteToMember(
     @MessageBody('user') user: string,
     @MessageBody('chatId', new ParseIntPipe()) chatId: number,
+    @ConnectedSocket() client: Socket,
   ) {
+    const login = client.handshake.auth?.user?.login;
     const member = await this.chatService.getMemberFromChat(chatId, user);
-    const you = await this.chatService.getMemberFromChat(chatId, user);
+    const you = await this.chatService.getMemberFromChat(chatId, login);
     if (!member || !you) {
       this.logger.error('User not found');
       return;
