@@ -177,7 +177,7 @@ export default function ChatUsersChannelPopOver({
                   aria-label="Channel Owner"
                   alt="Channel Owner"
                 />}
-                {user.role === 'MEMBER' &&
+                {myUserList[0] && myUserList[0].role === 'OWNER' && user.role === 'MEMBER' &&
                   <ArrowFatLineUp
                     className="cursor-pointer text-orange42-500"
                     size={20}
