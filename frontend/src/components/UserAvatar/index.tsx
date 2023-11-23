@@ -4,6 +4,19 @@ type UserAvatarProps = {
 };
 
 export default function UserAvatar({ imageUrl, login }: UserAvatarProps) {
+  // check if imageUrl is a link
+  if (imageUrl?.includes("http")) {
+    return (
+      <img
+        src={imageUrl}
+        alt="avatar"
+        width={40}
+        height={40}
+        className="rounded-full"
+      />
+    );
+  }
+
   if (imageUrl) {
     // TODO: change to next/image when all urls comes from our server
     return (
