@@ -24,8 +24,6 @@ type ChatContextType = {
   setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
   validationRequired: boolean;
   user: User;
-  update: boolean;
-  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type ChatProviderProps = {
@@ -56,7 +54,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [user, setUser] = useState<User>({} as User);
   const [isLoading, setIsLoading] = useState(true);
   const [validationRequired, setValidationRequired] = useState(true);
-  const [update, setUpdate] = useState(false);
 
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
@@ -66,10 +63,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       chatService.socket?.emit("listMembers", { chatId: chat.id });
     }
     setShowElement("showChannelOpen");
-  };
-
-  const timeout = (delay: number) => {
-    return new Promise((res) => setTimeout(res, delay));
   };
 
   useEffect(() => {
@@ -87,9 +80,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
       setChatList(() => newChatList);
       setIsLoading(false);
-      timeout(10000).then(() => {
-        chatService.socket?.emit("listChats");
-      });
     });
 
     chatService.socket?.on("deleteChat", (deletedChat: any) => {
@@ -150,8 +140,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         setValidationRequired,
         validationRequired,
         user,
-        update,
-        setUpdate,
       }}
     >
       {children}
