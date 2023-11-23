@@ -36,6 +36,7 @@ export default function EditUserModal() {
         .then(() => {
           toast.success("Nome de usuário atualizado com sucesso!");
           queryClient.invalidateQueries(["users"]);
+          queryClient.invalidateQueries(["me"]);
         })
         .catch((error) => {
           toast.error(
