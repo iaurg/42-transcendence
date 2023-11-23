@@ -294,6 +294,7 @@ export class ChatGateway
     if (you.role !== 'OWNER') {
       return;
     }
+
     const members = await this.chatService.listMembersByChatId(chatId);
     if (!members) {
       client.emit('leaveChat', { error: 'Failed to list members' });
@@ -372,6 +373,50 @@ export class ChatGateway
     }
   }
 
+  async updateListMembers(chatId: number) {
+    const members = await this.chatService.listMembersByChatId(chatId);
+    if (!members) {
+      this.logger.error('Failed to list members');
+      return;
+    }
+
+    // order members by alphabetical order
+    members.sort((a, b) => {
+      if (a.userLogin < b.userLogin) {
+        return -1;
+      }
+      if (a.userLogin > b.userLogin) {
+        return 1;
+      }
+      return 0;
+    });
+
+    // order members by role
+    members.sort((a, b) => {
+      if (a.role === 'OWNER') {
+        return -1;
+      }
+      if (b.role === 'OWNER') {
+        return 1;
+      }
+      if (a.role === 'ADMIN') {
+        return -1;
+      }
+      if (b.role === 'ADMIN') {
+        return 1;
+      }
+      return 0;
+    });
+
+    // update list of members in chat and emit event to all members
+    for (const member of members) {
+      const socket = this.connectedUsers[member.userLogin];
+      if (socket) {
+        socket.emit('listMembers', members);
+      }
+    }
+  }
+
   @SubscribeMessage('promoteToAdmin')
   async promoteToAdmin(
     @MessageBody('user') user: string,
@@ -390,6 +435,10 @@ export class ChatGateway
       this.logger.error('Failed to promote user');
       return;
     }
+
+    // update list of members in chat and emit event to all members
+    await this.updateListMembers(chatId);
+
     this.logger.log(`You promoted ${user} to admin of chat ${chatId}`);
   }
 
@@ -420,6 +469,10 @@ export class ChatGateway
       this.logger.error('Failed to demote user');
       return;
     }
+
+    // update list of members in chat and emit event to all members
+    await this.updateListMembers(chatId);
+
     this.logger.log(`You demoted ${user} to member of chat ${chatId}`);
   }
 
@@ -501,6 +554,10 @@ export class ChatGateway
         message: `You have been kicked from chat ${chatId}`,
       });
     }
+
+    // update list of members in chat and emit event to all members
+    await this.updateListMembers(chatId);
+
     client.emit('kickMember', {
       message: `You kicked ${user} from chat ${chatId}`,
     });
@@ -553,6 +610,10 @@ export class ChatGateway
         message: `You have been banned from chat ${chatId}`,
       });
     }
+
+    // update list of members in chat and emit event to all members
+    await this.updateListMembers(chatId);
+
     client.emit('banMember', {
       message: `You banned ${user} from chat ${chatId}`,
     });
@@ -574,6 +635,10 @@ export class ChatGateway
       client.emit('muteMember', { error: 'Failed to mute user' });
       return;
     }
+
+    // update list of members in chat and emit event to all members
+    await this.updateListMembers(chatId);
+
     client.emit('muteMember', {
       message: `You muted ${user} from chat ${chatId}`,
     });
@@ -597,6 +662,10 @@ export class ChatGateway
       client.emit('unmuteMember', { error: 'Failed to unmute user' });
       return;
     }
+
+    // update list of members in chat and emit event to all members
+    await this.updateListMembers(chatId);
+
     client.emit('unmuteMember', {
       message: `You unmuted ${user} from chat ${chatId}`,
     });
