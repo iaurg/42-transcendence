@@ -6,6 +6,7 @@ const nextConfig = {
   output: "standalone",
   experimental: {
     outputFileTracingRoot: path.join(__dirname, "../../"),
+    appDir: true,
   },
   webpack: (config) => {
     config.externals.push({
