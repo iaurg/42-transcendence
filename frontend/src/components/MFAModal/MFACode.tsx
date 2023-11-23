@@ -4,6 +4,7 @@ import MFAForm from "../MFAForm";
 import { api } from "@/services/apiClient";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
+import { queryClient } from "@/services/queryClient";
 
 type MFACodeProps = {
   handleStep: (step: number) => void;
@@ -11,7 +12,7 @@ type MFACodeProps = {
 
 export default function MFACode({ handleStep }: MFACodeProps) {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const { user,setUser } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const handleSubmit = async () => {
     // Handle submission logic here
@@ -20,7 +21,7 @@ export default function MFACode({ handleStep }: MFACodeProps) {
       .post(endpoint, { code: code.join("") }, { withCredentials: true })
       .then((r) => {
         if (r.status == 201) handleStep(2);
-        setUser({ ...user, mfaEnabled: !user.mfaEnabled });
+        queryClient.invalidateQueries(["me"]);
       })
       .catch((e) => {
         toast.error("Código inválido", {

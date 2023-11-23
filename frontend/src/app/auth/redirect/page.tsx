@@ -4,20 +4,21 @@ import { useContext, useEffect } from "react";
 import nookies from "nookies";
 import jwt_decode from "jwt-decode";
 import { useRouter } from "next/navigation";
+import { queryClient } from "@/services/queryClient";
 
 export default function RootLoginRedirectPage() {
-  const { payload: user, setPayload: setUser } = useContext(AuthContext);
+  const { payload: user } = useContext(AuthContext);
   const router = useRouter();
 
   useEffect(() => {
     const { accessToken } = nookies.get(null, "accesssToken");
     if (accessToken) {
       const payload: TokenPayload = jwt_decode(accessToken);
-      if (payload) setUser(payload);
+      if (payload) queryClient.invalidateQueries(["me"]);
     } else {
       router.push("/login");
     }
-  }, [setUser, router]);
+  }, [router]);
 
   useEffect(() => {
     if (user.sub) {
