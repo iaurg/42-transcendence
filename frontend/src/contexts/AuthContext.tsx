@@ -4,12 +4,12 @@ import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
 import { redirect } from "next/navigation";
 import { User } from "@/types/user";
+import { useGetMe } from "@/services/queries/user/getMe";
 
 type AuthContextType = {
   payload: TokenPayload;
   setPayload: React.Dispatch<React.SetStateAction<TokenPayload>>;
   user: User;
-  setUser: React.Dispatch<React.SetStateAction<User>>;
 };
 
 export type TokenPayload = {
@@ -37,21 +37,12 @@ export function signOut() {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [payload, setPayload] = useState<TokenPayload>({} as TokenPayload);
-  const [user, setUser] = useState<User>({} as User);
+  const { data: user } = useGetMe();
 
   useEffect(() => {
     const { accessToken } = nookies.get(null, "accesssToken");
     if (accessToken) {
-      api
-        .get(`/users/me`, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          setUser(response.data);
-        })
-        .catch((error) => {
-          signOut();
-        });
+      api.defaults.headers["Authorization"] = `Bearer ${accessToken}`;
     } else {
       signOut();
     }
@@ -63,7 +54,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         payload,
         setPayload,
         user,
-        setUser,
       }}
     >
       {children}

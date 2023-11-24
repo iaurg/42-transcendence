@@ -1,5 +1,10 @@
 import { ChatContext } from "@/contexts/ChatContext";
-import { PaperPlaneTilt, PencilSimpleSlash, UsersThree, XCircle } from "@phosphor-icons/react";
+import {
+  PaperPlaneTilt,
+  PencilSimpleSlash,
+  UsersThree,
+  XCircle,
+} from "@phosphor-icons/react";
 import { useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
@@ -20,8 +25,6 @@ export function OpenChannel() {
     validationRequired,
     setValidationRequired,
     user,
-    update,
-    setUpdate,
   } = useContext(ChatContext);
   // List messages from the websocket
   const [message, setMessage] = useState("");
@@ -29,7 +32,7 @@ export function OpenChannel() {
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const myUserList = users.filter(usr => usr.userLogin === user.login);
+  const myUserList = users.filter((usr) => usr.userLogin === user.login);
   const myUser = myUserList[0] || null;
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
@@ -42,13 +45,15 @@ export function OpenChannel() {
 
   useEffect(() => {
     chatService.socket?.on("listMembers", (members: ChatMember[]) => {
-      const currentMembers = members.filter((member) => member.status !== "BANNED");
+      const currentMembers = members.filter(
+        (member) => member.status !== "BANNED"
+      );
       setNumberOfUsersInChat(currentMembers.length);
       setUsers(currentMembers);
+      console.log("listMembers", currentMembers);
       setIsLoading(false);
-      setUpdate(false);
     });
-  }, [update]);
+  }, []);
 
   chatService.socket?.on("verifyPassword", (response: any) => {
     if (response.error) {
@@ -62,8 +67,7 @@ export function OpenChannel() {
   });
 
   const handleSendMessage = () => {
-    if (myUser && myUser.status === 'MUTED')
-      return;
+    if (myUser && myUser.status === "MUTED") return;
     chatService.socket?.emit("message", {
       chatId: selectedChat.id,
       content: message,
@@ -95,6 +99,7 @@ export function OpenChannel() {
       chatId: selectedChat.id,
       password: data.password,
     });
+
     chatService.socket?.emit("joinChat", {
       chatId: selectedChat.id,
       password: data.password,
@@ -141,13 +146,14 @@ export function OpenChannel() {
       </div>
     );
   }
+
   if (isLoading)
     return (
       <div className="flex flex-col flex-1 justify-center items-center">
         <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
         <span className="text-white text-lg mt-4">Carregando...</span>
       </div>
-    )
+    );
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -178,10 +184,11 @@ export function OpenChannel() {
           <div
             key={message.id}
             // TODO: Implement user context to compare user login with message user
-            className={`${message.userLogin === user.login
-              ? "text-white bg-purple42-200 self-end"
-              : "text-white bg-black42-300 self-start"
-              } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
+            className={`${
+              message.userLogin === user.login
+                ? "text-white bg-purple42-200 self-end"
+                : "text-white bg-black42-300 self-start"
+            } py-2 px-4 w-3/4 rounded-lg mx-2 my-2 break-words`}
           >
             <span className="font-semibold">
               <Link href={`/game/history/${message.userId}`}>
@@ -207,13 +214,19 @@ export function OpenChannel() {
             }
           }}
         />
-        < button
+        <button
           className="bg-purple42-200 text-white rounded-lg p-3 placeholder-gray-700 absolute z-10 right-4"
-          onClick={() => handleSendMessage()} /*TODO: Check if other users are receiving the message */
+          onClick={() =>
+            handleSendMessage()
+          } /*TODO: Check if other users are receiving the message */
         >
-          {myUser && myUser.status !== 'MUTED' ? <PaperPlaneTilt size={20} color="white" /> : <PencilSimpleSlash alt="Muted user" size={20} color="gray" />}
+          {myUser && myUser.status !== "MUTED" ? (
+            <PaperPlaneTilt size={20} color="white" />
+          ) : (
+            <PencilSimpleSlash alt="Muted user" size={20} color="gray" />
+          )}
         </button>
       </div>
-    </div >
+    </div>
   );
 }

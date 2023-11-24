@@ -33,6 +33,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
+          h-[calc(100vh-130px)]
         "
         >
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
@@ -58,6 +59,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
+          h-[calc(100vh-130px)]
         "
         >
           <div className="text-white text-3xl text-center">Game finished</div>
@@ -84,6 +86,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
+          h-[calc(100vh-130px)]
         "
         >
           <div className="text-white text-3xl text-center">Game abandoned</div>
@@ -100,6 +103,7 @@ export default function PlayPage() {
         rounded-lg
         w-full
         mt-4
+        h-[calc(100vh-130px)]
       "
       >
         <div
@@ -140,7 +144,7 @@ export default function PlayPage() {
             onClick={() => setGameLayout("dark")}
           >
             Dark
-          </button>          
+          </button>
         </div>
         <div
           className="

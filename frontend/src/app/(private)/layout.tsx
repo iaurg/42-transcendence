@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 // These styles apply to every route in the application
 import "../../styles/globals.css";
-import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import Header from "@/components/Header";
 import Providers from "../auth/providers";
@@ -23,9 +22,6 @@ export default function RootPrivateLayout({
     <html lang="en">
       <body className="bg-black42-100 flex">
         <Providers>
-          <div className="flex flex-col md:flex-row">
-            <Sidebar />
-          </div>
           <div className="flex flex-col flex-1 py-4 mx-4">
             <Header />
             {children}
