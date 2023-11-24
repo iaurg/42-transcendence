@@ -66,7 +66,6 @@ export default function ChatUsersChannelPopOver({
 
   const handlepromoteToAdmin = (user: ChatMember) => {
     promoteToAdminMutation.mutate(user);
-    // refresh the page to see the changes
     toast.success(`${user.userLogin} is now an admin`);
   };
 
@@ -215,19 +214,17 @@ export default function ChatUsersChannelPopOver({
                     alt="Channel Owner"
                   />
                 )}
-                {
-                  user.role === "MEMBER" && (
-                    <ArrowFatLineUp
-                      className="cursor-pointer text-orange42-500"
-                      size={20}
-                      aria-label="Promote to Admin"
-                      alt="Promote to Admin"
-                      onClick={() => {
-                        handlepromoteToAdmin(user);
-                      }}
-                    />
-                  ) /*TODO: Make this command responsive */
-                }
+                {user.role === "MEMBER" && myUser?.role === "ADMIN" && (
+                  <ArrowFatLineUp
+                    className="cursor-pointer text-orange42-500"
+                    size={20}
+                    aria-label="Promote to Admin"
+                    alt="Promote to Admin"
+                    onClick={() => {
+                      handlepromoteToAdmin(user);
+                    }}
+                  />
+                )}
                 {
                   myUser &&
                     myUser.role === "OWNER" &&
