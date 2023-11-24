@@ -164,10 +164,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowUp") {
-        console.log("up");
         handleMovePlayer("UP");
       } else if (e.key === "ArrowDown") {
-        console.log("down");
         handleMovePlayer("DOWN");
       }
     };
@@ -178,6 +176,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [clientId, gameData]);
+
   return (
     <GameContext.Provider
       value={{

@@ -43,9 +43,9 @@ export default function ChatUsersChannelPopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "left",
   });
-  
+
   // import user from useContext but rename it as currentUser
-  const { user: currentUser, setUpdate } = useContext(ChatContext);
+  const { user: currentUser } = useContext(ChatContext);
 
   const otherUsers = users.filter(
     (user) => user.userLogin !== currentUser.login
@@ -68,7 +68,6 @@ export default function ChatUsersChannelPopOver({
     promoteToAdminMutation.mutate(user);
     // refresh the page to see the changes
     toast.success(`${user.userLogin} is now an admin`);
-    setUpdate(true);
   };
 
   const muteUserMutation = useMutation({
@@ -85,7 +84,6 @@ export default function ChatUsersChannelPopOver({
   const handleMuteUser = (user: ChatMember) => {
     muteUserMutation.mutate(user);
     toast.success(`${user.userLogin} is now muted`);
-    setUpdate(true);
   };
 
   const unmuteUserMutation = useMutation({
@@ -98,10 +96,10 @@ export default function ChatUsersChannelPopOver({
       return user;
     },
   });
+
   const handleUnmuteUser = (user: ChatMember) => {
     unmuteUserMutation.mutate(user);
     toast.success(`${user.userLogin} is now unmuted`);
-    setUpdate(true);
   };
 
   const banUserMutation = useMutation({
@@ -118,7 +116,6 @@ export default function ChatUsersChannelPopOver({
   const handleBanUser = (user: ChatMember) => {
     banUserMutation.mutate(user);
     toast.success(`${user.userLogin} is now banned from the chat`);
-    setUpdate(true);
   };
 
   const kickUserMutation = useMutation({
@@ -135,7 +132,6 @@ export default function ChatUsersChannelPopOver({
   const handleKickUser = (user: ChatMember) => {
     kickUserMutation.mutate(user);
     toast.success(`${user.userLogin} was kicked from the chat`);
-    setUpdate(true);
   };
 
   const demoteToMemberMutation = useMutation({
@@ -152,7 +148,6 @@ export default function ChatUsersChannelPopOver({
   const handleDemoteToMember = (user: ChatMember) => {
     demoteToMemberMutation.mutate(user);
     toast.success(`${user.userLogin} is now a user`);
-    setUpdate(true);
   };
 
   return (
