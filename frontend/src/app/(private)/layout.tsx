@@ -22,15 +22,7 @@ export default function RootPrivateLayout({
     <html lang="en">
       <body className="bg-black42-100 flex">
         <Providers>
-          <div className="flex flex-col flex-1 py-4 mx-4">
-            <Header />
-            {children}
-          </div>
-          <div className="flex flex-col">
-            <ChatProvider>
-              <Chat />
-            </ChatProvider>
-          </div>
+          <div className="flex flex-col flex-1">{children}</div>
           <Toaster />
         </Providers>
         <Toaster />

@@ -5,7 +5,7 @@ import { Play, SignOut, Trophy } from "@phosphor-icons/react";
 
 export default function Header() {
   return (
-    <div className="flex justify-between items-center py-4 bg-black42-300 p-4 rounded-lg">
+    <div className="flex justify-between items-center py-4 bg-black42-300 p-4 rounded-lg mb-2">
       <div className="flex items-center ml-4">
         <UserInfo />
       </div>

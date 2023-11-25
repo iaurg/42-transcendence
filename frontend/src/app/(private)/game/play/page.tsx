@@ -1,6 +1,7 @@
 "use client";
 import { GameContext } from "@/contexts/GameContext";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useContext, useRef } from "react";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
@@ -102,8 +103,7 @@ export default function PlayPage() {
         bg-black42-300
         rounded-lg
         w-full
-        mt-4
-        h-[calc(100vh-130px)]
+        h-[calc(100vh-35px)]
       "
       >
         <div
@@ -116,67 +116,93 @@ export default function PlayPage() {
           py-2
           text-white
           font-bold
-          w-[80%]
+          w-[20%]
           mx-auto
+          absolute
+          left-0
+          right-0
+          top-21
+          z-10
         "
         >
-          Choose map colour:
           <button
-            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-purple42-400 hover:bg-purple42-500"
             onClick={() => setGameLayout("default")}
-          >
-            Default
-          </button>
+          />
           <button
-            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-yellow-400 hover:bg-yellow-500"
             onClick={() => setGameLayout("sunlight")}
-          >
-            Sunlight
-          </button>
+          />
           <button
-            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-blue-400 hover:bg-blue-500"
             onClick={() => setGameLayout("moonlight")}
-          >
-            Moonlight
-          </button>
+          />
           <button
-            className="bg-purple42-400 hover:bg-purple42-500 text-white font-bold py-2 px-4 rounded"
+            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-gray-800 hover:bg-gray-900"
             onClick={() => setGameLayout("dark")}
-          >
-            Dark
-          </button>
+          />
         </div>
         <div
           className="
+            text-white
+            font-bold
+            text-2xl
+            absolute
+            top-1/6
+            right-0
+            left-0
+            m-4
             flex
             flex-row
             justify-between
             items-center
-            px-4
-            py-2
-            text-white
-            font-bold
-            text-5xl
-            w-[80%]
+            w-[60%]
             mx-auto
           "
         >
           <div>Score: {gameData.score?.player1}</div>
           <div>Score: {gameData.score?.player2}</div>
         </div>
+        <div id="game-canvas" ref={canvasRef}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              alignContent: "center",
+              height: "90vh",
+            }}
+          >
+            <Game data={gameData} />
+          </div>
+        </div>
         <div
-          id="game-canvas"
-          style={{
-            width: 800,
-            height: 600,
-            margin: "0 auto",
-            borderRadius: "10px",
-            marginTop: "10px",
-            aspectRatio: "16/9",
-          }}
-          ref={canvasRef}
+          className="
+          flex
+          flex-row
+          justify-center
+          items-center
+          absolute
+          bottom-8
+          right-0
+          left-0
+          m-4
+        "
         >
-          <Game data={gameData} />
+          <Link
+            href="/game"
+            className="
+            bg-red-500
+            hover:bg-red-600
+            text-white
+            font-bold
+            py-2
+            px-4
+            rounded
+          "
+          >
+            Quit the game
+          </Link>
         </div>
       </div>
     </>
