@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { GameDto } from './dto/game.dto';
 import { GameMoveDto } from './dto/game.move';
 import { Player } from './dto/game.player.dto';
@@ -13,9 +13,11 @@ export class GameService {
     private matchHistoryService: MatchHistoryService,
   ) {}
 
+  private readonly logger = new Logger(GameService.name);
+
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
-  private MAX_SCORE = 10;
+  private MAX_SCORE = 2;
   private BALL_SPEED = 6;
   private BALL_ACCELERATION = 1.1;
 
@@ -172,13 +174,16 @@ export class GameService {
       winnerPoints = gameDto.score.player2;
       loserPoints = gameDto.score.player1;
     }
-
-    await this.matchHistoryService.create({
-      winnerId: winner.userId,
-      loserId: loser.userId,
-      winnerPoints,
-      loserPoints,
-    });
+    try {
+      await this.matchHistoryService.create({
+        winnerId: winner.userId,
+        loserId: loser.userId,
+        winnerPoints,
+        loserPoints,
+      });
+    } catch (e) {
+      this.logger.debug(e);
+    }
   }
 
   private async storeGameResult(gameDto: GameDto) {

@@ -56,7 +56,6 @@ export class ChatGateway
             `Failed to authenticate user: ${socket.handshake.auth?.user?.login}`,
             err,
           );
-          return next(new Error(err));
         });
     });
   }
@@ -86,7 +85,7 @@ export class ChatGateway
       return this.usersService.findOne(payload.sub);
     } catch {
       this.logger.error('Token invalid or expired');
-      throw new WsException('Token invalid or expired');
+      return Promise.reject(new WsException('Token invalid or expired'));
     }
   }
 

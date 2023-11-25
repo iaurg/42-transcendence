@@ -21,7 +21,7 @@ export default function RootLoginRedirectPage() {
   }, [router]);
 
   useEffect(() => {
-    if (user.sub) {
+    if (user) {
       if (user.mfaEnabled) {
         router.push("/auth/2fa");
       } else {
