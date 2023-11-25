@@ -267,6 +267,7 @@ export class ChatGateway
     }
     client.join(`chat:${chatId}`);
     client.emit('joinChat', { message: `You joined chat ${chatId}`, chat });
+    await this.updateListMembers(chatId);
   }
 
   @SubscribeMessage('leaveChat')
