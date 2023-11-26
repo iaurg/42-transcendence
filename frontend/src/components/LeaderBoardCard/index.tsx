@@ -32,7 +32,11 @@ export function LeaderBoardCard({
         </div>
         <div>
           {isFriend && (
-            <UserPlus className="text-purple42-200 cursor-pointer" size={24} />
+            <UserPlus
+              className="text-purple42-200 cursor-pointer"
+              size={24}
+              alt="Adicionar amigo"
+            />
           )}
         </div>
       </div>

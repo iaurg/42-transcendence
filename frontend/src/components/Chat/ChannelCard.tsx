@@ -25,12 +25,18 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
     // TODO: add user context for chat owner
     <div className="bg-black42-200 flex justify-between rounded-lg items-center p-3 my-1">
       <div className="flex space-x-2 items-center">
-        <span className="cursor-pointer" onClick={() => handleOpenChannel()}>
+        <span
+          className="cursor-pointer"
+          onClick={() => handleOpenChannel()}
+          title="Acessar chat"
+        >
           {chat.name}
         </span>
         <div className="flex ml-1 space-x-1">
-          {chat.chatType === 'PROTECTED' && <Lock color="white" size={12} />}
-          {chat.owner === user.login && <Crown className="text-orange42-500" size={12} />}
+          {chat.chatType === "PROTECTED" && <Lock color="white" size={12} />}
+          {chat.owner === user.login && (
+            <Crown className="text-orange42-500" size={12} />
+          )}
         </div>
       </div>
       <div className="flex space-x-5 items-center">
@@ -39,12 +45,14 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
             className="text-red-400 cursor-pointer"
             size={18}
             onClick={() => handleDeleteChannel()}
+            alt="Deletar chat"
           />
         )}
         <ArrowRight
           className="text-purple42-200 cursor-pointer"
           size={18}
           onClick={() => handleOpenChannel()}
+          alt="Acessar chat"
         />
       </div>
     </div>

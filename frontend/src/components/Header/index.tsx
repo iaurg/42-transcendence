@@ -14,6 +14,7 @@ export default function Header() {
           href="/game/play"
           className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
+          title="Iniciar um jogo"
         >
           <Play color="white" size={32} />
         </Link>
@@ -21,6 +22,7 @@ export default function Header() {
           href="/game"
           className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
+          title="Ver ranking"
         >
           <Trophy color="white" size={32} />
         </Link>
@@ -28,6 +30,7 @@ export default function Header() {
           href="/"
           className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
                 flex items-center justify-center w-12 h-12"
+          title="Sair"
         >
           <SignOut color="white" size={32} />
         </Link>
