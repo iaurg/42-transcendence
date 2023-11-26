@@ -24,6 +24,7 @@ type ChatContextType = {
   setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
   validationRequired: boolean;
   user: User;
+  handleUpdateListChats: () => void;
 };
 
 type ChatProviderProps = {
@@ -63,6 +64,10 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       chatService.socket?.emit("listMembers", { chatId: chat.id });
     }
     setShowElement("showChannelOpen");
+  };
+
+  const handleUpdateListChats = () => {
+    chatService.socket?.emit("listChats");
   };
 
   useEffect(() => {
@@ -140,6 +145,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         setValidationRequired,
         validationRequired,
         user,
+        handleUpdateListChats,
       }}
     >
       {children}

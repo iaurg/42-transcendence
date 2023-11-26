@@ -1,14 +1,19 @@
 import { Plus } from "@phosphor-icons/react";
 import ChannelCard from "./ChannelCard";
 import { Chat, ChatContext } from "@/contexts/ChatContext";
-import { useContext } from "react";
+import { use, useContext, useEffect } from "react";
 
 type ListChannelsProps = {
   handleShowCreateChannel: () => void;
 };
 
 export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
-  const { isLoading, chatList } = useContext(ChatContext);
+  const { isLoading, chatList, handleUpdateListChats } =
+    useContext(ChatContext);
+
+  useEffect(() => {
+    handleUpdateListChats();
+  }, []);
 
   return (
     <div className="flex flex-col flex-1 justify-between">
