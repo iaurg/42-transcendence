@@ -11,7 +11,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async logout(user: User, res: Response) {
-    await this.usersService.update(user.login, { refreshToken: null });
+    await this.usersService.updateAuth(user.login, { refreshToken: null });
     res.redirect(`${this.configService.get('FRONTEND_URL')}/login`);
   }
 }

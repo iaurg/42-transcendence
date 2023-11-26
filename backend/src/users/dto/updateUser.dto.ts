@@ -12,13 +12,4 @@ export class UpdateUserDto {
 
   @IsInt()
   victory?: number;
-
-  @IsString()
-  refreshToken?: string;
-
-  @IsString()
-  mfaSecret?: string;
-
-  @IsBoolean()
-  mfaEnabled?: boolean;
 }

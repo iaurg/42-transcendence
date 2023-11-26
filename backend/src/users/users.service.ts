@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdateUserAuthDto } from './dto/updateUserAuth.dto';
 import { User, UserStatus } from '@prisma/client';
 
 @Injectable()
@@ -63,6 +64,18 @@ export class UsersService {
       data: {
         displayName: updateUserDto.displayName,
         status: updateUserDto.status,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async updateAuth(login: string, updateUserAuthDto: UpdateUserAuthDto) {
+    return await this.prisma.user.update({
+      where: { login: login },
+      data: {
+        refreshToken: updateUserAuthDto.refreshToken,
+        mfaSecret: updateUserAuthDto.mfaSecret,
+        mfaEnabled: updateUserAuthDto.mfaEnabled,
         updatedAt: new Date(),
       },
     });
