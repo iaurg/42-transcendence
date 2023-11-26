@@ -21,7 +21,7 @@ export default function FriendCard({
   id,
   status,
 }: FriendCardProps) {
- const { user } = useContext(ChatContext);
+  const { user } = useContext(ChatContext);
 
   const deleteFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
@@ -67,7 +67,11 @@ export default function FriendCard({
         ></div>
       </div>
       <div className="flex space-x-5 items-center">
-        <EnvelopeSimple className="text-purple42-200" size={18} onClick={handleOpenDirectMessage} />
+        <EnvelopeSimple
+          className="text-purple42-200 cursor-pointer"
+          size={18}
+          onClick={handleOpenDirectMessage}
+        />
         <Sword className="text-purple42-200" size={18} />
         <UserMinus
           className="text-purple42-200 cursor-pointer"
