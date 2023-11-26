@@ -10,6 +10,7 @@ import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import ChangeChatPassword from "./ChangeChatPassword";
 interface Message {
   id: number;
   content: string;
@@ -32,8 +33,7 @@ export function OpenChannel() {
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const myUserList = users.filter((usr) => usr.userLogin === user.login);
-  const myUser = myUserList[0] || null;
+  const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
@@ -167,12 +167,25 @@ export function OpenChannel() {
           </ChatUsersChannelPopOver>
         </div>
         <h3 className="text-white text-lg">{selectedChat.name}</h3>
-        <XCircle
-          className="cursor-pointer"
-          color="white"
-          size={20}
-          onClick={() => handleCloseChat(selectedChat.id)}
-        />
+        <div
+          className="
+            flex 
+            flex-row 
+            space-x-2 
+            items-center
+          "
+        >
+          {selectedChat.chatType === "PROTECTED" &&
+            myUser?.role === "OWNER" && (
+              <ChangeChatPassword chatId={selectedChat.id} />
+            )}
+          <XCircle
+            className="cursor-pointer"
+            color="white"
+            size={20}
+            onClick={() => handleCloseChat(selectedChat.id)}
+          />
+        </div>
       </div>
       <div
         id="messages-container"

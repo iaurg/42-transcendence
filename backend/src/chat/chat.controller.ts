@@ -6,11 +6,15 @@ import {
   HttpStatus,
   Logger,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { chatMemberRole, chatType } from '@prisma/client';
+import { User, chatMemberRole, chatType } from '@prisma/client';
+import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 
 // create a new chat in the database using post request
 // get all chats from the database using get request
@@ -27,11 +31,13 @@ export class ChatController {
   ): Promise<boolean> {
     const you = await this.chatService.getMemberFromChat(chatId, login);
     const member = await this.chatService.getMemberFromChat(chatId, user);
+
     // Me and him must exist in the database
     if (!you || !member) {
       this.logger.error('Unable to find user or member');
       return true;
     }
+
     // I cannot be the member I want to mute, I cannot be member to mute, I cannot mute an admin nor the owner
     if (you === member || you.role === 'MEMBER' || member.role !== 'MEMBER') {
       this.logger.error('You are not allowed to mute this user');
@@ -188,5 +194,22 @@ export class ChatController {
     } catch (error) {
       throw new HttpException({ error }, HttpStatus.FORBIDDEN);
     }
+  }
+
+  // Patch to update a chat password if the user is the owner
+  @UseGuards(AccessTokenGuard)
+  @Patch('/password')
+  async updateChatPassword(
+    @Req() request: Request & { user: User },
+    @Body() body: { chatId: number; password: string },
+  ) {
+    const { chatId, password } = body;
+    const { login } = request.user;
+    const updatedChat = await this.chatService.updateChatPassword(
+      chatId,
+      password,
+      login,
+    );
+    return updatedChat;
   }
 }
