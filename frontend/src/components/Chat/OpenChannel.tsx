@@ -50,9 +50,16 @@ export function OpenChannel() {
       );
       setNumberOfUsersInChat(currentMembers.length);
       setUsers(currentMembers);
-      console.log("listMembers", currentMembers);
       setIsLoading(false);
     });
+
+    // on chat open go to the bottom of the messages
+    setTimeout(() => {
+      const messagesContainer = document.getElementById("messages-container");
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }, 100);
   }, []);
 
   chatService.socket?.on("verifyPassword", (response: any) => {
