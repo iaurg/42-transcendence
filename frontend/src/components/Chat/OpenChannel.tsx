@@ -183,7 +183,6 @@ export function OpenChannel() {
         {messages.map((message: any) => (
           <div
             key={message.id}
-            // TODO: Implement user context to compare user login with message user
             className={`${
               message.userLogin === user.login
                 ? "text-white bg-purple42-200 self-end"
@@ -218,7 +217,7 @@ export function OpenChannel() {
           className="bg-purple42-200 text-white rounded-lg p-3 placeholder-gray-700 absolute z-10 right-4"
           onClick={() =>
             handleSendMessage()
-          } /*TODO: Check if other users are receiving the message */
+          }
         >
           {myUser && myUser.status !== "MUTED" ? (
             <PaperPlaneTilt size={20} color="white" />

@@ -33,7 +33,6 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
                         scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
         >
           {chatList?.map((channel: Chat) => (
-            // TODO: add user context for chat owner
             <ChannelCard key={channel.id} chat={channel} />
           ))}
         </div>

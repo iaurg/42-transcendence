@@ -144,7 +144,6 @@ export class ChatGateway
   @SubscribeMessage('listChats')
   async listChats(@ConnectedSocket() client: Socket) {
     const chats = await this.chatService.listChats();
-    // TODO: do not display PRIVATE CHATS
     client.emit('listChats', chats);
   }
 
@@ -179,6 +178,18 @@ export class ChatGateway
     if (chatType === 'PROTECTED' && !password) {
       client.emit('error', { error: 'Protected chat must have password' });
       return;
+    }
+    if (chatType === 'PRIVATE') {
+      // check if a chat with that name already exists
+      const createdChat = await this.chatService.getChatByName(chatName);
+      if (createdChat) {
+        client.join(`chat:${createdChat.id}`);
+        client.emit('joinChat', {
+          message: `You joined chat ${createdChat.id}`,
+        });
+        client.emit('createChat', createdChat);
+        return;
+      }
     }
     const createdChat = await this.chatService.createChat(
       login,
