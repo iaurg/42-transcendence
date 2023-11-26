@@ -1,5 +1,5 @@
 "use client";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import MFAForm from "../MFAForm";
 import { api } from "@/services/apiClient";
 import { useContext, useState } from "react";
@@ -36,7 +36,6 @@ export default function MFACode({ handleStep }: MFACodeProps) {
   return (
     <>
       <div className="mt-2"></div>
-      <Toaster />
       <div className="flex justify-center">
         {user.mfaEnabled ? (
           ""
