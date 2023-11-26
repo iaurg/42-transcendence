@@ -59,7 +59,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
     // check if chat has an id
-    if (chat.id) {
+    if (chat?.id) {
       chatService.socket?.emit("listMessages", { chatId: chat.id });
       chatService.socket?.emit("listMembers", { chatId: chat.id });
     }
