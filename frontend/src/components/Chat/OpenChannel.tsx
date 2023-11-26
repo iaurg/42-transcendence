@@ -34,6 +34,9 @@ export function OpenChannel() {
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
+  const [showLock, setShowLock] = useState(() =>
+    selectedChat.chatType === "PROTECTED" ? true : false
+  );
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
@@ -113,6 +116,10 @@ export function OpenChannel() {
     });
   };
 
+  const handleHideLock = () => {
+    setShowLock(false);
+  };
+
   if (selectedChat.chatType === "PROTECTED" && validationRequired) {
     return (
       <div className="flex flex-col flex-1 justify-between">
@@ -182,10 +189,12 @@ export function OpenChannel() {
             items-center
           "
         >
-          {selectedChat.chatType === "PROTECTED" &&
-            myUser?.role === "OWNER" && (
-              <ChangeChatPassword chatId={selectedChat.id} />
-            )}
+          {showLock && myUser?.role === "OWNER" && (
+            <ChangeChatPassword
+              handleHideLock={handleHideLock}
+              chatId={selectedChat.id}
+            />
+          )}
           <XCircle
             className="cursor-pointer"
             color="white"

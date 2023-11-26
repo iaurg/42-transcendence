@@ -9,10 +9,12 @@ import toast from "react-hot-toast";
 
 type ChangeChatPasswordProps = {
   chatId: number;
+  handleHideLock: () => void;
 };
 
 export default function ChangeChatPassword({
   chatId,
+  handleHideLock,
 }: ChangeChatPasswordProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +75,7 @@ export default function ChangeChatPassword({
         .finally(() => {
           setIsLoading(false);
           setIsOpen(false);
+          handleHideLock();
         });
     }
   };
