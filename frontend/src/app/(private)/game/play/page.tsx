@@ -191,8 +191,12 @@ export default function PlayPage() {
             mx-auto
           "
         >
-          <div>Pontos: {gameData.score?.player1}</div>
-          <div>Pontos: {gameData.score?.player2}</div>
+          <div>
+            {gameData.player1?.login}: {gameData.score?.player1}
+          </div>
+          <div>
+            {gameData.player2?.login}: {gameData.score?.player2}
+          </div>
         </div>
         <div id="game-canvas" ref={canvasRef}>
           <div
