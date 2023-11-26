@@ -19,14 +19,12 @@ export default function RootPrivateLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-black42-100 flex">
-        <Providers>
-          <div className="flex flex-col flex-1">{children}</div>
-          <Toaster />
-        </Providers>
+    <>
+      <Providers>
+        <div className="flex flex-col flex-1 bg-black42-100">{children}</div>
         <Toaster />
-      </body>
-    </html>
+      </Providers>
+      <Toaster />
+    </>
   );
 }
