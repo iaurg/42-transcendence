@@ -1,4 +1,4 @@
-import { ArrowRight, Crown, EnvelopeSimple, EyeSlash, Lock, Shield, TrashSimple } from "@phosphor-icons/react";
+import { ArrowRight, Crown, EnvelopeSimple,  Lock, TrashSimple } from "@phosphor-icons/react";
 import { useContext } from "react";
 import { Chat, ChatContext } from "@/contexts/ChatContext";
 import chatService from "@/services/chatClient";
