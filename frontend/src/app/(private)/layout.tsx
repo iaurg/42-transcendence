@@ -19,10 +19,11 @@ export default function RootPrivateLayout({
   return (
     <>
       <Providers>
-        <div className="flex flex-col flex-1 bg-black42-100">{children}</div>
-        <Toaster />
+        <ChatProvider>
+          <div className="flex flex-col flex-1 bg-black42-100">{children}</div>
+          <Toaster />
+        </ChatProvider>
       </Providers>
-      <Toaster />
     </>
   );
 }
