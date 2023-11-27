@@ -53,8 +53,7 @@ export class GameLobbyService {
 
   invitePlayer2(player: any, login: string, info: GameInviteDto) {
     const gameDto = this.invite_lobby[`game_${info.inviting}`];
-    if (gameDto == undefined)
-      return undefined;
+    if (gameDto == undefined) return undefined;
     gameDto.player2 = {
       login,
       socketId: player.id,
@@ -109,8 +108,9 @@ export class GameLobbyService {
   }
 
   abandoneLobby(playerId: string) {
-    let index = this.lobby.findIndex(item => item.gameId == `game_${playerId}`);
-    if (index >= 0)
-      this.lobby.splice(index);
+    let index = this.lobby.findIndex(
+      (item) => item.gameId == `game_${playerId}`,
+    );
+    if (index >= 0) this.lobby.splice(index);
   }
 }
