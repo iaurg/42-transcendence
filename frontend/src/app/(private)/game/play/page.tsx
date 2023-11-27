@@ -39,7 +39,7 @@ export default function PlayPage() {
         >
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
           <div className="text-white text-3xl text-center">
-            Waiting for player 2...
+            Aguardando oponente...
           </div>
         </div>
       </>
@@ -51,22 +51,53 @@ export default function PlayPage() {
       <>
         <div
           className="
-          bg-black42-300
-          rounded-lg
-          w-full
-          mt-4
-          flex
-          flex-col
-          justify-center
-          items-center
-          py-6
-          h-[calc(100vh-130px)]
-        "
+            bg-black42-300
+            rounded-lg
+            w-full
+            mt-4
+            flex
+            flex-col
+            justify-center
+            items-center
+            py-6
+            h-[calc(100vh-130px)]
+            p-4
+          "
         >
-          <div className="text-white text-3xl text-center">Game finished</div>
-          <div className="text-white text-3xl text-center flex flex-col">
-            <span>Player 1 Final Score: {gameFinishedData.score?.player1}</span>
-            <span>Player 2 Final Score: {gameFinishedData.score?.player2}</span>
+          <div className="text-white text-4xl text-center mb-4">
+            Jogo finalizado
+          </div>
+          <div className="text-white text-2xl text-center flex flex-col items-center space-y-2">
+            <span>
+              {gameFinishedData.player1.login} Pontos:{" "}
+              {gameFinishedData.score?.player1}
+            </span>
+            <span>
+              {gameFinishedData.player2.login} Pontos:{" "}
+              {gameFinishedData.score?.player2}
+            </span>
+            <span className="text-green-500 text-3xl mt-4">
+              Vencedor:{" "}
+              {gameFinishedData.score?.player1 > gameFinishedData.score?.player2
+                ? gameFinishedData.player1.login
+                : gameFinishedData.player2.login}
+            </span>
+            <Link
+              href="/game"
+              className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+            >
+              Voltar ao inicio
+            </Link>
           </div>
         </div>
       </>
@@ -90,7 +121,7 @@ export default function PlayPage() {
           h-[calc(100vh-130px)]
         "
         >
-          <div className="text-white text-3xl text-center">Game abandoned</div>
+          <div className="text-white text-3xl text-center">Jogo abandonado</div>
         </div>
       </>
     );
@@ -164,8 +195,12 @@ export default function PlayPage() {
             mx-auto
           "
         >
-          <div>Score: {gameData.score?.player1}</div>
-          <div>Score: {gameData.score?.player2}</div>
+          <div>
+            {gameData.player1?.login}: {gameData.score?.player1}
+          </div>
+          <div>
+            {gameData.player2?.login}: {gameData.score?.player2}
+          </div>
         </div>
         <div id="game-canvas" ref={canvasRef}>
           <div
@@ -205,7 +240,7 @@ export default function PlayPage() {
             rounded
           "
           >
-            Quit the game
+            Sair do jogo
           </Link>
         </div>
       </div>
