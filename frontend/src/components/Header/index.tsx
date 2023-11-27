@@ -9,30 +9,33 @@ export default function Header() {
       <div className="flex items-center ml-4">
         <UserInfo />
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center space-x-4">
         <Link
           href="/game/play"
-          className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
-                flex items-center justify-center w-12 h-12"
+          className="text-white font-bold  rounded-lg transition-all hover:bg-purple42-200
+                flex items-center justify-center space-x-2 px-4 py-2"
           title="Iniciar um jogo"
         >
-          <Play color="white" size={32} />
+          <Play color="white" size={22} />
+          <span>Jogar</span>
         </Link>
         <Link
           href="/game"
-          className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
-                flex items-center justify-center w-12 h-12"
+          className="text-white font-bold  rounded-lg transition-all hover:bg-purple42-200
+                flex items-center justify-center space-x-2 px-4 py-2"
           title="Ver ranking"
         >
-          <Trophy color="white" size={32} />
+          <Trophy color="white" size={22} />
+          <span>Ranking</span>
         </Link>
         <Link
           href="/"
-          className="text-white font-bold  rounded-full transition-all hover:bg-purple42-200
-                flex items-center justify-center w-12 h-12"
+          className="text-white font-bold  rounded-lg transition-all hover:bg-purple42-200
+                flex items-center justify-center space-x-2 px-4 py-2"
           title="Sair"
         >
-          <SignOut color="white" size={32} />
+          <SignOut color="white" size={22} />
+          <span>Sair</span>
         </Link>
       </div>
     </div>
