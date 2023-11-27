@@ -39,12 +39,14 @@ export default function Chat() {
           color="white"
           onClick={() => setShowElement("showChannels")}
           className="cursor-pointer"
+          alt="Canais"
         />
         <Users
           size={25}
           color="white"
           onClick={() => setShowElement("showFriends")}
           className="cursor-pointer"
+          alt="Amigos"
         />
       </div>
     </div>

@@ -128,18 +128,22 @@ export default function PlayPage() {
           <button
             className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-purple42-400 hover:bg-purple42-500"
             onClick={() => setGameLayout("default")}
+            title="Trocar tema"
           />
           <button
             className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-yellow-400 hover:bg-yellow-500"
             onClick={() => setGameLayout("sunlight")}
+            title="Trocar tema"
           />
           <button
             className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-blue-400 hover:bg-blue-500"
             onClick={() => setGameLayout("moonlight")}
+            title="Trocar tema"
           />
           <button
             className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-gray-800 hover:bg-gray-900"
             onClick={() => setGameLayout("dark")}
+            title="Trocar tema"
           />
         </div>
         <div

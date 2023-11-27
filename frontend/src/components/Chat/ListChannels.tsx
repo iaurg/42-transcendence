@@ -25,6 +25,7 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
                     flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
           size={14}
           onClick={handleShowCreateChannel}
+          alt="Criar novo canal"
         />
       </div>
       {isLoading ? (

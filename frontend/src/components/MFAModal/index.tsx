@@ -34,6 +34,7 @@ export default function MFAModal() {
         className="cursor-pointer"
         color="white"
         size={24}
+        alt="Autenticação de dois fatores"
       />
 
       <Transition appear show={isOpen} as={Fragment}>
