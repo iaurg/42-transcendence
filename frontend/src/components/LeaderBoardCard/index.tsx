@@ -1,5 +1,5 @@
 "use client";
-import { Trophy, UserPlus } from "@phosphor-icons/react";
+import { Trophy } from "@phosphor-icons/react";
 import { StatusTag } from "../StatusTag";
 import ProfilePopOver from "../ProfilePopOver";
 import UserAvatar from "../UserAvatar";
@@ -7,15 +7,10 @@ import { User } from "@/types/user";
 
 type LeaderBoardCardProps = {
   score: number;
-  isFriend: boolean;
   user: User;
 };
 
-export function LeaderBoardCard({
-  score,
-  isFriend,
-  user,
-}: LeaderBoardCardProps) {
+export function LeaderBoardCard({ score, user }: LeaderBoardCardProps) {
   return (
     <div className="flex flex-row justify-between items-center py-3 bg-black42-200 p-4 rounded-lg w-full">
       <ProfilePopOver name={user.login} score={score} id={user.id}>
@@ -27,13 +22,8 @@ export function LeaderBoardCard({
       </ProfilePopOver>
       <div className="flex flex-row justify-between items-center space-x-4">
         <div className="flex flex-row justify-start items-center w-[50px]">
-          <Trophy className="text-purple42-200 mr-2" size={24} />
+          <Trophy className="text-yellow-600 mr-2" size={24} />
           <span className="text-xl text-white">{score}</span>
-        </div>
-        <div>
-          {isFriend && (
-            <UserPlus className="text-purple42-200 cursor-pointer" size={24} />
-          )}
         </div>
       </div>
     </div>
