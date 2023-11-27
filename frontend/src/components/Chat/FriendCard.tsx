@@ -6,9 +6,9 @@ import chatService from "@/services/chatClient";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import InviteToGame from "../InviteToGame";
 import { ChatContext } from "@/contexts/ChatContext";
 import { useContext } from "react";
+import InviteToGame from "../InviteToGame";
 
 type FriendCardProps = {
   displayName: string;
