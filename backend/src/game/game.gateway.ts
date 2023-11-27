@@ -11,12 +11,14 @@ import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
 import { GameMoveDto } from './dto/game.move';
 import { JwtService } from '@nestjs/jwt';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private PADDLE_WIDTH = 10;
   private PADDLE_HEIGHT = 150;
   private FRAMES_PER_SECOND = 60;
+  private readonly logger = new Logger(GameGateway.name);
 
   constructor(
     private gameService: GameService,
@@ -41,14 +43,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Decode user from JWT
     const decodedUser = this.jwtService.decode(user).sub;
 
-    console.log(`Client ${decodedUser} connected`);
+    this.logger.log(`Client ${decodedUser} connected`);
   }
 
   handleDisconnect(client: Socket) {
     const gameId = this.finishGame(client);
     client.leave(gameId);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
-    console.log(`Client ${client.id} disconnected`);
+    this.logger.log(`Client ${client.id} disconnected`);
   }
 
   @SubscribeMessage('joinGame')
@@ -57,7 +59,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decodedUser = this.jwtService.decode(user).sub;
 
     if (this.gameLobby.joinPlayer1(client, decodedUser)) {
-      console.log(`waiting Player 2`);
+      this.logger.log(`Client ${client.id} joined game`);
       client.emit('waitingPlayer2', `game_${client.id}`);
     } else {
       const game = this.gameLobby.joinPlayer2(client, decodedUser);
@@ -77,10 +79,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameService.addPoint(game);
         this.gameService.restartBall(game);
       }
+
       if (this.gameService.isGameFinished(game)) {
         this.gameServer.to(gameId).emit('gameFinished', game);
         this.finishGame(client);
       }
+
       if (game.finished) {
         return;
       }
