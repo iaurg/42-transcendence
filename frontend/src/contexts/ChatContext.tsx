@@ -58,11 +58,13 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
     // check if chat has an id
-    if (chat.id) {
-      chatService.socket?.emit("listMessages", { chatId: chat.id });
-      chatService.socket?.emit("listMembers", { chatId: chat.id });
-    }
-    setShowElement("showChannelOpen");
+    try {
+      if (chat.id) {
+        chatService.socket?.emit("listMessages", { chatId: chat.id });
+        chatService.socket?.emit("listMembers", { chatId: chat.id });
+        setShowElement("showChannelOpen");
+      }
+    } catch (error) {}; // required to avoid raising an error when chat.id is undefined
   };
 
   useEffect(() => {
@@ -78,7 +80,11 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
-      setChatList(() => newChatList);
+      // remove chats which chatType is PRIVATE
+      const filteredChats = newChatList.filter(chat => {
+        return chat.chatType !== 'PRIVATE';
+      });
+      setChatList(() => filteredChats);
       setIsLoading(false);
     });
 
@@ -93,7 +99,12 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.on("createChat", (chat: Chat) => {
       setValidationRequired(false);
       handleOpenChannel(chat);
-      setChatList((chatList) => [...chatList, chat]);
+      const isDuplicateChat = chatList.some(existingChat =>
+        existingChat.name === chat.name && existingChat.chatType === 'PRIVATE'
+      );
+      if (!isDuplicateChat) {
+        setChatList((chatList) => [...chatList, chat]);
+      }
     });
 
     chatService.socket?.on("joinChat", (response: any) => {
