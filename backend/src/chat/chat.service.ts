@@ -665,4 +665,17 @@ export class ChatService {
 
     return isPasswordValid;
   }
+
+  async getChatByName(name: string): Promise<Chat> {
+    try {
+      const chat = await this.prisma.chat.findFirst({
+        where: {
+          name,
+        },
+      });
+      return chat;
+    } catch (error) {
+      return null;
+    }
+  }
 }
