@@ -24,7 +24,11 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
   return (
     <div className="bg-black42-200 flex justify-between rounded-lg items-center p-3 my-1">
       <div className="flex space-x-2 items-center">
-        <span className="cursor-pointer" onClick={() => handleOpenChannel()}>
+        <span
+          className="cursor-pointer"
+          onClick={() => handleOpenChannel()}
+          title="Acessar chat"
+        >
           {chat.name}
         </span>
         <div className="flex ml-1 space-x-1">
@@ -38,15 +42,15 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
           <TrashSimple
             className="text-red-400 cursor-pointer"
             size={18}
-            alt="Delete channel"
             onClick={() => handleDeleteChannel()}
+            alt="Deletar chat"
           />
         )}
         <ArrowRight
           className="text-purple42-200 cursor-pointer"
           size={18}
-          alt="Open channel"
           onClick={() => handleOpenChannel()}
+          alt="Acessar chat"
         />
       </div>
     </div>
