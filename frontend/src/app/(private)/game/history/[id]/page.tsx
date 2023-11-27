@@ -2,7 +2,6 @@
 import Chat from "@/components/Chat";
 import Header from "@/components/Header";
 import MatchHistory from "@/components/MatchHistory";
-import { ChatProvider } from "@/contexts/ChatContext";
 import { ArrowLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 
@@ -22,9 +21,7 @@ export default function HistoryPage({ params }: { params: { id: string } }) {
         <MatchHistory id={params.id} />
       </div>
       <div className="flex flex-col">
-        <ChatProvider>
-          <Chat />
-        </ChatProvider>
+        <Chat />
       </div>
     </div>
   );
