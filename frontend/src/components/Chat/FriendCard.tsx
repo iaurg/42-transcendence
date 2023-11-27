@@ -5,6 +5,7 @@ import { EnvelopeSimple, Sword, UserMinus } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import InviteToGame from "../InviteToGame";
 
 type FriendCardProps = {
   displayName: string;
@@ -53,7 +54,7 @@ export default function FriendCard({
       </div>
       <div className="flex space-x-5 items-center">
         <EnvelopeSimple className="text-purple42-200" size={18} />
-        <Sword className="text-purple42-200" size={18} />
+        <InviteToGame inviteUserId={id} />
         <UserMinus
           className="text-purple42-200 cursor-pointer"
           size={18}

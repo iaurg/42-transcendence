@@ -34,7 +34,6 @@ export function ListFriends() {
               id={user.id}
               status={user.status}
             />
-
           ))
         )}
       </div>
