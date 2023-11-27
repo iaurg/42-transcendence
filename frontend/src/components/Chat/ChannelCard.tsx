@@ -42,7 +42,6 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
           <TrashSimple
             className="text-red-400 cursor-pointer"
             size={18}
-            alt="Delete channel"
             onClick={() => handleDeleteChannel()}
             alt="Deletar chat"
           />
@@ -50,7 +49,6 @@ export default function ChannelCard({ chat }: ChannelCardProps) {
         <ArrowRight
           className="text-purple42-200 cursor-pointer"
           size={18}
-          alt="Open channel"
           onClick={() => handleOpenChannel()}
           alt="Acessar chat"
         />
