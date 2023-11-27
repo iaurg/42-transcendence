@@ -76,6 +76,7 @@ export default function EditUserModal() {
         className="cursor-pointer"
         color="white"
         size={24}
+        alt="Editar perfil"
       />
 
       <Transition appear show={isOpen} as={Fragment}>

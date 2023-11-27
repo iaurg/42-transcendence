@@ -1,7 +1,6 @@
 import Chat from "@/components/Chat";
 import Header from "@/components/Header";
 import { LeaderBoard } from "@/components/LeaderBoard";
-import { ChatProvider } from "@/contexts/ChatContext";
 
 export default function GamePage() {
   return (
@@ -11,9 +10,7 @@ export default function GamePage() {
         <LeaderBoard />
       </div>
       <div className="flex flex-col">
-        <ChatProvider>
-          <Chat />
-        </ChatProvider>
+        <Chat />
       </div>
     </div>
   );

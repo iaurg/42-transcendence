@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 
 // These styles apply to every route in the application
 import "../../styles/globals.css";
-import Chat from "@/components/Chat";
-import Header from "@/components/Header";
 import Providers from "../auth/providers";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { Toaster } from "react-hot-toast";
@@ -22,8 +20,10 @@ export default function RootPrivateLayout({
     <html lang="en">
       <body className="bg-black42-100 flex">
         <Providers>
-          <div className="flex flex-col flex-1">{children}</div>
-          <Toaster />
+          <ChatProvider>
+            <div className="flex flex-col flex-1">{children}</div>
+            <Toaster />
+          </ChatProvider>
         </Providers>
         <Toaster />
       </body>

@@ -48,7 +48,7 @@ export default function ProfilePopOver({
   };
 
   return (
-    <Popover className="relative">
+    <Popover className="relative" title="Ver perfil">
       <Popover.Button ref={setReferenceElement} className="outline-none">
         {children}
       </Popover.Button>
