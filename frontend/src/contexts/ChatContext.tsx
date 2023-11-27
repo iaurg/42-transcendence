@@ -82,7 +82,11 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
-      setChatList(() => newChatList);
+      // remove chats which chatType is PRIVATE
+      const filteredChats = newChatList.filter(chat => {
+        return chat.chatType !== 'PRIVATE';
+      });
+      setChatList(() => filteredChats);
       setIsLoading(false);
     });
 
@@ -97,7 +101,12 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.on("createChat", (chat: Chat) => {
       setValidationRequired(false);
       handleOpenChannel(chat);
-      setChatList((chatList) => [...chatList, chat]);
+      const isDuplicateChat = chatList.some(existingChat =>
+        existingChat.name === chat.name && existingChat.chatType === 'PRIVATE'
+      );
+      if (!isDuplicateChat) {
+        setChatList((chatList) => [...chatList, chat]);
+      }
     });
 
     chatService.socket?.on("joinChat", (response: any) => {

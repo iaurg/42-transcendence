@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 
 // These styles apply to every route in the application
 import "../../styles/globals.css";
-import Chat from "@/components/Chat";
-import Header from "@/components/Header";
 import Providers from "../auth/providers";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { Toaster } from "react-hot-toast";

@@ -18,6 +18,10 @@ interface Message {
   userId: string;
 }
 
+type FormInputs = {
+  password: string;
+};
+
 export function OpenChannel() {
   const {
     selectedChat,
@@ -78,6 +82,7 @@ export function OpenChannel() {
 
   const handleSendMessage = () => {
     if (myUser && myUser.status === "MUTED") return;
+
     chatService.socket?.emit("message", {
       chatId: selectedChat.id,
       content: message,
@@ -91,10 +96,6 @@ export function OpenChannel() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }, 100);
-  };
-
-  type FormInputs = {
-    password: string;
   };
 
   const {
@@ -173,19 +174,27 @@ export function OpenChannel() {
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-8">
         <div className="flex items-center">
-          <ChatUsersChannelPopOver users={users}>
-            <div className="flex space-x-1 items-center">
-              <span className="text-xs">({numberOfUsersInChat})</span>
-              <UsersThree className="text-white" size={20} />
-            </div>
-          </ChatUsersChannelPopOver>
+          {selectedChat.chatType !== "PRIVATE" && (
+            <ChatUsersChannelPopOver users={users}>
+              <div className="flex space-x-1 items-center">
+                <span className="text-xs">({numberOfUsersInChat})</span>
+                <UsersThree className="text-white" size={20} />
+              </div>
+            </ChatUsersChannelPopOver>
+          )}
         </div>
-        <h3 className="text-white text-lg">{selectedChat.name}</h3>
+        <h3 className="text-white text-lg">
+          {selectedChat.chatType === "PRIVATE"
+            ? `DM: ${selectedChat.name
+                .split(" - ")
+                .filter((name) => name !== user.displayName)}`
+            : selectedChat.name}
+        </h3>
         <div
           className="
-            flex 
-            flex-row 
-            space-x-2 
+            flex
+            flex-row
+            space-x-2
             items-center
           "
         >
@@ -202,6 +211,7 @@ export function OpenChannel() {
             onClick={() => handleCloseChat(selectedChat.id)}
           />
         </div>
+
       </div>
       <div
         id="messages-container"
@@ -212,7 +222,6 @@ export function OpenChannel() {
         {messages.map((message: any) => (
           <div
             key={message.id}
-            // TODO: Implement user context to compare user login with message user
             className={`${
               message.userLogin === user.login
                 ? "text-white bg-purple42-200 self-end"
@@ -245,9 +254,7 @@ export function OpenChannel() {
         />
         <button
           className="bg-purple42-200 text-white rounded-lg p-3 placeholder-gray-700 absolute z-10 right-4"
-          onClick={() =>
-            handleSendMessage()
-          } /*TODO: Check if other users are receiving the message */
+          onClick={() => handleSendMessage()}
         >
           {myUser && myUser.status !== "MUTED" ? (
             <PaperPlaneTilt size={20} color="white" />
