@@ -1,11 +1,14 @@
 import { api } from "@/services/apiClient";
 import { queryClient } from "@/services/queryClient";
 import { UserStatus } from "@/types/user";
-import { EnvelopeSimple, Sword, UserMinus } from "@phosphor-icons/react";
+import { EnvelopeSimple, UserMinus } from "@phosphor-icons/react";
+import chatService from "@/services/chatClient";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import InviteToGame from "../InviteToGame";
+import { ChatContext } from "@/contexts/ChatContext";
+import { useContext } from "react";
 
 type FriendCardProps = {
   displayName: string;
@@ -18,6 +21,8 @@ export default function FriendCard({
   id,
   status,
 }: FriendCardProps) {
+  const { user } = useContext(ChatContext);
+
   const deleteFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
       return api.delete("/friends", {
@@ -37,6 +42,15 @@ export default function FriendCard({
     deleteFriendMutation.mutate({ friend_id: id });
   };
 
+  const handleOpenDirectMessage = () => {
+    const chatName = `${displayName} - ${user.displayName}`;
+    chatService.socket?.emit("createChat", {
+      chatName,
+      chatType: "PRIVATE",
+      password: "",
+    });
+  };
+
   return (
     <div className="bg-black42-200 flex justify-between rounded-lg items-center p-3 my-1">
       <div className="flex justify-between items-center cursor-pointer gap-2">
@@ -53,7 +67,11 @@ export default function FriendCard({
         ></div>
       </div>
       <div className="flex space-x-5 items-center">
-        <EnvelopeSimple className="text-purple42-200" size={18} />
+        <EnvelopeSimple
+          className="text-purple42-200 cursor-pointer"
+          size={18}
+          onClick={handleOpenDirectMessage}
+        />
         <InviteToGame inviteUserId={id} />
         <UserMinus
           className="text-purple42-200 cursor-pointer"
