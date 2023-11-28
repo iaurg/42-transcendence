@@ -16,6 +16,7 @@ export default function PlayPage() {
     gameFinishedData,
     gameData,
     setGameLayout,
+    handleRedirectToHome,
   } = useContext(GameContext);
 
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
@@ -41,8 +42,8 @@ export default function PlayPage() {
           <div className="text-white text-3xl text-center">
             Aguardando oponente...
           </div>
-          <Link
-            href="/game"
+          <button
+            onClick={() => handleRedirectToHome()}
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -56,7 +57,7 @@ export default function PlayPage() {
               "
           >
             Voltar ao inicio
-          </Link>
+          </button>
         </div>
       </>
     );
@@ -98,8 +99,8 @@ export default function PlayPage() {
                 ? gameFinishedData.player1.login
                 : gameFinishedData.player2.login}
             </span>
-            <Link
-              href="/game"
+            <button
+              onClick={() => handleRedirectToHome()}
               className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -113,7 +114,7 @@ export default function PlayPage() {
               "
             >
               Voltar ao inicio
-            </Link>
+            </button>
           </div>
         </div>
       </>
@@ -138,8 +139,8 @@ export default function PlayPage() {
         "
         >
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
-          <Link
-            href="/game"
+          <button
+            onClick={() => handleRedirectToHome()}
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -153,7 +154,7 @@ export default function PlayPage() {
               "
           >
             Voltar ao inicio
-          </Link>
+          </button>
         </div>
       </>
     );
@@ -260,8 +261,8 @@ export default function PlayPage() {
           m-4
         "
         >
-          <Link
-            href="/game"
+          <button
+            onClick={() => handleRedirectToHome()}
             className="
             bg-red-500
             hover:bg-red-600
@@ -273,7 +274,7 @@ export default function PlayPage() {
           "
           >
             Sair do jogo
-          </Link>
+          </button>
         </div>
       </div>
     </>

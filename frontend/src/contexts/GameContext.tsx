@@ -86,6 +86,16 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
   const socket = useRef<Socket | null>(null);
 
+  const handleDisconnectPlayer = () => {
+    socket.current?.disconnect();
+  };
+
+  const handleRedirectToHome = () => {
+    //disconnect player
+    handleDisconnectPlayer();
+    //redirect to home
+    router.push("/game");
+  };
   useEffect(() => {
     // Listen for the 'connect' event
     const { accessToken } = nookies.get(null, "accesssToken");
