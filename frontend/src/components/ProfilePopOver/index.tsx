@@ -1,7 +1,7 @@
 import { api } from "@/services/apiClient";
 import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
-import { ListNumbers, Play, UserPlus } from "@phosphor-icons/react";
+import { ListNumbers, Play, Prohibit, UserPlus } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
@@ -86,17 +86,23 @@ export default function ProfilePopOver({
                 size={14}
               />
             </Link>
+
+            <Prohibit
+              color="white"
+              className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+                      flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
+              size={14}
+              alt="Bloquear"
+            />
           </div>
           <p className="text-base font-semibold leading-none text-white">
-            <a href="#">{name}</a>
+            {name}
           </p>
 
           <ul className="flex text-sm mt-2">
-            <li className="mr-2">
-              <a href="#" className=" text-white">
-                <span className="font-semibold mr-2">{score}</span>
-                <span>Vitórias</span>
-              </a>
+            <li className="mr-2 text-white">
+              <span className="font-semibold mr-2">{score}</span>
+              <span>Vitórias</span>
             </li>
           </ul>
         </div>
