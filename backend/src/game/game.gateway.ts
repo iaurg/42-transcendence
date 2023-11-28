@@ -81,7 +81,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client ${client.id} created a invite game`);
       client.emit('sendInvite', `game_${client.id}`);
     } else {
-      client.emit('inviteRejected', `game_${client.id}`);
+      client.emit('inviteError', `game_${client.id}`);
     }
   }
 
@@ -92,7 +92,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const game = this.gameLobby.invitePlayer2(client, decodedUser, info);
     if (game == undefined)
-      client.emit('inviteRejected', `game_${info.inviting}`);
+      client.emit('inviteError', `game_${info.inviting}`);
     this.gamesPlaying[game.gameId] = game;
     this.gameService.restartBall(this.gamesPlaying[game.gameId]);
     this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
@@ -102,7 +102,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('inviteRejected')
   inviteRejected(client: Socket, info: GameInviteDto) {
     this.gameLobby.inviteRejected(info)
-    client.emit('inviteRejected', `game_${info.inviting}`);
+    client.emit('inviteError', `game_${info.inviting}`);
   }
 
   @SubscribeMessage('startGame')
