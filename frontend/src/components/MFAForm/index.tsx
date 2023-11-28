@@ -41,7 +41,6 @@ export default function MFAForm({ code, setCode, handleSubmit }: MFAFormProps) {
         const newCode = code;
         newCode[index + i] = String(number);
         setCode((code) => [...newCode]);
-        console.log("code", code);
         if (e !== undefined) {
           change2faFocus(index + i + 1);
         }
