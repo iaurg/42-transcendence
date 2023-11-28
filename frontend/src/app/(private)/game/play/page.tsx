@@ -41,6 +41,22 @@ export default function PlayPage() {
           <div className="text-white text-3xl text-center">
             Aguardando oponente...
           </div>
+          <Link
+            href="/game"
+            className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+          >
+            Voltar ao inicio
+          </Link>
         </div>
       </>
     );
@@ -122,6 +138,22 @@ export default function PlayPage() {
         "
         >
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
+          <Link
+            href="/game"
+            className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+          >
+            Voltar ao inicio
+          </Link>
         </div>
       </>
     );
