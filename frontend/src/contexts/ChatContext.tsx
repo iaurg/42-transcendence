@@ -24,6 +24,7 @@ type ChatContextType = {
   setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
   validationRequired: boolean;
   user: User;
+  handleUpdateListChats: () => void;
 };
 
 type ChatProviderProps = {
@@ -58,13 +59,15 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
     // check if chat has an id
-    try {
-      if (chat.id) {
-        chatService.socket?.emit("listMessages", { chatId: chat.id });
-        chatService.socket?.emit("listMembers", { chatId: chat.id });
-        setShowElement("showChannelOpen");
-      }
-    } catch (error) {}; // required to avoid raising an error when chat.id is undefined
+    if (chat?.id) {
+      chatService.socket?.emit("listMessages", { chatId: chat.id });
+      chatService.socket?.emit("listMembers", { chatId: chat.id });
+    }
+    setShowElement("showChannelOpen");
+  };
+
+  const handleUpdateListChats = () => {
+    chatService.socket?.emit("listChats");
   };
 
   useEffect(() => {
@@ -72,7 +75,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.connect();
 
     chatService.socket?.on("userLogin", (user: User) => {
-      console.log(`Current user login: ${user.login}`, user);
       setUser(() => user);
       queryClient.invalidateQueries(["user_status", user.id]);
       queryClient.invalidateQueries(["friends"]);
@@ -151,6 +153,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         setValidationRequired,
         validationRequired,
         user,
+        handleUpdateListChats,
       }}
     >
       {children}
