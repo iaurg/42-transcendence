@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { queryClient } from "@/services/queryClient";
 
 export default function RootLoginRedirectPage() {
-  const { payload: user } = useContext(AuthContext);
+  const { user: user } = useContext(AuthContext);
   const router = useRouter();
 
   useEffect(() => {
