@@ -11,11 +11,8 @@ type Elements =
   | "showChannelOpen";
 
 type ChatContextType = {
-  isCollapsed: boolean;
-  setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   showElement: Elements;
   setShowElement: React.Dispatch<React.SetStateAction<Elements>>;
-  handleToggleCollapse: () => void;
   setSelectedChat: React.Dispatch<React.SetStateAction<Chat>>;
   selectedChat: Chat;
   chatList: ChatList;
@@ -48,7 +45,6 @@ export const ChatContext = createContext<ChatContextType>(
 );
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
   const [showElement, setShowElement] = useState<Elements>("showChannels");
   const [selectedChat, setSelectedChat] = useState<Chat>({} as Chat);
   const [chatList, setChatList] = useState<ChatList>([]);
@@ -140,11 +136,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   return (
     <ChatContext.Provider
       value={{
-        isCollapsed,
-        setIsCollapsed,
         showElement,
         setShowElement,
-        handleToggleCollapse,
         setSelectedChat,
         selectedChat,
         chatList,
