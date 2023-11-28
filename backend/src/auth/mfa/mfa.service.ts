@@ -20,7 +20,7 @@ export class MultiFactorAuthService {
     const secret = authenticator.generateSecret();
     const appName = this.configService.get('APP_NAME');
     const otpauthUrl = authenticator.keyuri(login, appName, secret);
-    await this.usersService.update(login, {
+    await this.usersService.updateAuth(login, {
       mfaSecret: secret,
     });
     return otpauthUrl;
@@ -38,7 +38,7 @@ export class MultiFactorAuthService {
   }
 
   async disableMfa(user: User, res: Response) {
-    const updated_user = await this.usersService.update(user.login, {
+    const updated_user = await this.usersService.updateAuth(user.login, {
       mfaEnabled: false,
       mfaSecret: null,
     });
@@ -48,7 +48,7 @@ export class MultiFactorAuthService {
   }
 
   async enableMfa(user: User, res: Response) {
-    const updated_user = await this.usersService.update(user.login, {
+    const updated_user = await this.usersService.updateAuth(user.login, {
       mfaEnabled: true,
     });
     const tokens = await this.jwtAuthService.generateJwt(updated_user, true);
