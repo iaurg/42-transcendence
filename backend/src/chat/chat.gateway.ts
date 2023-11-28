@@ -722,7 +722,6 @@ export class ChatGateway
   async handleConnection(@ConnectedSocket() client: Socket) {
     const { login, id } = client.handshake.auth?.user;
 
-    // TODO: remove this hardcoded user id
     if (!login) {
       client.emit('connected', { error: 'User not found' });
       client.disconnect();
