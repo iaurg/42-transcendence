@@ -15,7 +15,7 @@ export function LeaderBoardCard({ score, user }: LeaderBoardCardProps) {
     <div className="flex flex-row justify-between items-center py-3 bg-black42-200 p-4 rounded-lg w-full">
       <ProfilePopOver name={user.login} score={score} id={user.id}>
         <div className="flex flex-row justify-between items-center">
-          <UserAvatar imageUrl={user.avatar || ""} login={user.login} />
+          <UserAvatar imageUrl={user.avatar || ""} login={user.displayName} />
           <div className="text-white text-lg mx-3">{user.displayName}</div>
           <StatusTag user={user} />
         </div>
