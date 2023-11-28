@@ -2,6 +2,8 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import nookies from "nookies";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 /**
  * Backend websocket events
@@ -65,6 +67,7 @@ type GameContextType = {
   gameData: GameData;
   gameLayout: GameLayout;
   setGameLayout: (layout: GameLayout) => void;
+  handleRedirectToHome: () => void;
 };
 
 type GameProviderProps = {
@@ -83,6 +86,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [gameData, setGameData] = useState({} as GameData);
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
   const [gameLayout, setGameLayout] = useState<GameLayout>("default");
+  const router = useRouter();
 
   const socket = useRef<Socket | null>(null);
 
@@ -96,6 +100,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     //redirect to home
     router.push("/game");
   };
+
   useEffect(() => {
     // Listen for the 'connect' event
     const { accessToken } = nookies.get(null, "accesssToken");
@@ -118,6 +123,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       console.log("Disconnected from the WebSocket server");
       if (socket.current) {
         socket.current.emit("finishGame");
+      } else {
+        toast.error("Erro ao finalizar jogo");
       }
     });
 
@@ -131,6 +138,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       setWaitingPlayer2(false);
       if (socket.current) {
         socket.current.emit("startGame");
+      } else {
+        toast.error("Erro ao iniciar jogo");
       }
     });
 
@@ -144,7 +153,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
 
     socket.current.on("gameFinished", (data: any) => {
-      console.log("gameFinished", data);
+      toast.success("Jogo finalizado");
       socket.current?.emit("finishGame");
       socket.current?.disconnect();
       setGameFinishedData(data);
@@ -199,6 +208,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameData,
         gameLayout,
         setGameLayout,
+        handleRedirectToHome,
       }}
     >
       {children}

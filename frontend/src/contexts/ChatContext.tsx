@@ -3,6 +3,7 @@ import chatService from "@/services/chatClient";
 import { queryClient } from "@/services/queryClient";
 import { User } from "@/types/user";
 import React, { createContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 type Elements =
   | "showChannels"
@@ -54,7 +55,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
-    // check if chat has an id
+
     if (chat?.id) {
       chatService.socket?.emit("listMessages", { chatId: chat.id });
       chatService.socket?.emit("listMembers", { chatId: chat.id });
@@ -79,8 +80,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
       // remove chats which chatType is PRIVATE
-      const filteredChats = newChatList.filter(chat => {
-        return chat.chatType !== 'PRIVATE';
+      const filteredChats = newChatList.filter((chat) => {
+        return chat.chatType !== "PRIVATE";
       });
       setChatList(() => filteredChats);
       setIsLoading(false);
@@ -97,16 +98,20 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.on("createChat", (chat: Chat) => {
       setValidationRequired(false);
       handleOpenChannel(chat);
-      const isDuplicateChat = chatList.some(existingChat =>
-        existingChat.name === chat.name && existingChat.chatType === 'PRIVATE'
+      const isDuplicateChat = chatList.some(
+        (existingChat) =>
+          existingChat.name === chat.name && existingChat.chatType === "PRIVATE"
       );
       if (!isDuplicateChat) {
         setChatList((chatList) => [...chatList, chat]);
+      } else {
+        toast.error("Você já possui um chat privado com esse usuário");
       }
     });
 
     chatService.socket?.on("joinChat", (response: any) => {
       if (response.error) {
+        toast.error("Erro ao entrar no chat, tente novamente");
         return;
       }
       handleOpenChannel(response.chat);
@@ -118,11 +123,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     };
   }, []);
 
-  const handleToggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const handleCloseChat = (chatId: number) => {
+  const handleCloseChat = () => {
     setIsLoading(true);
     chatService.socket?.off("listMessages");
     chatService.socket?.off("message");
