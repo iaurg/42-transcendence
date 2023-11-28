@@ -20,7 +20,7 @@ export default function PlayPage() {
 
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
 
-  if (waitingPlayer2) {
+  if (waitingPlayer2 || !gameData.player1 || !gameData.player2) {
     return (
       <>
         <div
