@@ -1,6 +1,7 @@
 import { api } from "@/services/apiClient";
 import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
+import { ListNumbers, Play, UserPlus } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
@@ -60,46 +61,37 @@ export default function ProfilePopOver({
       >
         <div className="p-3">
           <div className="flex items-center space-x-4 mb-4">
-            <button
-              type="button"
-              className="text-white bg-purple42-200 hover:bg-purple42-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none "
+            <UserPlus
+              color="white"
+              className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+                    flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
+              size={14}
               onClick={handleAddFriend}
-            >
-              Add amigo
-            </button>
-            <button
-              type="button"
-              className="text-white bg-purple42-200 hover:bg-purple42-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none "
-            >
-              Jogar
-            </button>
-            <Link href={`/game/history/${id}`} passHref>
-              <button
-                type="button"
-                className="text-white bg-purple42-200 hover:bg-purple42-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 focus:outline-none "
-              >
-                Histórico
-              </button>
+              alt="Adicionar amigo"
+            />
+            <Play
+              color="white"
+              className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+                    flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
+              size={14}
+              onClick={() => console.log("jogar")}
+              alt="Jogar"
+            />
+
+            <Link href={`/game/history/${id}`} passHref title="Histórico">
+              <ListNumbers
+                color="white"
+                className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+                      flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
+                size={14}
+              />
             </Link>
           </div>
           <p className="text-base font-semibold leading-none text-white">
             <a href="#">{name}</a>
           </p>
-          <p className="mb-3 text-sm font-normal text-white">
-            <a href="#" className="hover:underline">
-              @{name}
-            </a>
-          </p>
-          <p className="mb-4 text-sm text-white">
-            Open-source contributor. Building{" "}
-            <a
-              href="#"
-              className="text-blue-600 dark:text-blue-500 hover:underline"
-            >
-              {name}@42org.br
-            </a>
-          </p>
-          <ul className="flex text-sm">
+
+          <ul className="flex text-sm mt-2">
             <li className="mr-2">
               <a href="#" className=" text-white">
                 <span className="font-semibold mr-2">{score}</span>
