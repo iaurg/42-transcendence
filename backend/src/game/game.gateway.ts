@@ -67,6 +67,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
         this.startGame(client, game.gameId);
       } catch (Error) {
+        console.log(`${client.id} disconnected: Player can't play with himself`);
         client.disconnect();
       }
     }
