@@ -25,6 +25,8 @@ export class GameLobbyService {
 
   joinPlayer2(player: any, login: string): GameDto {
     const gameDto = this.lobby[0];
+    if (gameDto.player1.login == login)
+      throw new Error("You can't play with tyourself");
     gameDto.player2 = {
       login,
       socketId: player.id,
