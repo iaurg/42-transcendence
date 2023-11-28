@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   Chat,
   ChatMember,
@@ -664,6 +669,68 @@ export class ChatService {
     const isPasswordValid = await argon2.verify(chat.password, password);
 
     return isPasswordValid;
+  }
+
+  async updateChatPassword(
+    chatId: number,
+    password: string,
+    userLogin: string,
+  ): Promise<Chat | null> {
+    // check if user is the owner of the chat
+    const chat = await this.prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    if (chat.owner !== userLogin) {
+      throw new UnauthorizedException('You are not the owner of this chat');
+    }
+
+    if (chat.chatType !== 'PROTECTED' || !chat.password) {
+      throw new HttpException(
+        {
+          status: 403,
+          error: 'Chat is not protected',
+        },
+        403,
+      );
+    }
+
+    // if password is empty, remove password and set chat type to public
+    if (!password) {
+      const updatedChat = await this.prisma.chat.update({
+        where: {
+          id: chatId,
+        },
+        data: {
+          password: null,
+          chatType: 'PUBLIC',
+        },
+      });
+
+      return updatedChat;
+    }
+
+    try {
+      const updatedChat = await this.prisma.chat.update({
+        where: {
+          id: chatId,
+        },
+        data: {
+          password: await argon2.hash(password),
+        },
+      });
+
+      return updatedChat;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   async getChatByName(name: string): Promise<Chat> {

@@ -10,6 +10,7 @@ import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import ChangeChatPassword from "./ChangeChatPassword";
 interface Message {
   id: number;
   content: string;
@@ -36,8 +37,10 @@ export function OpenChannel() {
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const myUserList = users.filter((usr) => usr.userLogin === user.login);
-  const myUser = myUserList[0] || null;
+  const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
+  const [showLock, setShowLock] = useState(() =>
+    selectedChat.chatType === "PROTECTED" ? true : false
+  );
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
     setMessages(() => messages);
@@ -54,9 +57,16 @@ export function OpenChannel() {
       );
       setNumberOfUsersInChat(currentMembers.length);
       setUsers(currentMembers);
-      console.log("listMembers", currentMembers);
       setIsLoading(false);
     });
+
+    // on chat open go to the bottom of the messages
+    setTimeout(() => {
+      const messagesContainer = document.getElementById("messages-container");
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }, 100);
   }, []);
 
   chatService.socket?.on("verifyPassword", (response: any) => {
@@ -105,6 +115,10 @@ export function OpenChannel() {
       chatId: selectedChat.id,
       password: data.password,
     });
+  };
+
+  const handleHideLock = () => {
+    setShowLock(false);
   };
 
   if (selectedChat.chatType === "PROTECTED" && validationRequired) {
@@ -176,12 +190,28 @@ export function OpenChannel() {
                 .filter((name) => name !== user.displayName)}`
             : selectedChat.name}
         </h3>
-        <XCircle
-          className="cursor-pointer"
-          color="white"
-          size={20}
-          onClick={() => handleCloseChat(selectedChat.id)}
-        />
+        <div
+          className="
+            flex
+            flex-row
+            space-x-2
+            items-center
+          "
+        >
+          {showLock && myUser?.role === "OWNER" && (
+            <ChangeChatPassword
+              handleHideLock={handleHideLock}
+              chatId={selectedChat.id}
+            />
+          )}
+          <XCircle
+            className="cursor-pointer"
+            color="white"
+            size={20}
+            onClick={() => handleCloseChat(selectedChat.id)}
+          />
+        </div>
+
       </div>
       <div
         id="messages-container"
