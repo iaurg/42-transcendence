@@ -10,6 +10,7 @@ import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
 import { GameMoveDto } from './dto/game.move';
+import { GameInviteDto } from './dto/game.invite.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
 
@@ -68,6 +69,40 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
       this.startGame(client, game.gameId);
     }
+  }
+
+  @SubscribeMessage('createInvite')
+  inviteGame(client: Socket, info: GameInviteDto) {
+    const user = client.handshake.auth.token;
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    if (this.gameService.checkGuestAvailability(info.guest, this.gamesPlaying)) {
+      this.gameLobby.invitePlayer1(client, decodedUser)
+      this.logger.log(`Client ${client.id} created a invite game`);
+      client.emit('sendInvite', `game_${client.id}`);
+    } else {
+      client.emit('inviteRejected', `game_${client.id}`);
+    }
+  }
+
+  @SubscribeMessage('inviteAccepted')
+  inviteAccepted(client: Socket, info: GameInviteDto) {
+    const user = client.handshake.auth.token;
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    const game = this.gameLobby.invitePlayer2(client, decodedUser, info);
+    if (game == undefined)
+      client.emit('inviteRejected', `game_${info.inviting}`);
+    this.gamesPlaying[game.gameId] = game;
+    this.gameService.restartBall(this.gamesPlaying[game.gameId]);
+    this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
+    this.startGame(client, game.gameId);
+  }
+
+  @SubscribeMessage('inviteRejected')
+  inviteRejected(client: Socket, info: GameInviteDto) {
+    this.gameLobby.inviteRejected(info)
+    client.emit('inviteRejected', `game_${info.inviting}`);
   }
 
   @SubscribeMessage('startGame')

@@ -186,6 +186,14 @@ export class GameService {
     }
   }
 
+  checkGuestAvailability(player: string, gamesPlaying: Map<string, GameDto>): boolean {
+    gamesPlaying.forEach((value: GameDto) => {
+        if (value.player1.login == player || value.player2.login == player)
+            return false
+	});
+	return true;
+ }
+
   private async storeGameResult(gameDto: GameDto) {
     await this.updatePlayerVictory(gameDto);
 
