@@ -35,7 +35,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
-          h-[calc(100vh-130px)]
+          h-[100vh]
         "
         >
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
@@ -77,7 +77,7 @@ export default function PlayPage() {
             justify-center
             items-center
             py-6
-            h-[calc(100vh-130px)]
+            h-[100vh]
             p-4
           "
         >
@@ -135,7 +135,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
-          h-[calc(100vh-130px)]
+          h-[100vh]
         "
         >
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
@@ -167,7 +167,7 @@ export default function PlayPage() {
         bg-black42-300
         rounded-lg
         w-full
-        h-[calc(100vh-35px)]
+        h-[100vh]
       "
       >
         <div
