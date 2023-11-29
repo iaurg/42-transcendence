@@ -107,4 +107,10 @@ export class GameLobbyService {
     };
     return gameDto;
   }
+
+  abandoneLobby(playerId: string) {
+    let index = this.lobby.findIndex(item => item.gameId == `game_${playerId}`);
+    if (index >= 0)
+      this.lobby.splice(index);
+  }
 }

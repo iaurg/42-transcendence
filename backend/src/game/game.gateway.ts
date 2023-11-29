@@ -50,6 +50,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleDisconnect(client: Socket) {
     const gameId = this.finishGame(client);
     client.leave(gameId);
+    this.gameLobby.abandoneLobby(client.id);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
     this.logger.log(`Client ${client.id} disconnected`);
   }
