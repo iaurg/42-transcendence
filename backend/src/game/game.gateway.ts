@@ -11,6 +11,7 @@ import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
 import { GameMoveDto } from './dto/game.move';
 import { JwtService } from '@nestjs/jwt';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -33,15 +34,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   gameServer: Server;
   private gamesPlaying: Map<string, GameDto> = new Map();
+  private logger = new Logger(GameGateway.name);
 
   handleConnection(client: Socket) {
-    // Get user from cookie coming from client
-    const user = client.handshake.auth.token;
-
-    // Decode user from JWT
-    const decodedUser = this.jwtService.decode(user).sub;
-
-    console.log(`Client ${decodedUser} connected`);
+    this.logger.debug(`Client ${client.id} connected.`);
   }
 
   handleDisconnect(client: Socket) {
@@ -49,7 +45,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.leave(gameId);
     this.gameLobby.abandoneLobby(client.id);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
-    console.log(`Client ${client.id} disconnected`);
+    this.logger.debug(`Client ${client.id} disconnected Game ${gameId}.`);
   }
 
   @SubscribeMessage('joinGame')
@@ -58,7 +54,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decodedUser = this.jwtService.decode(user).sub;
 
     if (this.gameLobby.joinPlayer1(client, decodedUser)) {
-      console.log(`waiting Player 2`);
+      this.logger.log(`waiting Player 2`);
       client.emit('waitingPlayer2', `game_${client.id}`);
     } else {
       const game = this.gameLobby.joinPlayer2(client, decodedUser);

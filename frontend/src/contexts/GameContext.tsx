@@ -91,6 +91,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const socket = useRef<Socket | null>(null);
 
   const handleDisconnectPlayer = () => {
+    socket.current?.emit("finishGame");
     socket.current?.disconnect();
   };
 
@@ -122,7 +123,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     socket.current.on("disconnect", () => {
       console.log("Disconnected from the WebSocket server");
       if (socket.current) {
-        socket.current.emit("finishGame");
+        toast.error("Jogo finalizado por desconexão");
+        handleRedirectToHome();
       } else {
         toast.error("Erro ao finalizar jogo");
       }
@@ -134,7 +136,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       setWaitingPlayer2(true);
     });
 
-    socket.current.on("gameCreated", (data: any, data2: any) => {
+    socket.current.on("gameCreated", () => {
       setWaitingPlayer2(false);
       if (socket.current) {
         socket.current.emit("startGame");
@@ -154,7 +156,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
     socket.current.on("gameFinished", (data: any) => {
       toast.success("Jogo finalizado");
-      socket.current?.emit("finishGame");
       socket.current?.disconnect();
       setGameFinishedData(data);
       setGameFinished(true);
