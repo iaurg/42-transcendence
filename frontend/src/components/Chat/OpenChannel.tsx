@@ -5,12 +5,15 @@ import {
   UsersThree,
   XCircle,
 } from "@phosphor-icons/react";
+import { User } from "@/types/user";
+
 import { useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import ChangeChatPassword from "./ChangeChatPassword";
+import { useGetLeaderboard } from "@/services/queries/leaderboard/getLeaderboard";
 interface Message {
   id: number;
   content: string;
@@ -41,9 +44,18 @@ export function OpenChannel() {
   const [showLock, setShowLock] = useState(() =>
     selectedChat.chatType === "PROTECTED" ? true : false
   );
+  const { data } = useGetLeaderboard();
+
+
+  const myData = data?.find((user: User) => user.login === myUser?.userLogin);
+  const blockedUsers = myData?.blocked.map((user: User) => user.login);
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
-    setMessages(() => messages);
+    // filter messages coming from users that are blocked
+    const filteredMessages = messages.filter(
+      (message) => !blockedUsers?.includes(message.userLogin)
+    );
+    setMessages(() => filteredMessages);
   });
 
   chatService.socket?.on("message", (message: Message) => {
