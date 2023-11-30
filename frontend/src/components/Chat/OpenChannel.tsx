@@ -31,6 +31,7 @@ export function OpenChannel() {
     setValidationRequired,
     user,
   } = useContext(ChatContext);
+
   // List messages from the websocket
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -211,7 +212,6 @@ export function OpenChannel() {
             onClick={() => handleCloseChat(selectedChat.id)}
           />
         </div>
-
       </div>
       <div
         id="messages-container"

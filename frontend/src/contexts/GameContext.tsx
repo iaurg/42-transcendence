@@ -2,6 +2,8 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import nookies from "nookies";
+import { set } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 /**
  * Backend websocket events
@@ -65,6 +67,9 @@ type GameContextType = {
   gameData: GameData;
   gameLayout: GameLayout;
   setGameLayout: (layout: GameLayout) => void;
+  handleInviteToGame: (guestId: string) => void;
+  handleJoinGame: () => void;
+  handleRedirectToHome: () => void;
 };
 
 type GameProviderProps = {
@@ -83,8 +88,41 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [gameData, setGameData] = useState({} as GameData);
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
   const [gameLayout, setGameLayout] = useState<GameLayout>("default");
-
+  const router = useRouter();
   const socket = useRef<Socket | null>(null);
+
+  const handleInviteToGame = () => {
+    if (socket.current) {
+      socket.current.emit("inviteToGame", {
+        inviting: clientId,
+        guest: "test",
+      });
+    }
+  };
+
+  const handleJoinGame = () => {
+    if (socket.current) {
+      socket.current.emit("joinGame");
+    }
+  };
+
+  const handleResetGame = () => {
+    setWaitingPlayer2(true);
+    setGameFinished(false);
+    setGameAbandoned(false);
+    setGameFinishedData({} as GameData);
+    setGameData({} as GameData);
+    setGameLayout("default");
+    setClientId("");
+  };
+
+  const handleRedirectToHome = () => {
+    //disconnect player
+    socket.current?.emit("stopGame");
+    handleResetGame();
+    //redirect to home
+    router.push("/game");
+  };
 
   useEffect(() => {
     // Listen for the 'connect' event
@@ -107,14 +145,13 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     socket.current.on("disconnect", () => {
       console.log("Disconnected from the WebSocket server");
       if (socket.current) {
-        socket.current.emit("finishGame");
+        handleResetGame();
       }
     });
 
-    socket.current.emit("joinGame");
-
     socket.current.on("waitingPlayer2", () => {
       setWaitingPlayer2(true);
+      console.log("waitingPlayer2");
     });
 
     socket.current.on("gameCreated", (data: any, data2: any) => {
@@ -136,7 +173,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     socket.current.on("gameFinished", (data: any) => {
       console.log("gameFinished", data);
       socket.current?.emit("finishGame");
-      socket.current?.disconnect();
       setGameFinishedData(data);
       setGameFinished(true);
     });
@@ -189,6 +225,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameData,
         gameLayout,
         setGameLayout,
+        handleInviteToGame,
+        handleJoinGame,
+        handleRedirectToHome,
       }}
     >
       {children}
