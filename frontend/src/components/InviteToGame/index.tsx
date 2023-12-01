@@ -1,17 +1,19 @@
 import { Sword } from "@phosphor-icons/react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import toast from "react-hot-toast";
+import { GameContext } from "@/contexts/GameContext";
 
 type InviteToGameProps = {
-  inviteUserId: string;
+  inviteUserLogin: string;
 };
 
-export default function InviteToGame({ inviteUserId }: InviteToGameProps) {
+export default function InviteToGame({ inviteUserLogin }: InviteToGameProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isInviting, setIsInviting] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const { handleInviteToGame } = useContext(GameContext);
 
   function closeModal() {
     setIsOpen(false);
@@ -23,35 +25,16 @@ export default function InviteToGame({ inviteUserId }: InviteToGameProps) {
     setIsOpen(true);
   }
 
-  const handleInviteToGame = async () => {
+  const handleInvite = async () => {
     setIsInviting(true);
-    /*
-    await api
-      .post("/game/invite", {
-        inviteUserId,
-      })
-      .then(() => {
-        toast.success("Convite enviado com sucesso!");
-      })
-      .catch((error) => {
-        toast.error(`Erro ao enviar convite: ${error.response.data.message}`);
-      })
-      .finally(() => {
-        setIsInviting(false);
-        setIsOpen(false);
-      });
-      */
-    setTimeout(() => {
-      toast.success("Convite enviado com sucesso!");
-      setIsInviting(false);
-      setIsAccepted(true);
-    }, 2000);
+    handleInviteToGame(inviteUserLogin);
   };
 
   return (
     <>
       <Sword
-        className="text-purple42-200 cursor-pointer"
+        className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+        flex items-center justify-center w-8 h-8 p-2 cursor-pointer"
         size={18}
         onClick={openModal}
         alt="Convidar para jogo"
@@ -125,7 +108,7 @@ export default function InviteToGame({ inviteUserId }: InviteToGameProps) {
                           <button
                             type="button"
                             className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-purple42-200 border border-transparent rounded-md hover:bg-purple42-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple42-500"
-                            onClick={handleInviteToGame}
+                            onClick={handleInvite}
                           >
                             Convidar
                           </button>

@@ -2,8 +2,8 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import nookies from "nookies";
-import { set } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 /**
  * Backend websocket events
@@ -66,8 +66,10 @@ type GameContextType = {
   gameFinishedData: GameData;
   gameData: GameData;
   gameLayout: GameLayout;
+  joinGame: boolean;
+  setJoinGame: (joinGame: boolean) => void;
   setGameLayout: (layout: GameLayout) => void;
-  handleInviteToGame: (guestId: string) => void;
+  handleInviteToGame: (guestLogin: string) => void;
   handleJoinGame: () => void;
   handleRedirectToHome: () => void;
 };
@@ -88,14 +90,16 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [gameData, setGameData] = useState({} as GameData);
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
   const [gameLayout, setGameLayout] = useState<GameLayout>("default");
+  const [joinGame, setJoinGame] = useState(false);
+
   const router = useRouter();
   const socket = useRef<Socket | null>(null);
 
-  const handleInviteToGame = () => {
+  const handleInviteToGame = (guestLogin: string) => {
     if (socket.current) {
-      socket.current.emit("inviteToGame", {
+      socket.current.emit("createInvite", {
         inviting: clientId,
-        guest: "test",
+        guest: guestLogin,
       });
     }
   };
@@ -114,14 +118,19 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     setGameData({} as GameData);
     setGameLayout("default");
     setClientId("");
+    setJoinGame(false);
   };
 
   const handleRedirectToHome = () => {
     //disconnect player
     socket.current?.emit("stopGame");
-    handleResetGame();
     //redirect to home
     router.push("/game");
+    setGameFinished(false);
+    setGameAbandoned(false);
+    setGameFinishedData({} as GameData);
+    setGameData({} as GameData);
+    setJoinGame(false);
   };
 
   useEffect(() => {
@@ -154,10 +163,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       console.log("waitingPlayer2");
     });
 
-    socket.current.on("gameCreated", (data: any, data2: any) => {
+    socket.current.on("gameCreated", () => {
+      console.log("gameCreated on frontend");
       setWaitingPlayer2(false);
       if (socket.current) {
-        socket.current.emit("startGame");
+        router.push("/game/play");
+        setJoinGame(true);
       }
     });
 
@@ -180,6 +191,16 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     socket.current.on("gameAbandoned", (data: any) => {
       console.log("gameAbandoned", data);
       setGameAbandoned(true);
+    });
+
+    socket.current.on("inviteError", (data: any) => {
+      toast.error(`Falha ao convidar jogador: ${data}`);
+    });
+
+    socket.current.on("sendInvite", (data: any) => {
+      toast.success(`Convite enviado ${data}`);
+      console.log(data);
+      socket.current?.emit("inviteAccepted", data);
     });
 
     return () => {
@@ -224,6 +245,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameFinishedData,
         gameData,
         gameLayout,
+        joinGame,
+        setJoinGame,
         setGameLayout,
         handleInviteToGame,
         handleJoinGame,

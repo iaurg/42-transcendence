@@ -14,12 +14,14 @@ type FriendCardProps = {
   displayName: string;
   id: string;
   status: UserStatus;
+  login: string;
 };
 
 export default function FriendCard({
   displayName,
   id,
   status,
+  login,
 }: FriendCardProps) {
   const { user } = useContext(ChatContext);
 
@@ -73,7 +75,7 @@ export default function FriendCard({
           size={18}
           onClick={handleOpenDirectMessage}
         />
-        <InviteToGame inviteUserId={id} />
+        <InviteToGame inviteUserLogin={login} />
         <UserMinus
           className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
           flex items-center justify-center w-8 h-8 p-2 cursor-pointer"

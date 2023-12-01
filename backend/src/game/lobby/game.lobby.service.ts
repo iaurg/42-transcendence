@@ -52,8 +52,12 @@ export class GameLobbyService {
   }
 
   invitePlayer2(player: any, login: string, info: GameInviteDto) {
-    const gameDto = this.invite_lobby[`game_${info.inviting}`];
-    if (gameDto == undefined) return undefined;
+    const gameDto = this.invite_lobby.get(`game_${info.inviting}`);
+
+    if (gameDto == undefined) {
+      return;
+    }
+
     gameDto.player2 = {
       login,
       socketId: player.id,
@@ -65,7 +69,7 @@ export class GameLobbyService {
     };
     player.join(`game_${info.inviting}`);
     this.logger.log(`Client player 2 joined invited game`);
-    this.invite_lobby.delete(`game_${info.inviting}`);
+    // this.invite_lobby.delete(`game_${info.inviting}`);
     return gameDto;
   }
 
@@ -108,7 +112,7 @@ export class GameLobbyService {
   }
 
   abandoneLobby(playerId: string) {
-    let index = this.lobby.findIndex(
+    const index = this.lobby.findIndex(
       (item) => item.gameId == `game_${playerId}`,
     );
     if (index >= 0) this.lobby.splice(index);

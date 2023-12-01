@@ -1,7 +1,7 @@
 "use client";
 import { GameContext } from "@/contexts/GameContext";
 import dynamic from "next/dynamic";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
   ssr: false,
@@ -14,6 +14,8 @@ export default function PlayPage() {
     gameAbandoned,
     gameFinishedData,
     gameData,
+    joinGame,
+    setJoinGame,
     setGameLayout,
     handleJoinGame,
     handleRedirectToHome,
@@ -21,9 +23,60 @@ export default function PlayPage() {
 
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
 
-  useEffect(() => {
-    handleJoinGame();
-  }, []);
+  if (!joinGame) {
+    return (
+      <div
+        className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+          h-[calc(100vh)]
+        "
+      >
+        <button
+          onClick={() => {
+            setJoinGame(true);
+            handleJoinGame();
+          }}
+          className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+        >
+          Entrar no lobby
+        </button>
+        <button
+          onClick={handleRedirectToHome}
+          className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+        >
+          Voltar ao inicio
+        </button>
+      </div>
+    );
+  }
 
   if (waitingPlayer2 || !gameData.player1 || !gameData.player2) {
     return (
@@ -39,7 +92,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
-          h-[calc(100vh-130px)]
+          h-[calc(100vh)]
         "
         >
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
@@ -81,7 +134,7 @@ export default function PlayPage() {
             justify-center
             items-center
             py-6
-            h-[calc(100vh-130px)]
+            h-[calc(100vh)]
             p-4
           "
         >
@@ -139,7 +192,7 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
-          h-[calc(100vh-130px)]
+          h-[calc(100vh)]
         "
         >
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
@@ -171,7 +224,7 @@ export default function PlayPage() {
         bg-black42-300
         rounded-lg
         w-full
-        h-[calc(100vh-35px)]
+        h-[calc(100vh)]
       "
       >
         <div
