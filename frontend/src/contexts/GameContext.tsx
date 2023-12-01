@@ -67,11 +67,14 @@ type GameContextType = {
   gameData: GameData;
   gameLayout: GameLayout;
   joinGame: boolean;
+  showModalInvitedToGame: boolean;
+  setShowModalInvitedToGame: (showModalInvitedToGame: boolean) => void;
   setJoinGame: (joinGame: boolean) => void;
   setGameLayout: (layout: GameLayout) => void;
   handleInviteToGame: (guestLogin: string) => void;
   handleJoinGame: () => void;
   handleRedirectToHome: () => void;
+  handleInviteAction: (option: "accepted" | "declined") => void;
 };
 
 type GameProviderProps = {
@@ -91,6 +94,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
   const [gameLayout, setGameLayout] = useState<GameLayout>("default");
   const [joinGame, setJoinGame] = useState(false);
+  const [showModalInvitedToGame, setShowModalInvitedToGame] = useState(false);
+  const [invitedData, setInvitedData] = useState({} as any);
 
   const router = useRouter();
   const socket = useRef<Socket | null>(null);
@@ -131,6 +136,18 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     setGameFinishedData({} as GameData);
     setGameData({} as GameData);
     setJoinGame(false);
+  };
+
+  const handleInviteAction = (option: "accepted" | "declined") => {
+    if (socket.current) {
+      if (option === "accepted") {
+        socket.current?.emit("inviteAccepted", invitedData);
+      } else {
+        socket.current.emit("inviteDeclined", invitedData);
+      }
+      setShowModalInvitedToGame(false);
+      setInvitedData({} as any);
+    }
   };
 
   useEffect(() => {
@@ -195,8 +212,10 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
     socket.current.on("invited", (data: any) => {
       console.log("Received a invite", data);
-      toast.success("Received a invite, data");
-      socket.current?.emit("inviteAccepted", data);
+      toast.success("Received a invite to a game");
+      setInvitedData(data);
+      setShowModalInvitedToGame(true);
+      // socket.current?.emit("inviteAccepted", data);
     });
 
     socket.current.on("inviteError", (data: any) => {
@@ -246,11 +265,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameData,
         gameLayout,
         joinGame,
+        showModalInvitedToGame,
+        setShowModalInvitedToGame,
         setJoinGame,
         setGameLayout,
         handleInviteToGame,
         handleJoinGame,
         handleRedirectToHome,
+        handleInviteAction,
       }}
     >
       {children}
