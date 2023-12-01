@@ -7,7 +7,7 @@ import {
 } from "@phosphor-icons/react";
 import { User } from "@/types/user";
 
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
@@ -46,16 +46,17 @@ export function OpenChannel() {
   );
   const { data } = useGetLeaderboard();
 
-
   const myData = data?.find((user: User) => user.login === myUser?.userLogin);
   const blockedUsers = myData?.blocked.map((user: User) => user.login);
 
-  chatService.socket?.on("listMessages", (messages: Message[]) => {
-    // filter messages coming from users that are blocked
-    const filteredMessages = messages.filter(
+  const filteredMessages = useCallback(() => {
+    return messages.filter(
       (message) => !blockedUsers?.includes(message.userLogin)
     );
-    setMessages(() => filteredMessages);
+  }, [messages, blockedUsers]);
+
+  chatService.socket?.on("listMessages", (socketMessages: Message[]) => {
+    setMessages(socketMessages);
   });
 
   chatService.socket?.on("message", (message: Message) => {
@@ -223,7 +224,6 @@ export function OpenChannel() {
             onClick={() => handleCloseChat(selectedChat.id)}
           />
         </div>
-
       </div>
       <div
         id="messages-container"
@@ -231,7 +231,7 @@ export function OpenChannel() {
             scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
       >
         {/* add alternated users messages inside scrollable area */}
-        {messages.map((message: any) => (
+        {filteredMessages().map((message: any) => (
           <div
             key={message.id}
             className={`${
