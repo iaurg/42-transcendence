@@ -12,6 +12,16 @@ export class FriendsService {
   constructor(private prisma: PrismaService) {}
 
   async createFriend(userId: string, createFriendDto: CreateFriendDto) {
+    // first check if the user is blocked
+    const blocked = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { blocked: { where: { id: createFriendDto.friend_id } } },
+    });
+    // if blocked, throw error
+    if (blocked.blocked.length > 0) {
+      throw new NotAcceptableException('User is blocked');
+    }
+
     const friendship = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { friends: { where: { id: createFriendDto.friend_id } } },
@@ -48,7 +58,7 @@ export class FriendsService {
   async getFriends(userId: string) {
     const friends = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { friends: true },
+      select: { friends: true, blocked: true },
     });
 
     return friends;
@@ -80,12 +90,12 @@ export class FriendsService {
   }
 
   async blockUser(userId: string, createFriendDto: CreateFriendDto) {
-    const friendship = await this.prisma.user.findUnique({
+    const blocked = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { blocked: { where: { id: createFriendDto.friend_id } } },
     });
 
-    if (friendship.blocked.length > 0) {
+    if (blocked.blocked.length > 0) {
       throw new NotAcceptableException('User already blocked');
     }
 
@@ -106,7 +116,23 @@ export class FriendsService {
       where: { id: createFriendDto.friend_id },
       data: { blocked: { connect: [{ id: userId }] } },
     });
+    // check if user is friend
+    const friendship = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { friends: { where: { id: createFriendDto.friend_id } } },
+    });
+    // if user is friend, delete friendship
+    if (friendship.friends.length > 0) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { friends: { disconnect: [{ id: createFriendDto.friend_id }] } },
+      });
 
+      await this.prisma.user.update({
+        where: { id: createFriendDto.friend_id },
+        data: { friends: { disconnect: [{ id: userId }] } },
+      });
+    }
     return {
       message: 'User blocked successfully',
       user: blockUser,
