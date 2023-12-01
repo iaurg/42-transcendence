@@ -77,13 +77,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = client.handshake.auth.token;
     const decodedUser = this.jwtService.decode(user).sub;
 
-    if (this.gameService.checkGuestAvailability(info.guest, this.gamesPlaying)) {
-      this.gameLobby.invitePlayer1(client, decodedUser)
+    this.logger.debug(
+      `Client ${client.id} created a invite game for ${info.guest}`,
+    );
+
+    if (
+      this.gameService.checkGuestAvailability(info.guest, this.gamesPlaying)
+    ) {
+      this.gameLobby.invitePlayer1(client, decodedUser);
       this.logger.log(`Client ${client.id} created a invite game`);
-      client.emit('sendInvite', `game_${client.id}`);
+      info.inviting = client.id;
+      client.emit('sendInvite', info);
     } else {
-      client.emit('inviteError', `game_${client.id}`);
+      client.emit('inviteError', `Convidado não disponível`);
     }
+
+    // fake accept invite after 3 seconds
+    /*
+    setTimeout(() => {
+      this.inviteAccepted(client, info);
+    }, 3000);
+    */
   }
 
   @SubscribeMessage('inviteAccepted')
@@ -92,8 +106,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decodedUser = this.jwtService.decode(user).sub;
 
     const game = this.gameLobby.invitePlayer2(client, decodedUser, info);
-    if (game == undefined)
-      client.emit('inviteError', `game_${info.inviting}`);
+
+    if (game == undefined) {
+      client.emit('inviteError', `Jogo não encontrado`);
+      return;
+    }
+
     this.gamesPlaying[game.gameId] = game;
     this.gameService.restartBall(this.gamesPlaying[game.gameId]);
     this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
@@ -102,8 +120,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('inviteRejected')
   inviteRejected(client: Socket, info: GameInviteDto) {
-    this.gameLobby.inviteRejected(info)
-    client.emit('inviteError', `game_${info.inviting}`);
+    this.gameLobby.inviteRejected(info);
+    client.emit('inviteError', `Usuário recusou o convite`);
   }
 
   @SubscribeMessage('startGame')
