@@ -20,6 +20,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private PADDLE_HEIGHT = 150;
   private FRAMES_PER_SECOND = 60;
   private readonly logger = new Logger(GameGateway.name);
+  private pool = new Map<string, Socket>();
 
   constructor(
     private gameService: GameService,
@@ -44,14 +45,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Decode user from JWT
     const decodedUser = this.jwtService.decode(user).sub;
 
+    this.pool.set(decodedUser, client);
+
     this.logger.log(`Client ${decodedUser} connected`);
   }
 
   handleDisconnect(client: Socket) {
+    // Get user from cookie coming from client
+    const user = client.handshake.auth.token;
+
+    // Decode user from JWT
+    const decodedUser = this.jwtService.decode(user).sub;
+
     const gameId = this.finishGame(client);
     client.leave(gameId);
     this.gameLobby.abandoneLobby(client.id);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
+    this.pool.delete(decodedUser);
     this.logger.log(`Client ${client.id} disconnected`);
   }
 
@@ -82,12 +92,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
 
     if (
-      this.gameService.checkGuestAvailability(info.guest, this.gamesPlaying)
+      this.gameService.checkGuestAvailability(info.guest, this.gamesPlaying, this.pool)
     ) {
       this.gameLobby.invitePlayer1(client, decodedUser);
       this.logger.log(`Client ${client.id} created a invite game`);
       info.inviting = client.id;
-      client.emit('sendInvite', info);
+      const guest = this.pool.get(info.guest);
+      this.logger.debug(`SOCKET INVITED: ${guest.id}`)
+      guest.emit('invited', info);
     } else {
       client.emit('inviteError', `Convidado não disponível`);
     }

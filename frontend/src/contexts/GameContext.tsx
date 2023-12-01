@@ -193,14 +193,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       setGameAbandoned(true);
     });
 
-    socket.current.on("inviteError", (data: any) => {
-      toast.error(`Falha ao convidar jogador: ${data}`);
+    socket.current.on("invited", (data: any) => {
+      console.log("Received a invite", data);
+      toast.success("Received a invite, data");
+      socket.current?.emit("inviteAccepted", data);
     });
 
-    socket.current.on("sendInvite", (data: any) => {
-      toast.success(`Convite enviado ${data}`);
-      console.log(data);
-      socket.current?.emit("inviteAccepted", data);
+    socket.current.on("inviteError", (data: any) => {
+      toast.error(`Falha ao convidar jogador: ${data}`);
     });
 
     return () => {

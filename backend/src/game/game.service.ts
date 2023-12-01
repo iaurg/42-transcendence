@@ -5,6 +5,7 @@ import { Player } from './dto/game.player.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { MatchHistoryService } from 'src/match-history/match-history.service';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class GameService {
@@ -189,9 +190,11 @@ export class GameService {
   checkGuestAvailability(
     player: string,
     gamesPlaying: Map<string, GameDto>,
+    pool: Map<string, Socket>
   ): boolean {
     gamesPlaying.forEach((value: GameDto) => {
-      if (value.player1.login == player || value.player2.login == player)
+      if ((value.player1.login == player || value.player2.login == player) 
+            && pool.get(player) != undefined)
         return false;
     });
     return true;
