@@ -1,10 +1,12 @@
+import { ChatContext } from "@/contexts/ChatContext";
 import { api } from "@/services/apiClient";
+import chatService from "@/services/chatClient";
 import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
 import { ListNumbers, Play, Prohibit, ProhibitInset, UserMinus, UserPlus } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { usePopper } from "react-popper";
 
@@ -34,6 +36,8 @@ export default function ProfilePopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "right",
   });
+  const {selectedChat} = useContext(ChatContext);
+
   const addFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
       return api.post("/friends", friendData);
@@ -60,6 +64,8 @@ export default function ProfilePopOver({
       toast.success("Usuário bloqueado com sucesso!");
       queryClient.invalidateQueries(["leaderboard"]);
       queryClient.invalidateQueries(["friends"]);
+      chatService.socket?.emit("listMembers", { chatId: selectedChat.id });
+      chatService.socket?.emit("listMessages", { chatId: selectedChat.id });
     },
     onError: (error: any) => {
       toast.error(`Erro ao bloquear usuário: ${error.response.data.message}`);
@@ -80,6 +86,8 @@ export default function ProfilePopOver({
       toast.success("Usuário desbloqueado com sucesso!");
       queryClient.invalidateQueries(["leaderboard"]);
       queryClient.invalidateQueries(["friends"]);
+      chatService.socket?.emit("listMembers", { chatId: selectedChat.id });
+      chatService.socket?.emit("listMessages", { chatId: selectedChat.id });
     },
     onError: (error: any) => {
       toast.error(`Erro ao desbloquear usuário: ${error.response.data.message}`);

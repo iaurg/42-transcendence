@@ -21,7 +21,7 @@ export default function BlockedCard({
   id,
   status,
 }: BlockedCardProps) {
-  const { user } = useContext(ChatContext);
+  const { selectedChat } = useContext(ChatContext);
 
   const deleteFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
@@ -39,19 +39,6 @@ export default function BlockedCard({
     },
   });
 
-  const handleDeleteFriend = () => {
-    deleteFriendMutation.mutate({ friend_id: id });
-  };
-
-  const handleOpenDirectMessage = () => {
-    const chatName = `${displayName} - ${user.displayName}`;
-    chatService.socket?.emit("createChat", {
-      chatName,
-      chatType: "PRIVATE",
-      password: "",
-    });
-  };
-
   const unblockFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
       return api.delete("/friends/block", {
@@ -62,6 +49,8 @@ export default function BlockedCard({
       toast.success("Usuário desbloqueado com sucesso!");
       queryClient.invalidateQueries(["leaderboard"]);
       queryClient.invalidateQueries(["friends"]);
+      chatService.socket?.emit("listMembers", { chatId: selectedChat.id });
+      chatService.socket?.emit("listMessages", { chatId: selectedChat.id });
     },
     onError: (error: any) => {
       toast.error(`Erro ao desbloquear usuário: ${error.response.data.message}`);
