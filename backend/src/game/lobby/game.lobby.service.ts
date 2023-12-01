@@ -52,12 +52,11 @@ export class GameLobbyService {
   }
 
   invitePlayer2(player: any, login: string, info: GameInviteDto) {
-    const gameDto = this.invite_lobby.get(`game_${info.inviting}`);
-
-    if (gameDto == undefined) {
+    if (this.invite_lobby.get(`game_${info.inviting}`) == undefined) {
       return;
     }
 
+    const gameDto = Object.assign(this.invite_lobby.get(`game_${info.inviting}`));
     gameDto.player2 = {
       login,
       socketId: player.id,
@@ -69,7 +68,7 @@ export class GameLobbyService {
     };
     player.join(`game_${info.inviting}`);
     this.logger.log(`Client player 2 joined invited game`);
-    // this.invite_lobby.delete(`game_${info.inviting}`);
+    this.invite_lobby.delete(`game_${info.inviting}`);
     return gameDto;
   }
 
