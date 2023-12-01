@@ -1,9 +1,7 @@
-import { AuthContext } from "@/contexts/AuthContext";
 import { api } from "@/services/apiClient";
-import { queryClient } from "@/services/queryClient";
 import { Dialog, Transition } from "@headlessui/react";
 import { Lock } from "@phosphor-icons/react";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
