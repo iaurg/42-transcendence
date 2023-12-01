@@ -48,6 +48,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.debug(`Client ${client.id} disconnected Game ${gameId}.`);
   }
 
+  @SubscribeMessage('stopGame')
+  stopGame(client: Socket) {
+    this.finishGame(client);
+  }
+
   @SubscribeMessage('joinGame')
   joinGame(client: Socket) {
     const user = client.handshake.auth.token;
@@ -98,8 +103,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private finishGame(client: Socket): string {
     const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
       return (
-        this.gamesPlaying[gameId].player1.id === client.id ||
-        this.gamesPlaying[gameId].player2.id === client.id
+        this.gamesPlaying[gameId].player1.socketId === client.id ||
+        this.gamesPlaying[gameId].player2.socketId === client.id
       );
     });
     if (gameId) {
