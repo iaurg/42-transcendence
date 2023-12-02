@@ -92,24 +92,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
 
     if (
-      this.gameService.checkGuestAvailability(info.guest, this.gamesPlaying, this.pool)
+      this.gameService.checkGuestAvailability(
+        info.guest,
+        this.gamesPlaying,
+        this.pool,
+      )
     ) {
       this.gameLobby.invitePlayer1(client, decodedUser);
       this.logger.log(`Client ${client.id} created a invite game`);
       info.inviting = client.id;
       const guest = this.pool.get(info.guest);
-      this.logger.debug(`SOCKET INVITED: ${guest.id}`)
+      this.logger.debug(`SOCKET INVITED: ${guest.id}`);
       guest.emit('invited', info);
     } else {
       client.emit('inviteError', `Convidado não disponível`);
     }
-
-    // fake accept invite after 3 seconds
-    /*
-    setTimeout(() => {
-      this.inviteAccepted(client, info);
-    }, 3000);
-    */
   }
 
   @SubscribeMessage('inviteAccepted')
@@ -133,7 +130,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('inviteRejected')
   inviteRejected(client: Socket, info: GameInviteDto) {
     this.gameLobby.inviteRejected(info);
-    client.emit('inviteError', `Usuário recusou o convite`);
+    client.leave(`game_${info.inviting}`);
+    this.gameServer.to(`game_${info.inviting}`).emit('guestRejected');
   }
 
   @SubscribeMessage('startGame')
