@@ -31,7 +31,6 @@ export class GameLobbyService {
     gameDto.player2 = {
       login,
       socketId: player.id,
-      userId: '',
       x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
       y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
       width: this.PADDLE_WIDTH,
@@ -56,11 +55,13 @@ export class GameLobbyService {
       return;
     }
 
-    const gameDto = Object.assign(this.invite_lobby.get(`game_${info.inviting}`));
+    const gameDto = Object.assign(
+      this.invite_lobby.get(`game_${info.inviting}`),
+    );
+
     gameDto.player2 = {
       login,
       socketId: player.id,
-      userId: '',
       x: gameDto.canvas.width - this.PLAYER_INITIAL_X - this.PADDLE_WIDTH,
       y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
       width: this.PADDLE_WIDTH,
@@ -84,7 +85,6 @@ export class GameLobbyService {
       player1: {
         login: '',
         socketId: player1Id,
-        userId: '',
         x: this.PLAYER_INITIAL_X,
         y: this.CANVAS_HEIGHT / 2 - this.PADDLE_HEIGHT / 2,
         width: this.PADDLE_WIDTH,
