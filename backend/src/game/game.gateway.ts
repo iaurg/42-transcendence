@@ -16,11 +16,15 @@ import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+  @WebSocketServer()
+  gameServer: Server;
   private PADDLE_WIDTH = 10;
   private PADDLE_HEIGHT = 150;
   private FRAMES_PER_SECOND = 60;
   private readonly logger = new Logger(GameGateway.name);
   private pool = new Map<string, Socket>();
+  private gamesPlaying: Map<string, GameDto> = new Map();
 
   constructor(
     private gameService: GameService,
@@ -33,10 +37,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameLobby.PADDLE_HEIGHT = this.PADDLE_HEIGHT;
     this.gameLobby.PADDLE_WIDTH = this.PADDLE_WIDTH;
   }
-
-  @WebSocketServer()
-  gameServer: Server;
-  private gamesPlaying: Map<string, GameDto> = new Map();
 
   handleConnection(client: Socket) {
     // Get user from cookie coming from client
