@@ -24,6 +24,7 @@ type ChatContextType = {
   setValidationRequired: React.Dispatch<React.SetStateAction<boolean>>;
   validationRequired: boolean;
   user: User;
+  handleUpdateListChats: () => void;
 };
 
 type ChatProviderProps = {
@@ -58,11 +59,15 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const handleOpenChannel = (chat: Chat) => {
     setSelectedChat(chat);
     // check if chat has an id
-    if (chat.id) {
+    if (chat?.id) {
       chatService.socket?.emit("listMessages", { chatId: chat.id });
       chatService.socket?.emit("listMembers", { chatId: chat.id });
     }
     setShowElement("showChannelOpen");
+  };
+
+  const handleUpdateListChats = () => {
+    chatService.socket?.emit("listChats");
   };
 
   useEffect(() => {
@@ -70,7 +75,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.connect();
 
     chatService.socket?.on("userLogin", (user: User) => {
-      console.log(`Current user login: ${user.login}`, user);
       setUser(() => user);
       queryClient.invalidateQueries(["user_status", user.id]);
       queryClient.invalidateQueries(["friends"]);
@@ -78,7 +82,11 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
 
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
-      setChatList(() => newChatList);
+      // remove chats which chatType is PRIVATE
+      const filteredChats = newChatList.filter(chat => {
+        return chat.chatType !== 'PRIVATE';
+      });
+      setChatList(() => filteredChats);
       setIsLoading(false);
     });
 
@@ -93,7 +101,12 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.on("createChat", (chat: Chat) => {
       setValidationRequired(false);
       handleOpenChannel(chat);
-      setChatList((chatList) => [...chatList, chat]);
+      const isDuplicateChat = chatList.some(existingChat =>
+        existingChat.name === chat.name && existingChat.chatType === 'PRIVATE'
+      );
+      if (!isDuplicateChat) {
+        setChatList((chatList) => [...chatList, chat]);
+      }
     });
 
     chatService.socket?.on("joinChat", (response: any) => {
@@ -140,6 +153,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         setValidationRequired,
         validationRequired,
         user,
+        handleUpdateListChats,
       }}
     >
       {children}

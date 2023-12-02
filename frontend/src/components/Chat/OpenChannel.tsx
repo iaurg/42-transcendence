@@ -5,17 +5,25 @@ import {
   UsersThree,
   XCircle,
 } from "@phosphor-icons/react";
-import { useContext, useEffect, useState } from "react";
+import { User } from "@/types/user";
+
+import { useCallback, useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import ChangeChatPassword from "./ChangeChatPassword";
+import { useGetLeaderboard } from "@/services/queries/leaderboard/getLeaderboard";
 interface Message {
   id: number;
   content: string;
   userLogin: string;
   userId: string;
 }
+
+type FormInputs = {
+  password: string;
+};
 
 export function OpenChannel() {
   const {
@@ -32,11 +40,23 @@ export function OpenChannel() {
   const [numberOfUsersInChat, setNumberOfUsersInChat] = useState<number>(0);
   const [users, setUsers] = useState<ChatMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const myUserList = users.filter((usr) => usr.userLogin === user.login);
-  const myUser = myUserList[0] || null;
+  const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
+  const [showLock, setShowLock] = useState(() =>
+    selectedChat.chatType === "PROTECTED" ? true : false
+  );
+  const { data } = useGetLeaderboard();
 
-  chatService.socket?.on("listMessages", (messages: Message[]) => {
-    setMessages(() => messages);
+  const myData = data?.find((user: User) => user.login === myUser?.userLogin);
+  const blockedUsers = myData?.blocked.map((user: User) => user.login);
+
+  const filteredMessages = useCallback(() => {
+    return messages.filter(
+      (message) => !blockedUsers?.includes(message.userLogin)
+    );
+  }, [messages, blockedUsers]);
+
+  chatService.socket?.on("listMessages", (socketMessages: Message[]) => {
+    setMessages(socketMessages);
   });
 
   chatService.socket?.on("message", (message: Message) => {
@@ -50,9 +70,16 @@ export function OpenChannel() {
       );
       setNumberOfUsersInChat(currentMembers.length);
       setUsers(currentMembers);
-      console.log("listMembers", currentMembers);
       setIsLoading(false);
     });
+
+    // on chat open go to the bottom of the messages
+    setTimeout(() => {
+      const messagesContainer = document.getElementById("messages-container");
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }, 100);
   }, []);
 
   chatService.socket?.on("verifyPassword", (response: any) => {
@@ -68,6 +95,7 @@ export function OpenChannel() {
 
   const handleSendMessage = () => {
     if (myUser && myUser.status === "MUTED") return;
+
     chatService.socket?.emit("message", {
       chatId: selectedChat.id,
       content: message,
@@ -81,10 +109,6 @@ export function OpenChannel() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }, 100);
-  };
-
-  type FormInputs = {
-    password: string;
   };
 
   const {
@@ -104,6 +128,10 @@ export function OpenChannel() {
       chatId: selectedChat.id,
       password: data.password,
     });
+  };
+
+  const handleHideLock = () => {
+    setShowLock(false);
   };
 
   if (selectedChat.chatType === "PROTECTED" && validationRequired) {
@@ -159,20 +187,43 @@ export function OpenChannel() {
     <div className="flex flex-col flex-1 justify-between">
       <div className="flex flex-row justify-between items-center h-8">
         <div className="flex items-center">
-          <ChatUsersChannelPopOver users={users}>
-            <div className="flex space-x-1 items-center">
-              <span className="text-xs">({numberOfUsersInChat})</span>
-              <UsersThree className="text-white" size={20} />
-            </div>
-          </ChatUsersChannelPopOver>
+          {selectedChat.chatType !== "PRIVATE" && (
+            <ChatUsersChannelPopOver users={users}>
+              <div className="flex space-x-1 items-center">
+                <span className="text-xs">({numberOfUsersInChat})</span>
+                <UsersThree className="text-white" size={20} />
+              </div>
+            </ChatUsersChannelPopOver>
+          )}
         </div>
-        <h3 className="text-white text-lg">{selectedChat.name}</h3>
-        <XCircle
-          className="cursor-pointer"
-          color="white"
-          size={20}
-          onClick={() => handleCloseChat(selectedChat.id)}
-        />
+        <h3 className="text-white text-lg">
+          {selectedChat.chatType === "PRIVATE"
+            ? `DM: ${selectedChat.name
+                .split(" - ")
+                .filter((name) => name !== user.displayName)}`
+            : selectedChat.name}
+        </h3>
+        <div
+          className="
+            flex
+            flex-row
+            space-x-2
+            items-center
+          "
+        >
+          {showLock && myUser?.role === "OWNER" && (
+            <ChangeChatPassword
+              handleHideLock={handleHideLock}
+              chatId={selectedChat.id}
+            />
+          )}
+          <XCircle
+            className="cursor-pointer"
+            color="white"
+            size={20}
+            onClick={() => handleCloseChat(selectedChat.id)}
+          />
+        </div>
       </div>
       <div
         id="messages-container"
@@ -180,10 +231,9 @@ export function OpenChannel() {
             scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
       >
         {/* add alternated users messages inside scrollable area */}
-        {messages.map((message: any) => (
+        {filteredMessages().map((message: any) => (
           <div
             key={message.id}
-            // TODO: Implement user context to compare user login with message user
             className={`${
               message.userLogin === user.login
                 ? "text-white bg-purple42-200 self-end"
@@ -216,9 +266,7 @@ export function OpenChannel() {
         />
         <button
           className="bg-purple42-200 text-white rounded-lg p-3 placeholder-gray-700 absolute z-10 right-4"
-          onClick={() =>
-            handleSendMessage()
-          } /*TODO: Check if other users are receiving the message */
+          onClick={() => handleSendMessage()}
         >
           {myUser && myUser.status !== "MUTED" ? (
             <PaperPlaneTilt size={20} color="white" />

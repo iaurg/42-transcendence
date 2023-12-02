@@ -40,7 +40,7 @@ export class JwtAuthService {
       secret: Buffer.from(this.configService.get('HASH_PEPPER')),
     });
 
-    await this.usersService.update(user.login, {
+    await this.usersService.updateAuth(user.login, {
       refreshToken: hash,
     });
   }

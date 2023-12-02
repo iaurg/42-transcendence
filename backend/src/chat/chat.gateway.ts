@@ -56,7 +56,6 @@ export class ChatGateway
             `Failed to authenticate user: ${socket.handshake.auth?.user?.login}`,
             err,
           );
-          return next(new Error(err));
         });
     });
   }
@@ -86,7 +85,7 @@ export class ChatGateway
       return this.usersService.findOne(payload.sub);
     } catch {
       this.logger.error('Token invalid or expired');
-      throw new WsException('Token invalid or expired');
+      return Promise.reject(new WsException('Token invalid or expired'));
     }
   }
 
@@ -145,7 +144,6 @@ export class ChatGateway
   @SubscribeMessage('listChats')
   async listChats(@ConnectedSocket() client: Socket) {
     const chats = await this.chatService.listChats();
-    // TODO: do not display PRIVATE CHATS
     client.emit('listChats', chats);
   }
 
@@ -180,6 +178,18 @@ export class ChatGateway
     if (chatType === 'PROTECTED' && !password) {
       client.emit('error', { error: 'Protected chat must have password' });
       return;
+    }
+    if (chatType === 'PRIVATE') {
+      // check if a chat with that name already exists
+      const createdChat = await this.chatService.getChatByName(chatName);
+      if (createdChat) {
+        client.join(`chat:${createdChat.id}`);
+        client.emit('joinChat', {
+          message: `You joined chat ${createdChat.id}`,
+        });
+        client.emit('createChat', createdChat);
+        return;
+      }
     }
     const createdChat = await this.chatService.createChat(
       login,
@@ -268,6 +278,7 @@ export class ChatGateway
     }
     client.join(`chat:${chatId}`);
     client.emit('joinChat', { message: `You joined chat ${chatId}`, chat });
+    await this.updateListMembers(chatId);
   }
 
   @SubscribeMessage('leaveChat')
@@ -629,6 +640,7 @@ export class ChatGateway
     if (await this.notValidAction('muteMember', chatId, login, user, client)) {
       return;
     }
+
     const updatedChat = await this.chatService.muteUserFromChat(chatId, user);
 
     if (!updatedChat) {
@@ -638,6 +650,19 @@ export class ChatGateway
 
     // update list of members in chat and emit event to all members
     await this.updateListMembers(chatId);
+
+    // set a timer to unmute the user automatically after 5s
+    setTimeout(async () => {
+      const updatedChat = await this.chatService.unmuteUserFromChat(
+        chatId,
+        user,
+      );
+      if (!updatedChat) {
+        client.emit('muteMember', { error: 'Failed to unmute user' });
+        return;
+      }
+      await this.updateListMembers(chatId);
+    }, 5000);
 
     client.emit('muteMember', {
       message: `You muted ${user} from chat ${chatId}`,

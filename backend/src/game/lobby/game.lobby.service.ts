@@ -7,8 +7,8 @@ export class GameLobbyService {
   public PADDLE_HEIGHT: number;
   private lobby: GameDto[] = [];
   private PLAYER_INITIAL_X = 0;
-  private CANVAS_WIDTH = 800;
-  private CANVAS_HEIGHT = 600;
+  private CANVAS_WIDTH = 858;
+  private CANVAS_HEIGHT = 525;
 
   joinPlayer1(player: any, login: string): boolean {
     if (this.lobby.length == 0) {
@@ -71,5 +71,12 @@ export class GameLobbyService {
       },
     };
     return gameDto;
+  }
+
+  abandoneLobby(playerId: string) {
+    const index = this.lobby.findIndex(
+      (item) => item.gameId == `game_${playerId}`,
+    );
+    if (index >= 0) this.lobby.splice(index);
   }
 }

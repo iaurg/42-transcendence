@@ -1,7 +1,7 @@
 import { api } from "@/services/apiClient";
 import { queryClient } from "@/services/queryClient";
 import { UserStatus } from "@/types/user";
-import { EnvelopeSimple, Sword, UserMinus } from "@phosphor-icons/react";
+import { EnvelopeSimple, ProhibitInset, Sword, UserMinus } from "@phosphor-icons/react";
 import chatService from "@/services/chatClient";
 
 import { useMutation } from "@tanstack/react-query";
@@ -10,18 +10,18 @@ import toast from "react-hot-toast";
 import { ChatContext } from "@/contexts/ChatContext";
 import { useContext } from "react";
 
-type FriendCardProps = {
+type BlockedCardProps = {
   displayName: string;
   id: string;
   status: UserStatus;
 };
 
-export default function FriendCard({
+export default function BlockedCard({
   displayName,
   id,
   status,
-}: FriendCardProps) {
-  const { user } = useContext(ChatContext);
+}: BlockedCardProps) {
+  const { selectedChat } = useContext(ChatContext);
 
   const deleteFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
@@ -39,17 +39,26 @@ export default function FriendCard({
     },
   });
 
-  const handleDeleteFriend = () => {
-    deleteFriendMutation.mutate({ friend_id: id });
-  };
+  const unblockFriendMutation = useMutation({
+    mutationFn: (friendData: any) => {
+      return api.delete("/friends/block", {
+        data: friendData,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Usuário desbloqueado com sucesso!");
+      queryClient.invalidateQueries(["leaderboard"]);
+      queryClient.invalidateQueries(["friends"]);
+      chatService.socket?.emit("listMembers", { chatId: selectedChat.id });
+      chatService.socket?.emit("listMessages", { chatId: selectedChat.id });
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao desbloquear usuário: ${error.response.data.message}`);
+    },
+  });
 
-  const handleOpenDirectMessage = () => {
-    const chatName = `${displayName} - ${user.displayName}`;
-    chatService.socket?.emit("createChat", {
-      chatName,
-      chatType: "PRIVATE",
-      password: "",
-    });
+  const handleUnblockFriend = () => {
+    unblockFriendMutation.mutate({ friend_id: String(id) });
   };
 
   return (
@@ -68,22 +77,12 @@ export default function FriendCard({
         ></div>
       </div>
       <div className="flex space-x-2 items-center">
-        <EnvelopeSimple
-          className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+      <ProhibitInset
+          className="text-white font-bold rounded-lg bg-red-500 transition-all hover:bg-red-600
           flex items-center justify-center w-8 h-8 p-2 cursor-pointer"
           size={18}
-          onClick={handleOpenDirectMessage}
-        />
-        <Sword
-          className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
-                      flex items-center justify-center w-8 h-8 p-2 cursor-pointer"
-          size={18}
-        />
-        <UserMinus
-          className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
-          flex items-center justify-center w-8 h-8 p-2 cursor-pointer"
-          size={18}
-          onClick={handleDeleteFriend}
+          alt="Desbloquear"
+          onClick={handleUnblockFriend}
         />
       </div>
     </div>

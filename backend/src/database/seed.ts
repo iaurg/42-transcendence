@@ -141,6 +141,17 @@ async function main() {
     data: chatOwners,
   });
 
+  // create many messages in every chat
+  const messages: any = Array.from({ length: 10 }).map(() => ({
+    chatId: createdChats[Math.floor(Math.random() * 3)].id,
+    userLogin: getRandomUserLogin(),
+    content: faker.lorem.sentence(),
+  }));
+
+  await prisma.message.createMany({
+    data: messages,
+  });
+
   const matchHistory = Array.from({ length: 50 }).map(() => ({
     winnerId: getRandomUserId(),
     winnerPoints: Math.floor(Math.random() * 5) + 5,

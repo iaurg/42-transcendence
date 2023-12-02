@@ -1,14 +1,24 @@
 import { Plus } from "@phosphor-icons/react";
 import ChannelCard from "./ChannelCard";
 import { Chat, ChatContext } from "@/contexts/ChatContext";
-import { useContext } from "react";
+import { use, useContext, useEffect } from "react";
 
 type ListChannelsProps = {
   handleShowCreateChannel: () => void;
 };
 
 export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
-  const { isLoading, chatList } = useContext(ChatContext);
+  const { isLoading, chatList, handleUpdateListChats } =
+    useContext(ChatContext);
+
+  useEffect(() => {
+    handleUpdateListChats();
+  }, []);
+
+  // filter private chats
+  const publicChats = chatList?.filter(
+    (chat: Chat) => chat.chatType !== "PRIVATE"
+  );
 
   return (
     <div className="flex flex-col flex-1 justify-between">
@@ -20,6 +30,7 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
                     flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
           size={14}
           onClick={handleShowCreateChannel}
+          alt="Criar novo canal"
         />
       </div>
       {isLoading ? (
@@ -32,8 +43,7 @@ export function ListChannels({ handleShowCreateChannel }: ListChannelsProps) {
           className="flex flex-col flex-1 max-h-[80vh] bg-black42-300 overflow-y-scroll overscroll-contain my-4
                         scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
         >
-          {chatList?.map((channel: Chat) => (
-            // TODO: add user context for chat owner
+          {publicChats?.map((channel: Chat) => (
             <ChannelCard key={channel.id} chat={channel} />
           ))}
         </div>

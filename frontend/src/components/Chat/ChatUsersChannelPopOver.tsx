@@ -66,7 +66,6 @@ export default function ChatUsersChannelPopOver({
 
   const handlepromoteToAdmin = (user: ChatMember) => {
     promoteToAdminMutation.mutate(user);
-    // refresh the page to see the changes
     toast.success(`${user.userLogin} is now an admin`);
   };
 
@@ -158,14 +157,13 @@ export default function ChatUsersChannelPopOver({
 
       <Popover.Panel
         ref={setPopperElement}
-        className="bg-black42-300 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 mr-8 
+        className="bg-black42-300 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 mr-8
           w-[300px]
         "
         style={styles.popper}
         {...attributes.popper}
       >
         <div className="p-3">
-          {/*TODO: Find a way to remove this validation without breaking the database seed*/}
           {myUser && (
             <div
               className="flex items-center space-x-4 mb-4 justify-between"
@@ -215,19 +213,17 @@ export default function ChatUsersChannelPopOver({
                     alt="Channel Owner"
                   />
                 )}
-                {
-                  user.role === "MEMBER" && (
-                    <ArrowFatLineUp
-                      className="cursor-pointer text-orange42-500"
-                      size={20}
-                      aria-label="Promote to Admin"
-                      alt="Promote to Admin"
-                      onClick={() => {
-                        handlepromoteToAdmin(user);
-                      }}
-                    />
-                  ) /*TODO: Make this command responsive */
-                }
+                {user.role === "MEMBER" && myUser?.role === "OWNER" && (
+                  <ArrowFatLineUp
+                    className="cursor-pointer text-orange42-500"
+                    size={20}
+                    aria-label="Promote to Admin"
+                    alt="Promote to Admin"
+                    onClick={() => {
+                      handlepromoteToAdmin(user);
+                    }}
+                  />
+                )}
                 {
                   myUser &&
                     myUser.role === "OWNER" &&
@@ -241,7 +237,7 @@ export default function ChatUsersChannelPopOver({
                           handleDemoteToMember(user);
                         }}
                       />
-                    ) /*TODO: Make this command responsive */
+                    )
                 }
                 {
                   user.role !== "MEMBER" && (
@@ -251,7 +247,7 @@ export default function ChatUsersChannelPopOver({
                       aria-label="Channel Admin"
                       alt="Channel Admin"
                     />
-                  ) /*TODO: Make this command responsive */
+                  )
                 }
                 {
                   myUser &&
@@ -265,7 +261,7 @@ export default function ChatUsersChannelPopOver({
                         alt="Mute user"
                         onClick={() => handleMuteUser(user)}
                       />
-                    ) /*TODO: Make this command responsive */
+                    )
                 }
                 {
                   myUser &&
@@ -279,7 +275,7 @@ export default function ChatUsersChannelPopOver({
                         alt="Unmute user"
                         onClick={() => handleUnmuteUser(user)}
                       />
-                    ) /*TODO: Make this command responsive */
+                    )
                 }
                 {
                   myUser &&
@@ -292,7 +288,7 @@ export default function ChatUsersChannelPopOver({
                         alt="Ban user"
                         onClick={() => handleBanUser(user)}
                       />
-                    ) /*TODO: Make this command responsive */
+                    )
                 }
                 {
                   myUser &&
@@ -305,7 +301,7 @@ export default function ChatUsersChannelPopOver({
                         alt="Kick user"
                         onClick={() => handleKickUser(user)}
                       />
-                    ) /*TODO: Make this command responsive */
+                    )
                 }
               </div>
             </div>

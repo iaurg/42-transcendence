@@ -18,6 +18,7 @@ export type GameData = {
   finished: boolean;
   player1: {
     id: string;
+    login: string;
     x: number;
     y: number;
     width: number;
@@ -25,6 +26,7 @@ export type GameData = {
   };
   player2: {
     id: string;
+    login: string;
     x: number;
     y: number;
     width: number;
