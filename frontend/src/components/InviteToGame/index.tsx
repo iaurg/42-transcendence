@@ -1,23 +1,22 @@
 import { Sword } from "@phosphor-icons/react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { GameContext } from "@/contexts/GameContext";
+import { set } from "react-hook-form";
 
 type InviteToGameProps = {
   inviteUserLogin: string;
 };
 
 export default function InviteToGame({ inviteUserLogin }: InviteToGameProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isInviting, setIsInviting] = useState(false);
-  const [isAccepted, setIsAccepted] = useState(false);
-  const { handleInviteToGame } = useContext(GameContext);
+  const { handleInviteToGame, inviteDeclined, setInviteDeclined } =
+    useContext(GameContext);
+  const [isOpen, setIsOpen] = useState(false);
 
   function closeModal() {
     setIsOpen(false);
-    setIsAccepted(false);
     setIsInviting(false);
   }
 
@@ -29,6 +28,15 @@ export default function InviteToGame({ inviteUserLogin }: InviteToGameProps) {
     setIsInviting(true);
     handleInviteToGame(inviteUserLogin);
   };
+
+  useEffect(() => {
+    if (inviteDeclined) {
+      closeModal();
+      setInviteDeclined(false);
+    }
+
+    return () => {};
+  }, [inviteDeclined, setInviteDeclined]);
 
   return (
     <>
@@ -77,9 +85,7 @@ export default function InviteToGame({ inviteUserLogin }: InviteToGameProps) {
                         </span>
                         <span className="text-white text-sm">
                           {isInviting
-                            ? "Enviando convite..."
-                            : isAccepted
-                            ? "Convite aceito!"
+                            ? "Aguardando convidado..."
                             : "Deseja convidar para um jogo?"}
                         </span>
                       </div>
@@ -90,12 +96,6 @@ export default function InviteToGame({ inviteUserLogin }: InviteToGameProps) {
                     <div className="flex flex-col items-center">
                       {isInviting ? (
                         <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
-                      ) : isAccepted ? (
-                        <div className="flex flex-col items-center">
-                          <span className="text-white text-sm">
-                            Você será redirecionado para o jogo.
-                          </span>
-                        </div>
                       ) : (
                         <div className="flex flex-row justify-center items-center w-full space-x-2">
                           <button
