@@ -18,7 +18,7 @@ export class GameService {
 
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
-  private MAX_SCORE = 2;
+  private MAX_SCORE = 5;
   private BALL_SPEED = 6;
   private BALL_ACCELERATION = 1.1;
 
@@ -193,11 +193,10 @@ export class GameService {
     gamesPlaying: Map<string, GameDto>,
     pool: Map<string, Socket>,
   ): boolean {
+    if (pool.get(player) == undefined)
+      return false;
     gamesPlaying.forEach((value: GameDto) => {
-      if (
-        (value.player1.login == player || value.player2.login == player) &&
-        pool.get(player) != undefined
-      )
+      if (value.player1.login == player || value.player2.login == player)
         return false;
     });
     return true;

@@ -102,10 +102,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client ${client.id} created a invite game`);
       info.inviting = client.id;
       const guest = this.pool.get(info.guest);
-      this.logger.debug(`SOCKET INVITED: ${guest.id}`);
       guest.emit('invited', info);
     } else {
-      client.emit('inviteError', `Convidado não disponível`);
+      client.emit('guestRejected', `Convidado não disponível`);
     }
   }
 
