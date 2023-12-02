@@ -191,6 +191,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       if (socket.current) {
         router.push("/game/play");
         setJoinGame(true);
+        setGameFinished(false);
+        setGameAbandoned(false);
+        setGameFinishedData({} as GameData);
       }
     });
 
@@ -208,6 +211,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       socket.current?.emit("stopGame");
       setGameFinishedData(data);
       setGameFinished(true);
+      setTimeout(() => {
+        setGameFinished(false);
+        setGameFinishedData({} as GameData);
+        handleRedirectToHome();
+      }, 2000);
     });
 
     socket.current.on("gameAbandoned", (data: any) => {

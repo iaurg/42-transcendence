@@ -8,10 +8,16 @@ export default function ModalInvitedToGame() {
     setShowModalInvitedToGame,
     showModalInvitedToGame,
     handleInviteAction,
+    joinGame,
   } = useContext(GameContext);
 
   function closeModal() {
     setShowModalInvitedToGame(false);
+  }
+
+  // If a game is already in progress, don't show the modal and auto decline the invite
+  if (joinGame) {
+    return null;
   }
 
   return (
