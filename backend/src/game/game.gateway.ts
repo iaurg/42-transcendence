@@ -145,7 +145,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (this.gameService.isGameFinished(game)) {
         this.gameServer.to(gameId).emit('gameFinished', game);
-        this.finishGame(client);
       }
 
       if (game.finished) {
@@ -180,6 +179,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (gameId) {
       this.gamesPlaying[gameId].finished = true;
       this.gamesPlaying.delete(gameId);
+      client.leave(gameId);
       return gameId;
     }
     return null;
