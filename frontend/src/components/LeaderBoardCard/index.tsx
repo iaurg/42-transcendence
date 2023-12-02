@@ -16,7 +16,9 @@ export function LeaderBoardCard({ score, user }: LeaderBoardCardProps) {
       <ProfilePopOver name={user.login} score={score} id={user.id}>
         <div className="flex flex-row justify-between items-center">
           <UserAvatar imageUrl={user.avatar || ""} login={user.displayName} />
-          <div className="text-white text-lg mx-3">{user.displayName}</div>
+          <div className="text-white text-lg mx-3">
+            {user.displayName.split(" ")[0]}
+          </div>
           <StatusTag user={user} />
         </div>
       </ProfilePopOver>

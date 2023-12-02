@@ -60,7 +60,9 @@ export default function FriendCard({
           href={`/game/history/${id}`}
           className="flex space-x-2 items-center"
         >
-          <div className="flex space-x-2 items-center">{displayName}</div>
+          <div className="flex space-x-2 items-center">
+            {displayName.split(" ")[0].substring(0, 15)}
+          </div>
         </Link>
         <div
           className={`${
