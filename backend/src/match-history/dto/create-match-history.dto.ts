@@ -3,11 +3,11 @@ import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 export class CreateMatchHistoryDto {
   @IsNotEmpty()
   @IsString()
-  winnerId: string;
+  winnerLogin: string;
 
   @IsNotEmpty()
   @IsString()
-  loserId: string;
+  loserLogin: string;
 
   @IsNotEmpty()
   @IsInt()

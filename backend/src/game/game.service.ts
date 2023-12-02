@@ -175,10 +175,11 @@ export class GameService {
       winnerPoints = gameDto.score.player2;
       loserPoints = gameDto.score.player1;
     }
+
     try {
       await this.matchHistoryService.create({
-        winnerId: winner.userId,
-        loserId: loser.userId,
+        winnerLogin: winner.login,
+        loserLogin: loser.login,
         winnerPoints,
         loserPoints,
       });
@@ -190,11 +191,13 @@ export class GameService {
   checkGuestAvailability(
     player: string,
     gamesPlaying: Map<string, GameDto>,
-    pool: Map<string, Socket>
+    pool: Map<string, Socket>,
   ): boolean {
     gamesPlaying.forEach((value: GameDto) => {
-      if ((value.player1.login == player || value.player2.login == player) 
-            && pool.get(player) != undefined)
+      if (
+        (value.player1.login == player || value.player2.login == player) &&
+        pool.get(player) != undefined
+      )
         return false;
     });
     return true;
