@@ -160,6 +160,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }, 1000 / this.FRAMES_PER_SECOND);
   }
 
+  @SubscribeMessage('stopGame')
+  stopGame(client: Socket) {
+    this.finishGame(client);
+  }
+
   @SubscribeMessage('movePlayer')
   movePlayer(_: Socket, info: GameMoveDto) {
     this.gameService.updatePlayerPosition(this.gamesPlaying[info.gameId], info);
