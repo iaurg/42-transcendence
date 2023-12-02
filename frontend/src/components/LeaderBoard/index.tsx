@@ -2,10 +2,12 @@
 import { LeaderBoardCard } from "../LeaderBoardCard";
 import { User } from "@/types/user";
 import { useGetLeaderboard } from "@/services/queries/leaderboard/getLeaderboard";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useContext } from "react";
 
 export function LeaderBoard() {
   const { data, isLoading, isError } = useGetLeaderboard();
-
+  const { user: yourUser } = useContext(AuthContext);
   return (
     <div
       className="flex flex-col justify-start items-center py-4 bg-black42-300 p-4 rounded-lg space-y-2 overflow-y-scroll overscroll-contain
@@ -25,8 +27,15 @@ export function LeaderBoard() {
       ) : (
         <>
           {data?.map((user: User) => (
-            <LeaderBoardCard key={user.id} score={user.victory} user={user} />
-          ))}
+
+            <LeaderBoardCard
+              key={user.id}
+              score={user.victory}
+              user={user}
+              isFriend={!!user.friends.find((friend) => friend.id === yourUser.id)}
+              isBlocked={!!user.blocked.find((blockedUser) => blockedUser.id === yourUser.id)}
+            />
+        ))}
         </>
       )}
     </div>

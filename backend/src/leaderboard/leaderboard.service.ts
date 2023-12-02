@@ -18,6 +18,8 @@ export class LeaderboardService {
         avatar: true,
         id: true,
         status: true,
+        friends: true,
+        blocked: true,
       },
     });
   }

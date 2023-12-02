@@ -61,6 +61,7 @@ export default function PlayPage() {
         <button
           onClick={handleRedirectToHome}
           className="
+
                 bg-purple42-400
                 hover:bg-purple42-500
                 text-white
@@ -75,6 +76,7 @@ export default function PlayPage() {
           Voltar ao inicio
         </button>
       </div>
+
     );
   }
 
@@ -138,6 +140,7 @@ export default function PlayPage() {
             p-4
           "
         >
+
           <div className="text-white text-4xl text-center mb-4">
             Jogo finalizado
           </div>
@@ -158,6 +161,7 @@ export default function PlayPage() {
             </span>
             <button
               onClick={handleRedirectToHome}
+
               className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -172,6 +176,7 @@ export default function PlayPage() {
             >
               Voltar ao inicio
             </button>
+
           </div>
         </div>
       </>
@@ -198,6 +203,7 @@ export default function PlayPage() {
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
           <button
             onClick={handleRedirectToHome}
+
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -212,6 +218,7 @@ export default function PlayPage() {
           >
             Voltar ao inicio
           </button>
+
         </div>
       </>
     );
@@ -332,6 +339,7 @@ export default function PlayPage() {
           >
             Sair do jogo
           </button>
+
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 import { useGetFriends } from "@/services/queries/friends/getFriends";
 import FriendCard from "./FriendCard";
 import { User } from "@/types/user";
+import BlockedCard from "./BlockedCard";
 
 export function ListFriends() {
   const { data, isLoading, isError } = useGetFriends();
@@ -25,8 +26,8 @@ export function ListFriends() {
               Erro ao carregar lista de amigos
             </span>
           </div>
-        ) : (
-          data?.friends.map((user: User) => (
+        ) : (<>
+          {data?.friends.map((user: User) => (
             <FriendCard
               key={user.id}
               displayName={user.displayName}
@@ -34,7 +35,16 @@ export function ListFriends() {
               id={user.id}
               status={user.status}
             />
-          ))
+          ))}
+          {data?.blocked.map((user: User) => (
+            <BlockedCard
+              key={user.id}
+              displayName={user.displayName}
+              id={user.id}
+              status={user.status}
+            />
+          ))}
+          </>
         )}
       </div>
     </div>

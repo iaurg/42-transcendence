@@ -118,5 +118,6 @@ export class GameLobbyService {
 
     if (this.invite_lobby.get(`game_${playerId}`) != undefined)
       this.invite_lobby.delete(`game_${playerId}`);
+
   }
 }
