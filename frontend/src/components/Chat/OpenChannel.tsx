@@ -40,7 +40,7 @@ export function OpenChannel() {
   const [isLoading, setIsLoading] = useState(true);
   const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
   const [showLock, setShowLock] = useState(() =>
-    selectedChat.chatType === "PROTECTED" ? true : false
+    selectedChat?.chatType === "PROTECTED" ? true : false
   );
 
   chatService.socket?.on("listMessages", (messages: Message[]) => {
@@ -122,7 +122,7 @@ export function OpenChannel() {
     setShowLock(false);
   };
 
-  if (selectedChat.chatType === "PROTECTED" && validationRequired) {
+  if (selectedChat?.chatType === "PROTECTED" && validationRequired) {
     return (
       <div className="flex flex-col flex-1 justify-between">
         <div className="flex flex-row justify-between items-center h-9">
@@ -173,7 +173,7 @@ export function OpenChannel() {
 
   return (
     <div className="flex flex-col flex-1 justify-between">
-      <div className="flex flex-row justify-between items-center h-8">
+      <div className="flex flex-col lg:flex-row justify-between items-center align-middle mb-1">
         <div className="flex items-center">
           {selectedChat.chatType !== "PRIVATE" && (
             <ChatUsersChannelPopOver users={users}>
@@ -184,7 +184,16 @@ export function OpenChannel() {
             </ChatUsersChannelPopOver>
           )}
         </div>
-        <h3 className="text-white text-lg">
+        <h3
+          style={{
+            display: "inline-block",
+            maxWidth: "120px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+          title={selectedChat.name}
+        >
           {selectedChat.chatType === "PRIVATE"
             ? `DM: ${selectedChat.name
                 .split(" - ")

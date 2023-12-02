@@ -11,7 +11,7 @@ export default function Chat() {
   const { showElement, setShowElement } = useContext(ChatContext);
 
   return (
-    <div className="flex flex-col flex-1 w-[309px] my-4 bg-black42-300 rounded-lg p-4">
+    <div className="flex flex-col flex-1 w-full lg:w-[309px] my-4 bg-black42-300 rounded-lg p-4">
       <div className="flex flex-col flex-1 justify-end">
         <div className={"flex flex-col flex-1 text-white"}>
           <div className="flex flex-col flex-1 justify-between">
