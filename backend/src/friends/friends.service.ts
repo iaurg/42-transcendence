@@ -17,9 +17,15 @@ export class FriendsService {
       where: { id: userId },
       select: { blocked: { where: { id: createFriendDto.friend_id } } },
     });
+
+    // if I'm trying to add myself as a friend throw error
+    if (userId === createFriendDto.friend_id) {
+      throw new NotAcceptableException('Você não pode adicionar a si mesmo');
+    }
+
     // if blocked, throw error
     if (blocked.blocked.length > 0) {
-      throw new NotAcceptableException('User is blocked');
+      throw new NotAcceptableException('Usuário bloqueado');
     }
 
     const friendship = await this.prisma.user.findUnique({
@@ -28,7 +34,7 @@ export class FriendsService {
     });
 
     if (friendship.friends.length > 0) {
-      throw new NotAcceptableException('Friendship already exists');
+      throw new NotAcceptableException('Você já é amigo dessa pessoa');
     }
 
     const friendUser = await this.prisma.user.findUnique({
@@ -36,7 +42,7 @@ export class FriendsService {
     });
 
     if (!friendUser) {
-      throw new NotFoundException('Friend not found');
+      throw new NotFoundException('Amigo não encontrado');
     }
 
     await this.prisma.user.update({
