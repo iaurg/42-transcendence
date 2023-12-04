@@ -41,5 +41,4 @@ USER node
 
 EXPOSE 3000
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:docker"]

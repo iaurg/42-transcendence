@@ -23,7 +23,7 @@
     "prisma:migrate:deploy": "npx prisma migrate deploy",
     "prisma:reset": "npx prisma db push --force-reset",
     "prisma:studio": "npx prisma studio",
-    "prestart:docker": "npm run prisma:generate && npm run prisma:migrate:deploy",
+    "prestart:docker": "npm run prisma:migrate:deploy",
     "start:docker": "npm run start:prod"
   },
   "dependencies": {
