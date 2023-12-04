@@ -64,7 +64,36 @@ export class FriendsService {
   async getFriends(userId: string) {
     const friends = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { friends: true, blocked: true },
+      select: {
+        friends: {
+          select: {
+            id: true,
+            displayName: true,
+            login: true,
+            email: true,
+            avatar: true,
+            status: true,
+            victory: true,
+            mfaEnabled: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        blocked: {
+          select: {
+            id: true,
+            displayName: true,
+            login: true,
+            email: true,
+            avatar: true,
+            status: true,
+            victory: true,
+            mfaEnabled: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
     });
 
     return friends;
@@ -148,7 +177,22 @@ export class FriendsService {
   async getBlockedUsers(userId: string) {
     const blockedUsers = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { blocked: true },
+      select: {
+        blocked: {
+          select: {
+            id: true,
+            displayName: true,
+            login: true,
+            email: true,
+            avatar: true,
+            status: true,
+            victory: true,
+            mfaEnabled: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
     });
 
     return blockedUsers;
