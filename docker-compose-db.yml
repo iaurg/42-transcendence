@@ -1,18 +1,20 @@
 version: "3.8"
 
-# create a postgres service
 services:
-  postgres:
+  database:
     container_name: nestjs-postgres
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      PGDATA: /data/postgres
+    image: postgres:latest
+    restart: unless-stopped
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - ./data/pg:/data/postgres
+    env_file:
+      - ./.env
+    environment:
+      PGDATA: /data/postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

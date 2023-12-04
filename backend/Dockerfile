@@ -1,53 +1,45 @@
-ARG NODE_VERSION=20-alpine
-###################
-# LOCAL DEVELOPMENT
-###################
-FROM node:${NODE_VERSION} As development
-
+FROM node:20-alpine as base
 WORKDIR /usr/src/app
+
+##############
+# DEPENDENCIES
+##############
+FROM base AS dependencies
+# https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine
+RUN apk add --no-cache libc6-compat
 
 COPY --chown=node:node package*.json ./
 
 RUN npm ci
 
-COPY --chown=node:node . .
+#############
+# DEVELOPMENT
+#############
+FROM base as development
 
-USER node
-
-#######
-# BUILD
-#######
-FROM node:${NODE_VERSION} As build
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node package*.json ./
-
-COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node . .
+COPY --from=dependencies /usr/src/app/node_modules ./node_modules
+COPY . .
 
 RUN npm run prisma:generate
 
+CMD ["npm", "run", "start:dev"]
+
+# ##########
+# PRODUCTION
+# ##########
+FROM base as production
+ENV NODE_ENV=production
+
+COPY --from=dependencies --chown=node:node /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node . .
+
+RUN npm run prisma:generate
 RUN npm run build
-
-ENV NODE_ENV production
-
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 USER node
 
-############
-# PRODUCTION
-############
-FROM node:${NODE_VERSION} As production
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-COPY --chown=node:node package*.json ./
-
 EXPOSE 3000
 
-CMD [ "npm", "run", "start:prod" ]
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["npm", "run", "start:prod"]

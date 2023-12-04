@@ -14,6 +14,7 @@ export default function AuthPage() {
       .post(
         "/auth/2fa/authenticate",
         { code: code.join("") },
+        { withCredentials: true }
       )
       .then((r) => {
         if (r.status == 201) router.push("/game");

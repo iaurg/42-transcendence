@@ -5,12 +5,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - avatars:/usr/src/app/uploads
-    restart: always
+    restart: unless-stopped
     env_file:
-      - ./.env
       - ./backend/.env
-    environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?schema=public"
     ports:
       - "3000:3000"
     depends_on:
@@ -21,20 +18,17 @@ services:
 
   database:
     image: postgres:latest
-    restart: always
+    restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
-      - ./data/pg:/data/postgres
+      - postgres-data:/data/postgres
     networks:
       - transcendence
     env_file:
       - ./.env
     environment:
       PGDATA: /data/postgres
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 5s
@@ -45,13 +39,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
     ports:
-      - "9090:3000"
-    restart: always
+      - "9090:9090"
+    restart: unless-stopped
     env_file:
       - ./frontend/.env
     environment:
@@ -60,7 +50,7 @@ services:
       - transcendence
 
 volumes:
-  transcendence-postgres:
+  postgres-data:
   avatars:
 networks:
   transcendence:
