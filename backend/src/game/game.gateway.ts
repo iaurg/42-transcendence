@@ -172,8 +172,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private finishGame(client: Socket): string {
     const gameId = Object.keys(this.gamesPlaying).find((gameId) => {
       return (
-        this.gamesPlaying[gameId].player1.id === client.id ||
-        this.gamesPlaying[gameId].player2.id === client.id
+        this.gamesPlaying[gameId].player1.socketId === client.id ||
+        this.gamesPlaying[gameId].player2.socketId === client.id
       );
     });
     if (gameId) {
