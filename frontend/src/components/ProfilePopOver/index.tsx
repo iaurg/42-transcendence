@@ -4,7 +4,13 @@ import chatService from "@/services/chatClient";
 import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
 
-import { ListNumbers, Play, Prohibit, ProhibitInset, UserMinus, UserPlus } from "@phosphor-icons/react";
+import {
+  ListNumbers,
+  Prohibit,
+  ProhibitInset,
+  UserMinus,
+  UserPlus,
+} from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useContext, useState } from "react";
@@ -37,7 +43,7 @@ export default function ProfilePopOver({
     modifiers: [{ name: "arrow", options: { element: arrowElement } }],
     placement: "right",
   });
-  const {selectedChat} = useContext(ChatContext);
+  const { selectedChat } = useContext(ChatContext);
 
   const addFriendMutation = useMutation({
     mutationFn: (friendData: any) => {
@@ -91,7 +97,9 @@ export default function ProfilePopOver({
       chatService.socket?.emit("listMessages", { chatId: selectedChat.id });
     },
     onError: (error: any) => {
-      toast.error(`Erro ao desbloquear usuário: ${error.response.data.message}`);
+      toast.error(
+        `Erro ao desbloquear usuário: ${error.response.data.message}`
+      );
     },
   });
 
@@ -133,30 +141,23 @@ export default function ProfilePopOver({
       >
         <div className="p-3">
           <div className="flex items-center space-x-4 mb-4">
-
-            {!isFriend ? <UserPlus
-              color="white"
-              className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+            {!isFriend ? (
+              <UserPlus
+                color="white"
+                className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
                     flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
-              size={14}
-              onClick={handleAddFriend}
-              alt="Adicionar amigo"
-
-            /> :
-            <UserMinus
-              className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
+                size={14}
+                onClick={handleAddFriend}
+                alt="Adicionar amigo"
+              />
+            ) : (
+              <UserMinus
+                className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
               flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
-              size={14}
-              onClick={handleDeleteFriend}
-            />}
-            <Play
-              color="white"
-              className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
-                    flex items-center justify-center w-9 h-9 p-2 cursor-pointer"
-              size={14}
-              onClick={() => console.log("jogar")}
-              alt="Jogar"
-            />
+                size={14}
+                onClick={handleDeleteFriend}
+              />
+            )}
 
             <Link href={`/game/history/${id}`} passHref title="Histórico">
               <ListNumbers
@@ -167,7 +168,7 @@ export default function ProfilePopOver({
               />
             </Link>
 
-            {!isBlocked ?
+            {!isBlocked ? (
               <Prohibit
                 color="white"
                 className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
@@ -175,7 +176,8 @@ export default function ProfilePopOver({
                 size={14}
                 alt="Bloquear"
                 onClick={handleBlockFriend}
-              /> :
+              />
+            ) : (
               <ProhibitInset
                 color="white"
                 className="text-white font-bold rounded-lg bg-red-500 transition-all hover:bg-red-600
@@ -183,7 +185,8 @@ export default function ProfilePopOver({
                 size={14}
                 alt="Bloquear"
                 onClick={handleUnblockFriend}
-              />}
+              />
+            )}
           </div>
           <p className="text-base font-semibold leading-none text-white">
             {name}
