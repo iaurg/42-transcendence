@@ -26,25 +26,25 @@ export function ListFriends() {
               Erro ao carregar lista de amigos
             </span>
           </div>
-        ) : (<>
-          {data?.friends.map((user: User) => (
-            <FriendCard
-              key={user.id}
-              displayName={user.displayName}
-              login={user.login}
-              id={user.id}
-              status={user.status}
-              login={user.login}
-            />
-          ))}
-          {data?.blocked.map((user: User) => (
-            <BlockedCard
-              key={user.id}
-              displayName={user.displayName}
-              id={user.id}
-              status={user.status}
-            />
-          ))}
+        ) : (
+          <>
+            {data?.friends.map((user: User) => (
+              <FriendCard
+                key={user.id}
+                displayName={user.displayName}
+                login={user.login}
+                id={user.id}
+                status={user.status}
+              />
+            ))}
+            {data?.blocked.map((user: User) => (
+              <BlockedCard
+                key={user.id}
+                displayName={user.displayName}
+                id={user.id}
+                status={user.status}
+              />
+            ))}
           </>
         )}
       </div>
