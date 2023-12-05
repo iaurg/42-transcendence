@@ -190,15 +190,10 @@ export class GameService {
 
   checkGuestAvailability(
     player: string,
-    gamesPlaying: Map<string, GameDto>,
     pool: Map<string, Socket>,
   ): boolean {
     if (pool.get(player) == undefined)
       return false;
-    gamesPlaying.forEach((value: GameDto) => {
-      if (value.player1.login == player || value.player2.login == player)
-        return false;
-    });
     return true;
   }
 
