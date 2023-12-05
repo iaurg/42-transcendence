@@ -51,6 +51,12 @@ The prisma studio command opens the Prisma Studio to view and edit the data in y
 npx prisma studio
 ```
 
+Reset and seed the database:
+
+```bash
+npx prisma db push --force-reset && npx prisma db seed
+```
+
 ## Websockets
 
 Check the [official documentation](https://docs.nestjs.com/websockets/gateways) for more information.

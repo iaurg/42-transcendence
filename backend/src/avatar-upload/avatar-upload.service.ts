@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-
+import { Express } from 'express';
+import 'multer';
 @Injectable()
 export class AvatarUploadService {
   constructor(private prisma: PrismaService) {}

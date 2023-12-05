@@ -1,7 +1,7 @@
 all: up
 
 up:
-	docker-compose -f docker-compose.yml up -d
+	docker-compose -f docker-compose.yml up --build -d
 
 up-refresh:
 	docker-compose -f docker-compose.yml up -d --build -V --force-recreate

@@ -10,6 +10,8 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
+import { Express } from 'express';
+import 'multer';
 import { AvatarUploadService } from './avatar-upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';

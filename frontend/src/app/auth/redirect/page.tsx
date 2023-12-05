@@ -2,7 +2,7 @@
 import { AuthContext, TokenPayload } from "@/contexts/AuthContext";
 import { useContext, useEffect } from "react";
 import nookies from "nookies";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { queryClient } from "@/services/queryClient";
 
@@ -13,7 +13,7 @@ export default function RootLoginRedirectPage() {
   useEffect(() => {
     const { accessToken } = nookies.get(null, "accesssToken");
     if (accessToken) {
-      const payload: TokenPayload = jwt_decode(accessToken);
+      const payload: TokenPayload = jwtDecode(accessToken);
       if (payload) queryClient.invalidateQueries(["me"]);
     } else {
       router.push("/login");
