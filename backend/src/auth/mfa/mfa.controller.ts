@@ -8,7 +8,6 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
 import { MultiFactorAuthService } from './mfa.service';
 import { Request, Response } from 'express';
 import { AccessTokenGuard } from '../jwt/jwt.guard';
@@ -17,10 +16,7 @@ import { User } from '@prisma/client';
 
 @Controller('auth/2fa')
 export class MultiFactorAuthController {
-  constructor(
-    private usersService: UsersService,
-    private mfaService: MultiFactorAuthService,
-  ) {}
+  constructor(private mfaService: MultiFactorAuthService) {}
 
   @UseGuards(AccessTokenGuard)
   @Get('generate')
@@ -72,9 +68,11 @@ export class MultiFactorAuthController {
       user,
       mfaPayload.code,
     );
+
     if (!isCodeValid) {
       throw new UnauthorizedException('Invalid 2FA code');
     }
+
     try {
       return await this.mfaService.enableMfa(user, res);
     } catch (error) {
@@ -95,6 +93,7 @@ export class MultiFactorAuthController {
       user,
       mfaPayload.code,
     );
+
     if (!isCodeValid) {
       throw new UnauthorizedException('Invalid 2FA code');
     }

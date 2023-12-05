@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Express } from 'express';
 import 'multer';
@@ -8,9 +8,16 @@ export class AvatarUploadService {
 
   async create(id: string, file: Express.Multer.File) {
     const { filename } = file;
+
+    // Validate the file type and size
+    if (!file.mimetype.startsWith('image/') || file.size > 1024 * 1024) {
+      throw new BadRequestException('Invalid file');
+    }
+
     const user = await this.prisma.user.update({
       where: { id: id },
       data: { avatar: filename },
+      select: { id: true, avatar: true }, // Select only the fields that are safe to return
     });
 
     return user;
@@ -18,9 +25,16 @@ export class AvatarUploadService {
 
   async update(id: string, file: Express.Multer.File) {
     const { filename } = file;
+
+    // Validate the file type and size
+    if (!file.mimetype.startsWith('image/') || file.size > 1024 * 1024) {
+      throw new BadRequestException('Invalid file');
+    }
+
     const user = await this.prisma.user.update({
       where: { id: id },
       data: { avatar: filename },
+      select: { id: true, avatar: true }, // Select only the fields that are safe to return
     });
 
     return user;

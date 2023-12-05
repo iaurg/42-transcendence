@@ -22,7 +22,6 @@ export class UsersService {
         avatar: true,
         status: true,
         victory: true,
-        mfaEnabled: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -99,6 +98,14 @@ export class UsersService {
   }
 
   async updateUserStatus(userId: string, status: UserStatus) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     return await this.prisma.user.update({
       where: { id: userId },
       data: {

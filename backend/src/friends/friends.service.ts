@@ -64,7 +64,34 @@ export class FriendsService {
   async getFriends(userId: string) {
     const friends = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { friends: true, blocked: true },
+      select: {
+        friends: {
+          select: {
+            id: true,
+            displayName: true,
+            login: true,
+            email: true,
+            avatar: true,
+            status: true,
+            victory: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        blocked: {
+          select: {
+            id: true,
+            displayName: true,
+            login: true,
+            email: true,
+            avatar: true,
+            status: true,
+            victory: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
     });
 
     return friends;
@@ -77,7 +104,7 @@ export class FriendsService {
     });
 
     if (friendship.friends.length === 0) {
-      throw new NotFoundException('Friendship not found');
+      throw new NotFoundException('Amigo não encontrado');
     }
 
     await this.prisma.user.update({
@@ -104,15 +131,26 @@ export class FriendsService {
 
 
     if (blocked.blocked.length > 0) {
-      throw new NotAcceptableException('User already blocked');
+      throw new NotAcceptableException('Usuário já bloqueado');
     }
 
     const blockUser = await this.prisma.user.findUnique({
       where: { id: createFriendDto.friend_id },
+      select: {
+        id: true,
+        displayName: true,
+        login: true,
+        email: true,
+        avatar: true,
+        status: true,
+        victory: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!blockUser) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     await this.prisma.user.update({
@@ -130,6 +168,7 @@ export class FriendsService {
       where: { id: userId },
       select: { friends: { where: { id: createFriendDto.friend_id } } },
     });
+
     // if user is friend, delete friendship
     if (friendship.friends.length > 0) {
       await this.prisma.user.update({
@@ -142,6 +181,7 @@ export class FriendsService {
         data: { friends: { disconnect: [{ id: userId }] } },
       });
     }
+
     return {
       message: 'User blocked successfully',
       user: blockUser,
@@ -151,7 +191,22 @@ export class FriendsService {
   async getBlockedUsers(userId: string) {
     const blockedUsers = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { blocked: true },
+      select: {
+        blocked: {
+          select: {
+            id: true,
+            displayName: true,
+            login: true,
+            email: true,
+            avatar: true,
+            status: true,
+            victory: true,
+            mfaEnabled: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
     });
 
     return blockedUsers;
