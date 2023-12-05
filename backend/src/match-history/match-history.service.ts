@@ -7,21 +7,23 @@ export class MatchHistoryService {
   constructor(private prisma: PrismaService) {}
 
   async create(createMatchHistoryDto: CreateMatchHistoryDto) {
-    // check if winnerId and loserId are the different
-    if (createMatchHistoryDto.winnerId === createMatchHistoryDto.loserId) {
-      throw new Error('winnerId and loserId must be different');
+    // check if winnerLogin and loserLogin are the different
+    if (
+      createMatchHistoryDto.winnerLogin === createMatchHistoryDto.loserLogin
+    ) {
+      throw new Error('winnerLogin and loserLogin must be different');
     }
 
-    // check if winnerId and loserId exists
+    // check if winnerLogin and loserLogin exists
     const winner = await this.prisma.user.findUnique({
       where: {
-        id: createMatchHistoryDto.winnerId,
+        login: createMatchHistoryDto.winnerLogin,
       },
     });
 
     const loser = await this.prisma.user.findUnique({
       where: {
-        id: createMatchHistoryDto.loserId,
+        login: createMatchHistoryDto.loserLogin,
       },
     });
 

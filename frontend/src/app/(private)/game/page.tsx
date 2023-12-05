@@ -4,8 +4,8 @@ import { LeaderBoard } from "@/components/LeaderBoard";
 
 export default function GamePage() {
   return (
-    <div className="flex">
-      <div className="flex flex-col flex-1 py-4 mx-4">
+    <div className="flex flex-col md:flex-row">
+      <div className="flex-1 py-4 mx-4">
         <Header />
         <LeaderBoard />
       </div>

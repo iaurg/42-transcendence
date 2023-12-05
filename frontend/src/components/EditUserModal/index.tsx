@@ -117,7 +117,7 @@ export default function EditUserModal() {
                         <img
                           src={`${process.env.NEXT_PUBLIC_API_URL}/avatars/${user.avatar}`}
                           alt="Avatar"
-                          className="rounded-full w-24 h-24"
+                          className="rounded-full w-16 h-16"
                         />
                       ) : (
                         <div className="rounded-full w-16 h-16 bg-black42-400" />

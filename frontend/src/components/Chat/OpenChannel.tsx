@@ -5,12 +5,16 @@ import {
   UsersThree,
   XCircle,
 } from "@phosphor-icons/react";
-import { useContext, useEffect, useState } from "react";
+import { User } from "@/types/user";
+
+import { useCallback, useContext, useEffect, useState } from "react";
 import ChatUsersChannelPopOver, { ChatMember } from "./ChatUsersChannelPopOver";
 import chatService from "@/services/chatClient";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import ChangeChatPassword from "./ChangeChatPassword";
+import { useGetLeaderboard } from "@/services/queries/leaderboard/getLeaderboard";
+
 interface Message {
   id: number;
   content: string;
@@ -31,6 +35,7 @@ export function OpenChannel() {
     setValidationRequired,
     user,
   } = useContext(ChatContext);
+
   // List messages from the websocket
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -39,11 +44,21 @@ export function OpenChannel() {
   const [isLoading, setIsLoading] = useState(true);
   const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
   const [showLock, setShowLock] = useState(() =>
-    selectedChat.chatType === "PROTECTED" ? true : false
+    selectedChat?.chatType === "PROTECTED" ? true : false
   );
 
-  chatService.socket?.on("listMessages", (messages: Message[]) => {
-    setMessages(() => messages);
+  const { data } = useGetLeaderboard();
+  const myData = data?.find((user: User) => user.login === myUser?.userLogin);
+  const blockedUsers = myData?.blocked.map((user: User) => user.login);
+
+  const filteredMessages = useCallback(() => {
+    return messages.filter(
+      (message) => !blockedUsers?.includes(message.userLogin)
+    );
+  }, [messages, blockedUsers]);
+
+  chatService.socket?.on("listMessages", (socketMessages: Message[]) => {
+    setMessages(socketMessages);
   });
 
   chatService.socket?.on("message", (message: Message) => {
@@ -121,7 +136,7 @@ export function OpenChannel() {
     setShowLock(false);
   };
 
-  if (selectedChat.chatType === "PROTECTED" && validationRequired) {
+  if (selectedChat?.chatType === "PROTECTED" && validationRequired) {
     return (
       <div className="flex flex-col flex-1 justify-between">
         <div className="flex flex-row justify-between items-center h-9">
@@ -172,7 +187,7 @@ export function OpenChannel() {
 
   return (
     <div className="flex flex-col flex-1 justify-between">
-      <div className="flex flex-row justify-between items-center h-8">
+      <div className="flex flex-col lg:flex-row justify-between items-center align-middle mb-1">
         <div className="flex items-center">
           {selectedChat.chatType !== "PRIVATE" && (
             <ChatUsersChannelPopOver users={users}>
@@ -183,7 +198,17 @@ export function OpenChannel() {
             </ChatUsersChannelPopOver>
           )}
         </div>
-        <h3 className="text-white text-lg">
+        <h3
+          style={{
+            display: "inline-block",
+            maxWidth: "120px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+          title={selectedChat.name}
+        >
+
           {selectedChat.chatType === "PRIVATE"
             ? `DM: ${selectedChat.name
                 .split(" - ")
@@ -211,7 +236,6 @@ export function OpenChannel() {
             onClick={() => handleCloseChat(selectedChat.id)}
           />
         </div>
-
       </div>
       <div
         id="messages-container"
@@ -219,7 +243,7 @@ export function OpenChannel() {
             scrollbar scrollbar-w-1 scrollbar-rounded-lg scrollbar-thumb-rounded-lg scrollbar-thumb-black42-100 scrollbar-track-black42-300"
       >
         {/* add alternated users messages inside scrollable area */}
-        {messages.map((message: any) => (
+        {filteredMessages().map((message: any) => (
           <div
             key={message.id}
             className={`${

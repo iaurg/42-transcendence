@@ -54,9 +54,9 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [validationRequired, setValidationRequired] = useState(true);
 
   const handleOpenChannel = (chat: Chat) => {
-    setSelectedChat(chat);
-
     if (chat?.id) {
+      setSelectedChat(chat);
+      chatService.socket?.emit("joinChat", { chatId: chat.id });
       chatService.socket?.emit("listMessages", { chatId: chat.id });
       chatService.socket?.emit("listMembers", { chatId: chat.id });
     }
@@ -114,7 +114,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         toast.error("Erro ao entrar no chat, tente novamente");
         return;
       }
-      handleOpenChannel(response.chat);
     });
 
     // Clean up the connection on component unmount

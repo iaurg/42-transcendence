@@ -1,7 +1,6 @@
 "use client";
 import { GameContext } from "@/contexts/GameContext";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useContext, useRef } from "react";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
@@ -15,11 +14,72 @@ export default function PlayPage() {
     gameAbandoned,
     gameFinishedData,
     gameData,
+    joinGame,
+    setJoinGame,
     setGameLayout,
+    handleJoinGame,
     handleRedirectToHome,
   } = useContext(GameContext);
 
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
+
+
+  if (!joinGame) {
+    return (
+      <div
+        className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+          h-[calc(100vh)]
+        "
+      >
+        <button
+          onClick={() => {
+            setJoinGame(true);
+            handleJoinGame();
+          }}
+          className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+        >
+          Entrar no lobby
+        </button>
+        <button
+          onClick={handleRedirectToHome}
+          className="
+
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+        >
+          Voltar ao inicio
+        </button>
+      </div>
+
+    );
+  }
 
   if (waitingPlayer2 || !gameData.player1 || !gameData.player2) {
     return (
@@ -43,7 +103,7 @@ export default function PlayPage() {
             Aguardando oponente...
           </div>
           <button
-            onClick={() => handleRedirectToHome()}
+            onClick={handleRedirectToHome}
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -81,6 +141,7 @@ export default function PlayPage() {
             p-4
           "
         >
+
           <div className="text-white text-4xl text-center mb-4">
             Jogo finalizado
           </div>
@@ -100,7 +161,7 @@ export default function PlayPage() {
                 : gameFinishedData.player2.login}
             </span>
             <button
-              onClick={() => handleRedirectToHome()}
+              onClick={handleRedirectToHome}
               className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -140,7 +201,7 @@ export default function PlayPage() {
         >
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
           <button
-            onClick={() => handleRedirectToHome()}
+            onClick={handleRedirectToHome}
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -262,7 +323,7 @@ export default function PlayPage() {
         "
         >
           <button
-            onClick={() => handleRedirectToHome()}
+            onClick={handleRedirectToHome}
             className="
             bg-red-500
             hover:bg-red-600

@@ -10,14 +10,21 @@ import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameLobbyService } from './lobby/game.lobby.service';
 import { GameMoveDto } from './dto/game.move';
+import { GameInviteDto } from './dto/game.invite.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+  @WebSocketServer()
+  gameServer: Server;
   private PADDLE_WIDTH = 10;
   private PADDLE_HEIGHT = 150;
   private FRAMES_PER_SECOND = 60;
+  private readonly logger = new Logger(GameGateway.name);
+  private pool = new Map<string, Socket>();
+  private gamesPlaying: Map<string, GameDto> = new Map();
 
   constructor(
     private gameService: GameService,
@@ -31,26 +38,32 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameLobby.PADDLE_WIDTH = this.PADDLE_WIDTH;
   }
 
-  @WebSocketServer()
-  gameServer: Server;
-  private gamesPlaying: Map<string, GameDto> = new Map();
-  private logger = new Logger(GameGateway.name);
-
   handleConnection(client: Socket) {
-    this.logger.debug(`Client ${client.id} connected.`);
+    // Get user from cookie coming from client
+    const user = client.handshake.auth.token;
+
+    // Decode user from JWT
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    this.pool.set(decodedUser, client);
+
+    this.logger.log(`Client ${decodedUser} connected`);
   }
 
   handleDisconnect(client: Socket) {
+    // Get user from cookie coming from client
+    const user = client.handshake.auth.token;
+
+    // Decode user from JWT
+    const decodedUser = this.jwtService.decode(user).sub;
+
     const gameId = this.finishGame(client);
     client.leave(gameId);
     this.gameLobby.abandoneLobby(client.id);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
-    this.logger.debug(`Client ${client.id} disconnected Game ${gameId}.`);
-  }
 
-  @SubscribeMessage('stopGame')
-  stopGame(client: Socket) {
-    this.finishGame(client);
+    this.pool.delete(decodedUser);
+    this.logger.log(`Client ${client.id} disconnected`);
   }
 
   @SubscribeMessage('joinGame')
@@ -60,14 +73,70 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (this.gameLobby.joinPlayer1(client, decodedUser)) {
       this.logger.log(`waiting Player 2`);
+      this.logger.log(`Client ${client.id} joined game`);
       client.emit('waitingPlayer2', `game_${client.id}`);
     } else {
-      const game = this.gameLobby.joinPlayer2(client, decodedUser);
-      this.gamesPlaying[game.gameId] = game;
-      this.gameService.restartBall(this.gamesPlaying[game.gameId]);
-      this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
-      this.startGame(client, game.gameId);
+      try {
+        const game = this.gameLobby.joinPlayer2(client, decodedUser);
+        this.gamesPlaying[game.gameId] = game;
+        this.gameService.restartBall(this.gamesPlaying[game.gameId]);
+        this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
+        this.startGame(client, game.gameId);
+      } catch (Error) {
+        console.log(`${client.id} disconnected: Player can't play with himself`);
+        client.disconnect();
+      }
     }
+  }
+
+  @SubscribeMessage('createInvite')
+  inviteGame(client: Socket, info: GameInviteDto) {
+    const user = client.handshake.auth.token;
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    this.logger.debug(
+      `Client ${client.id} created a invite game for ${info.guest}`,
+    );
+
+    if (
+      this.gameService.checkGuestAvailability(
+        info.guest,
+        this.pool,
+      )
+    ) {
+      this.gameLobby.invitePlayer1(client, decodedUser);
+      this.logger.log(`Client ${client.id} created a invite game`);
+      info.inviting = client.id;
+      const guest = this.pool.get(info.guest);
+      guest.emit('invited', info);
+    } else {
+      client.emit('guestRejected', `Convidado não disponível`);
+    }
+  }
+
+  @SubscribeMessage('inviteAccepted')
+  inviteAccepted(client: Socket, info: GameInviteDto) {
+    const user = client.handshake.auth.token;
+    const decodedUser = this.jwtService.decode(user).sub;
+
+    const game = this.gameLobby.invitePlayer2(client, decodedUser, info);
+
+    if (game == undefined) {
+      client.emit('inviteError', `Jogo não encontrado`);
+      return;
+    }
+
+    this.gamesPlaying[game.gameId] = game;
+    this.gameService.restartBall(this.gamesPlaying[game.gameId]);
+    this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
+    this.startGame(client, game.gameId);
+  }
+
+  @SubscribeMessage('inviteRejected')
+  inviteRejected(client: Socket, info: GameInviteDto) {
+    this.gameLobby.inviteRejected(info);
+    client.leave(`game_${info.inviting}`);
+    this.gameServer.to(`game_${info.inviting}`).emit('guestRejected');
   }
 
   @SubscribeMessage('startGame')
@@ -79,10 +148,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameService.addPoint(game);
         this.gameService.restartBall(game);
       }
+
       if (this.gameService.isGameFinished(game)) {
         this.gameServer.to(gameId).emit('gameFinished', game);
-        this.finishGame(client);
       }
+
       if (game.finished) {
         return;
       }
@@ -93,6 +163,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     setTimeout(() => {
       this.startGame(client, gameId);
     }, 1000 / this.FRAMES_PER_SECOND);
+  }
+
+  @SubscribeMessage('stopGame')
+  stopGame(client: Socket) {
+    this.finishGame(client);
   }
 
   @SubscribeMessage('movePlayer')
@@ -108,8 +183,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
     });
     if (gameId) {
-      this.gamesPlaying[gameId].finished = true;
-      this.gamesPlaying.delete(gameId);
+      if (this.gamesPlaying[gameId].finished == false)
+        this.gameService.setWinner(this.gamesPlaying[gameId], client.id);
+      this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
+      client.leave(gameId);
+      setTimeout(() => {
+        this.gamesPlaying.delete(gameId);
+      }, 1000);
       return gameId;
     }
     return null;

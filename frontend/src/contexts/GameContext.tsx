@@ -2,8 +2,9 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import nookies from "nookies";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { set } from "react-hook-form";
 
 /**
  * Backend websocket events
@@ -66,8 +67,17 @@ type GameContextType = {
   gameFinishedData: GameData;
   gameData: GameData;
   gameLayout: GameLayout;
+  joinGame: boolean;
+  showModalInvitedToGame: boolean;
+  inviteDeclined: boolean;
+  setInviteDeclined: (inviteDeclined: boolean) => void;
+  setShowModalInvitedToGame: (showModalInvitedToGame: boolean) => void;
+  setJoinGame: (joinGame: boolean) => void;
   setGameLayout: (layout: GameLayout) => void;
+  handleInviteToGame: (guestLogin: string) => void;
+  handleJoinGame: () => void;
   handleRedirectToHome: () => void;
+  handleInviteAction: (option: "accepted" | "declined") => void;
 };
 
 type GameProviderProps = {
@@ -86,20 +96,62 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [gameData, setGameData] = useState({} as GameData);
   const [gameFinishedData, setGameFinishedData] = useState({} as GameData);
   const [gameLayout, setGameLayout] = useState<GameLayout>("default");
+  const [joinGame, setJoinGame] = useState(false);
+  const [showModalInvitedToGame, setShowModalInvitedToGame] = useState(false);
+  const [invitedData, setInvitedData] = useState({} as any);
+  const [inviteDeclined, setInviteDeclined] = useState(false);
   const router = useRouter();
-
   const socket = useRef<Socket | null>(null);
 
-  const handleDisconnectPlayer = () => {
-    socket.current?.emit("finishGame");
-    socket.current?.disconnect();
+  const handleInviteToGame = (guestLogin: string) => {
+    if (socket.current) {
+      socket.current.emit("createInvite", {
+        inviting: clientId,
+        guest: guestLogin,
+      });
+    }
+  };
+
+  const handleJoinGame = () => {
+    if (socket.current) {
+      socket.current.emit("joinGame");
+    }
+  };
+
+  const handleResetGame = () => {
+    setWaitingPlayer2(true);
+    setGameFinished(false);
+    setGameAbandoned(false);
+    setGameFinishedData({} as GameData);
+    setGameData({} as GameData);
+    setGameLayout("default");
+    setClientId("");
+    setJoinGame(false);
   };
 
   const handleRedirectToHome = () => {
     //disconnect player
-    handleDisconnectPlayer();
+    socket.current?.emit("stopGame");
     //redirect to home
     router.push("/game");
+    setGameFinished(false);
+    setGameAbandoned(false);
+    setGameFinishedData({} as GameData);
+    setGameData({} as GameData);
+    setJoinGame(false);
+    setInvitedData({} as any);
+  };
+
+  const handleInviteAction = (option: "accepted" | "declined") => {
+    if (socket.current) {
+      if (option === "accepted") {
+        socket.current?.emit("inviteAccepted", invitedData);
+      } else {
+        socket.current.emit("inviteRejected", invitedData);
+      }
+      setShowModalInvitedToGame(false);
+      setInvitedData({} as any);
+    }
   };
 
   useEffect(() => {
@@ -128,20 +180,23 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       } else {
         toast.error("Erro ao finalizar jogo");
       }
+      handleResetGame();
     });
-
-    socket.current.emit("joinGame");
 
     socket.current.on("waitingPlayer2", () => {
       setWaitingPlayer2(true);
+      console.log("waitingPlayer2");
     });
 
     socket.current.on("gameCreated", () => {
+      console.log("gameCreated on frontend");
       setWaitingPlayer2(false);
       if (socket.current) {
-        socket.current.emit("startGame");
-      } else {
-        toast.error("Erro ao iniciar jogo");
+        router.push("/game/play");
+        setJoinGame(true);
+        setGameFinished(false);
+        setGameAbandoned(false);
+        setGameFinishedData({} as GameData);
       }
     });
 
@@ -155,10 +210,15 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
 
     socket.current.on("gameFinished", (data: any) => {
-      toast.success("Jogo finalizado");
-      socket.current?.disconnect();
+      console.log("gameFinished", data);
+      socket.current?.emit("stopGame");
       setGameFinishedData(data);
       setGameFinished(true);
+      setTimeout(() => {
+        setGameFinished(false);
+        setGameFinishedData({} as GameData);
+        handleRedirectToHome();
+      }, 2000);
     });
 
     socket.current.on("gameAbandoned", (data: any) => {
@@ -166,11 +226,28 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       setGameAbandoned(true);
     });
 
+    socket.current.on("invited", (data: any) => {
+      console.log("Received a invite", data);
+      toast.success("Você recebeu um convite para jogar");
+      setInvitedData(data);
+      setShowModalInvitedToGame(true);
+    });
+
+    socket.current.on("guestRejected", () => {
+      toast.error("Convite recusado.");
+      setInviteDeclined(true);
+    });
+
+    socket.current.on("inviteError", (data: any) => {
+      toast.error(`Falha ao convidar jogador: ${data}`);
+    });
+
     return () => {
       if (socket.current) {
         socket.current.disconnect();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -208,8 +285,17 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         gameFinishedData,
         gameData,
         gameLayout,
+        joinGame,
+        showModalInvitedToGame,
+        inviteDeclined,
+        setInviteDeclined,
+        setShowModalInvitedToGame,
+        setJoinGame,
         setGameLayout,
+        handleInviteToGame,
+        handleJoinGame,
         handleRedirectToHome,
+        handleInviteAction,
       }}
     >
       {children}

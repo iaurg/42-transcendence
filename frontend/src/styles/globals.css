@@ -7,6 +7,11 @@
 @layer base {
   html {
     font-family: Inter, system-ui, sans-serif;
-    overflow-y: hidden;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      overflow-y: hidden;
+    }
   }
 }

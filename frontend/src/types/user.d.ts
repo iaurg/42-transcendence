@@ -11,4 +11,6 @@ export type User = {
   mfaEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
+  friends: User[];
+  blocked: User[];
 };

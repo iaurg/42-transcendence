@@ -18,8 +18,6 @@ export class RemoveUsersFieldsInterceptor implements NestInterceptor {
         }
         delete user.refreshToken;
         delete user.mfaSecret;
-        // NOTE Is it necessary to remove mfaEnabled?
-        // delete user.mfaEnabled;
         return user;
       }),
     );

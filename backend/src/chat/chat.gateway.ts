@@ -182,7 +182,9 @@ export class ChatGateway
     if (chatType === 'PRIVATE') {
       // check if a chat with that name already exists
       const createdChat = await this.chatService.getChatByName(chatName);
+      this.logger.debug('createdChat: ', createdChat);
       if (createdChat) {
+        this.logger.error('Chat already exists');
         client.join(`chat:${createdChat.id}`);
         client.emit('joinChat', {
           message: `You joined chat ${createdChat.id}`,
@@ -252,10 +254,6 @@ export class ChatGateway
     const chat = await this.chatService.getChatById(chatId);
     if (!chat) {
       client.emit('joinChat', { error: 'Chat not found' });
-      return;
-    }
-    if (chat.chatType === 'PRIVATE') {
-      client.emit('joinChat', { error: 'Chat is private' });
       return;
     }
     if (chat.chatType === 'PROTECTED') {

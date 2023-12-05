@@ -29,7 +29,9 @@ export function UserInfo() {
           <UserAvatar imageUrl={user.avatar || ""} login={user.displayName} />
         </div>
         <div className="text-white">
-          <div className="text-lg">{user.displayName}</div>{" "}
+          <div className="text-lg">
+            {user.displayName.split(" ")[0].substring(0, 15)}
+          </div>
           <StatusTag user={user} />
         </div>
         <EditUserModal />
