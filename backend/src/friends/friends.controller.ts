@@ -23,9 +23,9 @@ export class FriendsController {
     @Req() request: Request & { user: User },
     @Body() createFriendDto: CreateFriendDto,
   ) {
-    const { id } = request.user;
+    const { id: userId } = request.user;
 
-    return this.friendsService.createFriend(id, createFriendDto);
+    return this.friendsService.createFriend(userId, createFriendDto);
   }
 
   @Get()
@@ -57,9 +57,9 @@ export class FriendsController {
     @Req() request: Request & { user: User },
     @Body() createFriendDto: CreateFriendDto,
   ) {
-    const { id } = request.user;
+    const { id: userId } = request.user;
 
-    return this.friendsService.blockUser(id, createFriendDto);
+    return this.friendsService.blockUser(userId, createFriendDto);
   }
 
   @Delete('/block')
@@ -67,8 +67,8 @@ export class FriendsController {
     @Req() request: Request & { user: User },
     @Body() deleteFriendDto: DeleteFriendDto,
   ) {
-    const { id } = request.user;
+    const { id: userId } = request.user;
 
-    return this.friendsService.unblockUser(id, deleteFriendDto);
+    return this.friendsService.unblockUser(userId, deleteFriendDto);
   }
 }
