@@ -47,7 +47,8 @@ export default function FriendCard({
   };
 
   const handleOpenDirectMessage = () => {
-    const chatName = `${displayName} - ${user.displayName}`;
+    const users = [user.login, login].sort();
+    const chatName = `${users[0]} - ${users[1]}`;
     chatService.socket?.emit("createChat", {
       chatName,
       chatType: "PRIVATE",

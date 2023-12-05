@@ -34,6 +34,7 @@ export function ListFriends() {
               login={user.login}
               id={user.id}
               status={user.status}
+              login={user.login}
             />
           ))}
           {data?.blocked.map((user: User) => (
