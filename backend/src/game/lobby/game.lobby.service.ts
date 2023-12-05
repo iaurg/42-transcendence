@@ -14,12 +14,13 @@ export class GameLobbyService {
   private CANVAS_HEIGHT = 525;
   private readonly logger = new Logger(GameLobbyService.name);
 
-  joinPlayer1(player: any, login: string): boolean {
+  joinPlayer1(player: Socket, login: string): boolean {
     if (this.lobby.length == 0) {
       const gameDto = this.initGame(player.id);
       gameDto.player1.login = login;
       this.lobby.push(gameDto);
       this.logger.log(`Client player 1 joined`);
+      this.cleanSocketRooms(player);
       player.join(`game_${gameDto.player1.socketId}`);
       return true;
     } else {
@@ -27,7 +28,7 @@ export class GameLobbyService {
     }
   }
 
-  joinPlayer2(player: any, login: string): GameDto {
+  joinPlayer2(player: Socket, login: string): GameDto {
     const gameDto = this.lobby[0];
     if (gameDto.player1.login == login)
       throw new Error("Error creating game: player 1 and player 2 cannot be\
@@ -40,21 +41,23 @@ export class GameLobbyService {
       width: this.PADDLE_WIDTH,
       height: this.PADDLE_HEIGHT,
     };
+    this.cleanSocketRooms(player);
     player.join(`game_${gameDto.player1.socketId}`);
     this.logger.log(`Client player 2 joined`);
     this.lobby.splice(0, 1);
     return gameDto;
   }
 
-  invitePlayer1(player: any, login: string) {
+  invitePlayer1(player: Socket, login: string) {
     const gameDto = this.initGame(player.id);
     gameDto.player1.login = login;
     this.invite_lobby.set(`game_${player.id}`, gameDto);
     this.logger.log(`Client player 1 joined invite game`);
+    this.cleanSocketRooms(player);
     player.join(`game_${gameDto.player1.socketId}`);
   }
 
-  invitePlayer2(player: any, login: string, info: GameInviteDto) {
+  invitePlayer2(player: Socket, login: string, info: GameInviteDto) {
     if (this.invite_lobby.get(`game_${info.inviting}`) == undefined) {
       return;
     }
@@ -71,6 +74,7 @@ export class GameLobbyService {
       width: this.PADDLE_WIDTH,
       height: this.PADDLE_HEIGHT,
     };
+    this.cleanSocketRooms(player);
     player.join(`game_${info.inviting}`);
     this.logger.log(`Client player 2 joined invited game`);
     this.invite_lobby.delete(`game_${info.inviting}`);
@@ -124,5 +128,12 @@ export class GameLobbyService {
       this.invite_lobby.delete(`game_${player.id}`);
     
     player.leave(`game_${player.id}`);
+  }
+
+  cleanSocketRooms(player: Socket) {
+    player.rooms.forEach(element => {
+      if (element.startsWith(`game_`))
+        player.leave(element);
+    });
   }
 }

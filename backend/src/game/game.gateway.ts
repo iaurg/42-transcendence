@@ -141,23 +141,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('startGame')
   startGame(client: Socket, gameId: string) {
-    const game = this.gamesPlaying[gameId];
-    if (game) {
-      this.gameService.updateBallPosition(game);
-      if (this.gameService.isPointScored(game)) {
-        this.gameService.addPoint(game);
-        this.gameService.restartBall(game);
+    if (this.gamesPlaying[gameId]) {
+      this.gameService.updateBallPosition(this.gamesPlaying[gameId]);
+      if (this.gameService.isPointScored(this.gamesPlaying[gameId])) {
+        this.gameService.addPoint(this.gamesPlaying[gameId]);
+        this.gameService.restartBall(this.gamesPlaying[gameId]);
       }
 
-      if (this.gameService.isGameFinished(game)) {
-        this.gameServer.to(gameId).emit('gameFinished', game);
+      if (this.gameService.isGameFinished(this.gamesPlaying[gameId])) {
+        this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
       }
 
-      if (game.finished) {
+      if (this.gamesPlaying[gameId].finished) {
         return;
       }
 
-      this.gameServer.to(gameId).emit('updatedGame', game);
+      this.gameServer.to(gameId).emit('updatedGame', this.gamesPlaying[gameId]);
     }
 
     setTimeout(() => {
