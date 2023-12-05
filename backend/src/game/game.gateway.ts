@@ -94,7 +94,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (
       this.gameService.checkGuestAvailability(
         info.guest,
-        this.gamesPlaying,
         this.pool,
       )
     ) {
