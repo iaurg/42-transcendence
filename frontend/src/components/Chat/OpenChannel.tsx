@@ -42,7 +42,7 @@ export function OpenChannel() {
   const [isLoading, setIsLoading] = useState(true);
   const myUser = users.find((chatUser) => chatUser.userLogin === user.login);
   const [showLock, setShowLock] = useState(() =>
-    selectedChat.chatType === "PROTECTED" ? true : false
+    selectedChat?.chatType === "PROTECTED" ? true : false
   );
   const { data } = useGetLeaderboard();
 
@@ -134,7 +134,7 @@ export function OpenChannel() {
     setShowLock(false);
   };
 
-  if (selectedChat.chatType === "PROTECTED" && validationRequired) {
+  if (selectedChat?.chatType === "PROTECTED" && validationRequired) {
     return (
       <div className="flex flex-col flex-1 justify-between">
         <div className="flex flex-row justify-between items-center h-9">

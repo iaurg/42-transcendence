@@ -57,9 +57,10 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [validationRequired, setValidationRequired] = useState(true);
 
   const handleOpenChannel = (chat: Chat) => {
-    setSelectedChat(chat);
     // check if chat has an id
     if (chat?.id) {
+      setSelectedChat(chat);
+      chatService.socket?.emit("joinChat", { chatId: chat.id });
       chatService.socket?.emit("listMessages", { chatId: chat.id });
       chatService.socket?.emit("listMembers", { chatId: chat.id });
     }
@@ -113,7 +114,6 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       if (response.error) {
         return;
       }
-      handleOpenChannel(response.chat);
     });
 
     // Clean up the connection on component unmount

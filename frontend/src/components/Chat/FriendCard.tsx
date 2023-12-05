@@ -14,12 +14,14 @@ type FriendCardProps = {
   displayName: string;
   id: string;
   status: UserStatus;
+  login: string;
 };
 
 export default function FriendCard({
   displayName,
   id,
   status,
+  login,
 }: FriendCardProps) {
   const { user } = useContext(ChatContext);
 
@@ -44,7 +46,8 @@ export default function FriendCard({
   };
 
   const handleOpenDirectMessage = () => {
-    const chatName = `${displayName} - ${user.displayName}`;
+    const users = [user.login, login].sort();
+    const chatName = `${users[0]} - ${users[1]}`;
     chatService.socket?.emit("createChat", {
       chatName,
       chatType: "PRIVATE",
