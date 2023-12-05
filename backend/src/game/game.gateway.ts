@@ -83,7 +83,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
         this.startGame(client, game.gameId);
       } catch (Error) {
-        console.log(`${client.id} disconnected: Player can't play with himself`);
+        this.logger.error(`${client.id} disconnected: Player1 and Player2 must be differente`);
         client.disconnect();
       }
     }
@@ -167,6 +167,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('stopGame')
   stopGame(client: Socket) {
+    this.gameLobby.abandoneLobby(client.id);
     this.finishGame(client);
   }
 
