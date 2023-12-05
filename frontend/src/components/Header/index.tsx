@@ -12,30 +12,30 @@ export default function Header() {
       <div className="flex items-center space-x-4">
         <Link
           href="/game/play"
-          className="text-white font-bold  rounded-lg transition-all hover:bg-purple42-200
+          className="text-white font-bold rounded-lg transition-all hover:bg-purple42-200
                 flex items-center justify-center space-x-2 px-4 py-2"
           title="Iniciar um jogo"
         >
           <Play color="white" size={22} />
-          <span>Jogar</span>
+          <span className="hidden sm:inline">Jogar</span>
         </Link>
         <Link
           href="/game"
-          className="text-white font-bold  rounded-lg transition-all hover:bg-purple42-200
+          className="text-white font-bold rounded-lg transition-all hover:bg-purple42-200
                 flex items-center justify-center space-x-2 px-4 py-2"
           title="Ver ranking"
         >
           <Trophy color="white" size={22} />
-          <span>Ranking</span>
+          <span className="hidden sm:inline">Ranking</span>
         </Link>
         <Link
           href="/"
-          className="text-white font-bold  rounded-lg transition-all hover:bg-purple42-200
+          className="text-white font-bold rounded-lg transition-all hover:bg-purple42-200
                 flex items-center justify-center space-x-2 px-4 py-2"
           title="Sair"
         >
           <SignOut color="white" size={22} />
-          <span>Sair</span>
+          <span className="hidden sm:inline">Sair</span>
         </Link>
       </div>
     </div>

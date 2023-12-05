@@ -90,10 +90,12 @@ export class FriendsService {
   }
 
   async blockUser(userId: string, createFriendDto: CreateFriendDto) {
+
     const blocked = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { blocked: { where: { id: createFriendDto.friend_id } } },
     });
+
 
     if (blocked.blocked.length > 0) {
       throw new NotAcceptableException('User already blocked');
@@ -116,6 +118,7 @@ export class FriendsService {
       where: { id: createFriendDto.friend_id },
       data: { blocked: { connect: [{ id: userId }] } },
     });
+
     // check if user is friend
     const friendship = await this.prisma.user.findUnique({
       where: { id: userId },

@@ -3,6 +3,7 @@ import { api } from "@/services/apiClient";
 import chatService from "@/services/chatClient";
 import { queryClient } from "@/services/queryClient";
 import { Popover } from "@headlessui/react";
+
 import { ListNumbers, Play, Prohibit, ProhibitInset, UserMinus, UserPlus } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
@@ -132,6 +133,7 @@ export default function ProfilePopOver({
       >
         <div className="p-3">
           <div className="flex items-center space-x-4 mb-4">
+
             {!isFriend ? <UserPlus
               color="white"
               className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
@@ -139,6 +141,7 @@ export default function ProfilePopOver({
               size={14}
               onClick={handleAddFriend}
               alt="Adicionar amigo"
+
             /> :
             <UserMinus
               className="text-white font-bold rounded-lg bg-purple42-200 transition-all hover:bg-purple42-300
@@ -163,6 +166,7 @@ export default function ProfilePopOver({
                 size={14}
               />
             </Link>
+
             {!isBlocked ?
               <Prohibit
                 color="white"
@@ -184,7 +188,6 @@ export default function ProfilePopOver({
           <p className="text-base font-semibold leading-none text-white">
             {name}
           </p>
-
           <ul className="flex text-sm mt-2">
             <li className="mr-2 text-white">
               <span className="font-semibold mr-2">{score}</span>

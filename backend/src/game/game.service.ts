@@ -5,6 +5,7 @@ import { Player } from './dto/game.player.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { MatchHistoryService } from 'src/match-history/match-history.service';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class GameService {
@@ -17,8 +18,8 @@ export class GameService {
 
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
-  private MAX_SCORE = 2;
-  private BALL_SPEED = 6;
+  private MAX_SCORE = 5;
+  private BALL_SPEED = 5;
   private BALL_ACCELERATION = 1.1;
 
   updateBallPosition(gameDto: GameDto) {
@@ -174,15 +175,37 @@ export class GameService {
       winnerPoints = gameDto.score.player2;
       loserPoints = gameDto.score.player1;
     }
+
     try {
       await this.matchHistoryService.create({
-        winnerId: winner.userId,
-        loserId: loser.userId,
+        winnerLogin: winner.login,
+        loserLogin: loser.login,
         winnerPoints,
         loserPoints,
       });
     } catch (e) {
       this.logger.debug(e);
+    }
+  }
+
+  checkGuestAvailability(
+    player: string,
+    pool: Map<string, Socket>,
+  ): boolean {
+    if (pool.get(player) == undefined)
+      return false;
+    return true;
+  }
+
+  setWinner(gameDto: GameDto, socketId: string) {
+    if (gameDto.player1.socketId == socketId) {
+      gameDto.score.player1 = 0;
+      gameDto.score.player2 = 5;
+      gameDto.finished = true;
+    } else {
+      gameDto.score.player2 = 0;
+      gameDto.score.player1 = 5;
+      gameDto.finished = true;
     }
   }
 

@@ -1,7 +1,6 @@
 "use client";
 import { GameContext } from "@/contexts/GameContext";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useContext, useRef } from "react";
 
 const Game = dynamic(() => import("../../../../components/Game"), {
@@ -15,12 +14,73 @@ export default function PlayPage() {
     gameAbandoned,
     gameFinishedData,
     gameData,
+    joinGame,
+    setJoinGame,
     setGameLayout,
+    handleJoinGame,
+    handleRedirectToHome,
   } = useContext(GameContext);
 
   const canvasRef = useRef() as React.RefObject<HTMLDivElement>;
 
-  if (waitingPlayer2) {
+  if (!joinGame) {
+    return (
+      <div
+        className="
+          bg-black42-300
+          rounded-lg
+          w-full
+          mt-4
+          flex
+          flex-col
+          justify-center
+          items-center
+          py-6
+          h-[calc(100vh)]
+        "
+      >
+        <button
+          onClick={() => {
+            setJoinGame(true);
+            handleJoinGame();
+          }}
+          className="
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+        >
+          Entrar no lobby
+        </button>
+        <button
+          onClick={handleRedirectToHome}
+          className="
+
+                bg-purple42-400
+                hover:bg-purple42-500
+                text-white
+                font-bold
+                py-2
+                px-4
+                rounded
+                text-sm
+                mt-6
+              "
+        >
+          Voltar ao inicio
+        </button>
+      </div>
+
+    );
+  }
+
+  if (waitingPlayer2 || !gameData.player1 || !gameData.player2) {
     return (
       <>
         <div
@@ -34,15 +94,15 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
-          h-[calc(100vh-130px)]
+          h-[calc(100vh)]
         "
         >
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-purple42-200"></div>
           <div className="text-white text-3xl text-center">
             Aguardando oponente...
           </div>
-          <Link
-            href="/game"
+          <button
+            onClick={handleRedirectToHome}
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -56,7 +116,7 @@ export default function PlayPage() {
               "
           >
             Voltar ao inicio
-          </Link>
+          </button>
         </div>
       </>
     );
@@ -76,10 +136,11 @@ export default function PlayPage() {
             justify-center
             items-center
             py-6
-            h-[calc(100vh-130px)]
+            h-[calc(100vh)]
             p-4
           "
         >
+
           <div className="text-white text-4xl text-center mb-4">
             Jogo finalizado
           </div>
@@ -98,8 +159,9 @@ export default function PlayPage() {
                 ? gameFinishedData.player1.login
                 : gameFinishedData.player2.login}
             </span>
-            <Link
-              href="/game"
+            <button
+              onClick={handleRedirectToHome}
+
               className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -113,7 +175,8 @@ export default function PlayPage() {
               "
             >
               Voltar ao inicio
-            </Link>
+            </button>
+
           </div>
         </div>
       </>
@@ -134,12 +197,13 @@ export default function PlayPage() {
           justify-center
           items-center
           py-6
-          h-[calc(100vh-130px)]
+          h-[calc(100vh)]
         "
         >
           <div className="text-white text-3xl text-center">Jogo abandonado</div>
-          <Link
-            href="/game"
+          <button
+            onClick={handleRedirectToHome}
+
             className="
                 bg-purple42-400
                 hover:bg-purple42-500
@@ -153,7 +217,8 @@ export default function PlayPage() {
               "
           >
             Voltar ao inicio
-          </Link>
+          </button>
+
         </div>
       </>
     );
@@ -166,7 +231,7 @@ export default function PlayPage() {
         bg-black42-300
         rounded-lg
         w-full
-        h-[calc(100vh-35px)]
+        h-[calc(100vh)]
       "
       >
         <div
@@ -260,8 +325,8 @@ export default function PlayPage() {
           m-4
         "
         >
-          <Link
-            href="/game"
+          <button
+            onClick={handleRedirectToHome}
             className="
             bg-red-500
             hover:bg-red-600
@@ -273,7 +338,8 @@ export default function PlayPage() {
           "
           >
             Sair do jogo
-          </Link>
+          </button>
+
         </div>
       </div>
     </>

@@ -27,6 +27,7 @@ export function LeaderBoard() {
       ) : (
         <>
           {data?.map((user: User) => (
+
             <LeaderBoardCard
               key={user.id}
               score={user.victory}
