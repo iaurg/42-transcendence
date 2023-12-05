@@ -177,7 +177,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
     });
     if (gameId) {
-      this.gamesPlaying[gameId].finished = true;
+      if (this.gamesPlaying[gameId].finished == false)
+        this.gameService.setWinner(this.gamesPlaying[gameId], client.id);
       this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
       client.leave(gameId);
       setTimeout(() => {

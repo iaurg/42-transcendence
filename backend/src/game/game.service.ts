@@ -19,7 +19,7 @@ export class GameService {
   public PADDLE_WIDTH: number;
   public PADDLE_HEIGHT: number;
   private MAX_SCORE = 5;
-  private BALL_SPEED = 6;
+  private BALL_SPEED = 5;
   private BALL_ACCELERATION = 1.1;
 
   updateBallPosition(gameDto: GameDto) {
@@ -200,6 +200,18 @@ export class GameService {
         return false;
     });
     return true;
+  }
+
+  setWinner(gameDto: GameDto, socketId: string) {
+    if (gameDto.player1.socketId == socketId) {
+      gameDto.score.player1 = 0;
+      gameDto.score.player2 = 5;
+      gameDto.finished = true;
+    } else {
+      gameDto.score.player2 = 0;
+      gameDto.score.player1 = 5;
+      gameDto.finished = true;
+    }
   }
 
   private async storeGameResult(gameDto: GameDto) {
