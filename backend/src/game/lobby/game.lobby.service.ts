@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GameDto } from '../dto/game.dto';
 import { GameInviteDto } from '../dto/game.invite.dto';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class GameLobbyService {
@@ -113,13 +114,15 @@ export class GameLobbyService {
     return gameDto;
   }
 
-  abandoneLobby(playerId: string) {
+  abandoneLobby(player: Socket) {
     const index = this.lobby.findIndex(
-      (item) => item.gameId == `game_${playerId}`,
+      (item) => item.gameId == `game_${player.id}`,
     );
     if (index >= 0) this.lobby.splice(index);
 
-    if (this.invite_lobby.get(`game_${playerId}`) != undefined)
-      this.invite_lobby.delete(`game_${playerId}`);
+    if (this.invite_lobby.get(`game_${player.id}`) != undefined)
+      this.invite_lobby.delete(`game_${player.id}`);
+    
+    player.leave(`game_${player.id}`);
   }
 }

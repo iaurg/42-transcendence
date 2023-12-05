@@ -59,7 +59,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const gameId = this.finishGame(client);
     client.leave(gameId);
-    this.gameLobby.abandoneLobby(client.id);
+    this.gameLobby.abandoneLobby(client);
     this.gameServer.to(gameId).emit('gameAbandoned', this.gamesPlaying[gameId]);
 
     this.pool.delete(decodedUser);
@@ -167,7 +167,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('stopGame')
   stopGame(client: Socket) {
-    this.gameLobby.abandoneLobby(client.id);
+    this.gameLobby.abandoneLobby(client);
     this.finishGame(client);
   }
 
@@ -184,13 +184,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
     });
     if (gameId) {
-      if (this.gamesPlaying[gameId].finished == false)
+      if (this.gamesPlaying[gameId].finished == false) {
         this.gameService.setWinner(this.gamesPlaying[gameId], client.id);
-      this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
-      client.leave(gameId);
-      setTimeout(() => {
+        this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
+      }
+      else
         this.gamesPlaying.delete(gameId);
-      }, 1000);
+      client.leave(gameId);
       return gameId;
     }
     return null;
