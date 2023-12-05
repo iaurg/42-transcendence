@@ -178,8 +178,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     if (gameId) {
       this.gamesPlaying[gameId].finished = true;
-      this.gamesPlaying.delete(gameId);
+      this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
       client.leave(gameId);
+      setTimeout(() => {
+        this.gamesPlaying.delete(gameId);
+      }, 1000);
       return gameId;
     }
     return null;
