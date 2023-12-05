@@ -28,6 +28,9 @@ export class GameLobbyService {
 
   joinPlayer2(player: any, login: string): GameDto {
     const gameDto = this.lobby[0];
+    if (gameDto.player1.login == login)
+      throw new Error("Error creating game: player 1 and player 2 cannot be\
+        the same user");
     gameDto.player2 = {
       login,
       socketId: player.id,
