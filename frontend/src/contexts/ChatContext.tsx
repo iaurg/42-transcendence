@@ -84,8 +84,8 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     // Listen for incoming messages recursively every 10 seconds
     chatService.socket?.on("listChats", (newChatList: ChatList) => {
       // remove chats which chatType is PRIVATE
-      const filteredChats = newChatList.filter(chat => {
-        return chat.chatType !== 'PRIVATE';
+      const filteredChats = newChatList.filter((chat) => {
+        return chat.chatType !== "PRIVATE";
       });
       setChatList(() => filteredChats);
       setIsLoading(false);
@@ -102,8 +102,9 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     chatService.socket?.on("createChat", (chat: Chat) => {
       setValidationRequired(false);
       handleOpenChannel(chat);
-      const isDuplicateChat = chatList.some(existingChat =>
-        existingChat.name === chat.name && existingChat.chatType === 'PRIVATE'
+      const isDuplicateChat = chatList.some(
+        (existingChat) =>
+          existingChat.name === chat.name && existingChat.chatType === "PRIVATE"
       );
       if (!isDuplicateChat) {
         setChatList((chatList) => [...chatList, chat]);
@@ -117,9 +118,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     });
 
     // Clean up the connection on component unmount
-    return () => {
-      chatService.socket?.disconnect();
-    };
+    return () => {};
   }, []);
 
   const handleToggleCollapse = () => {

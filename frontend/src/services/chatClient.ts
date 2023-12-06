@@ -16,6 +16,7 @@ class ChatService {
         auth: {
           token: accessToken,
         },
+        withCredentials: true,
         transports: ["websocket", "polling", "flashsocket"],
       });
     }

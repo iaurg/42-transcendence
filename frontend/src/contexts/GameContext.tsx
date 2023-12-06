@@ -163,8 +163,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       auth: {
         token: accessToken,
       },
+      withCredentials: true,
       transports: ["websocket", "polling", "flashsocket"],
     });
+
+    socket.current.connect();
 
     socket.current.on("connect", () => {
       console.log("Connected to the WebSocket server");
@@ -239,11 +242,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       toast.error(`Falha ao convidar jogador: ${data}`);
     });
 
-    return () => {
-      if (socket.current) {
-        socket.current.disconnect();
-      }
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
