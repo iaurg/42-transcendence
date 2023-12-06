@@ -20,6 +20,7 @@ interface Message {
   content: string;
   userLogin: string;
   userId: string;
+  chatId: number;
 }
 
 type FormInputs = {
@@ -57,14 +58,6 @@ export function OpenChannel() {
     );
   }, [messages, blockedUsers]);
 
-  chatService.socket?.on("listMessages", (socketMessages: Message[]) => {
-    setMessages(socketMessages);
-  });
-
-  chatService.socket?.on("message", (message: Message) => {
-    setMessages([...messages, message]);
-  });
-
   useEffect(() => {
     chatService.socket?.on("listMembers", (members: ChatMember[]) => {
       const currentMembers = members.filter(
@@ -73,6 +66,16 @@ export function OpenChannel() {
       setNumberOfUsersInChat(currentMembers.length);
       setUsers(currentMembers);
       setIsLoading(false);
+    });
+
+    chatService.socket?.on("listMessages", (socketMessages: Message[]) => {
+      setMessages(socketMessages);
+    });
+
+    chatService.socket?.on("message", (message: Message) => {
+      if (message.chatId === selectedChat.id) {
+        setMessages([...messages, message]);
+      }
     });
 
     // on chat open go to the bottom of the messages
@@ -98,9 +101,17 @@ export function OpenChannel() {
   const handleSendMessage = () => {
     if (myUser && myUser.status === "MUTED") return;
 
-    chatService.socket?.emit("message", {
+    const newMessage = {
       chatId: selectedChat.id,
       content: message,
+    };
+
+    chatService.socket?.emit("message", newMessage);
+
+    chatService.socket?.on("message", (message: Message) => {
+      if (message.chatId === selectedChat.id) {
+        setMessages([...messages, message]);
+      }
     });
 
     setMessage("");
@@ -208,7 +219,6 @@ export function OpenChannel() {
           }}
           title={selectedChat.name}
         >
-
           {selectedChat.chatType === "PRIVATE"
             ? `DM: ${selectedChat.name
                 .split(" - ")
