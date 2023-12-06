@@ -2,7 +2,6 @@
 import nookies from "nookies";
 import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
-import { redirect } from "next/navigation";
 import { User } from "@/types/user";
 import { useGetMe } from "@/services/queries/user/getMe";
 
@@ -32,7 +31,8 @@ export const AuthContext = createContext<AuthContextType>(
 export function signOut() {
   nookies.destroy(null, "accesssToken");
   nookies.destroy(null, "refreshToken");
-  redirect("/login");
+  api.defaults.headers["Authorization"] = "";
+  window.location.replace("/");
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
