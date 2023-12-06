@@ -28,7 +28,14 @@ interface ConnectedUsers {
   [key: number]: Socket;
 }
 
-@WebSocketGateway({ namespace: 'chat' })
+@WebSocketGateway({
+  namespace: 'chat',
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  },
+  cookie: true,
+})
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -711,9 +718,8 @@ export class ChatGateway
   }
 
   async getNumberofUsersInChat(chatId: number) {
-    const numberOfUsers = await this.chatService.getNumberOfUsersByChatId(
-      chatId,
-    );
+    const numberOfUsers =
+      await this.chatService.getNumberOfUsersByChatId(chatId);
     return numberOfUsers;
   }
 

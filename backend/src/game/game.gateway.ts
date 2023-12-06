@@ -14,9 +14,15 @@ import { GameInviteDto } from './dto/game.invite.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
 
-@WebSocketGateway({ namespace: '/game' })
+@WebSocketGateway({
+  namespace: 'game',
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  },
+  cookie: true,
+})
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-
   @WebSocketServer()
   gameServer: Server;
   private PADDLE_WIDTH = 10;
@@ -81,7 +87,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameServer.to(game.gameId).emit('gameCreated', game.gameId);
         this.startGame(client, game.gameId);
       } catch (Error) {
-        console.log(`${client.id} disconnected: Player can't play with himself`);
+        console.log(
+          `${client.id} disconnected: Player can't play with himself`,
+        );
         client.disconnect();
       }
     }
@@ -96,12 +104,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       `Client ${client.id} created a invite game for ${info.guest}`,
     );
 
-    if (
-      this.gameService.checkGuestAvailability(
-        info.guest,
-        this.pool,
-      )
-    ) {
+    if (this.gameService.checkGuestAvailability(info.guest, this.pool)) {
       this.gameLobby.invitePlayer1(client, decodedUser);
       this.logger.log(`Client ${client.id} created a invite game`);
       info.inviting = client.id;
@@ -183,7 +186,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (gameId) {
       if (this.gamesPlaying[gameId].finished == false)
         this.gameService.setWinner(this.gamesPlaying[gameId], client.id);
-      this.gameServer.to(gameId).emit('gameFinished', this.gamesPlaying[gameId]);
+      this.gameServer
+        .to(gameId)
+        .emit('gameFinished', this.gamesPlaying[gameId]);
       client.leave(gameId);
       setTimeout(() => {
         this.gamesPlaying.delete(gameId);
