@@ -46,13 +46,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     // Get user from cookie coming from client
-    const user = client.handshake.auth.token;
 
     // Decode user from JWT
-    const decodedUser = this.jwtService.decode(user).sub;
-
+    const user = client.handshake.auth.token;
+    const decodedUser = this.jwtService.decode(user)?.sub;
+    if (!decodedUser) {
+      this.logger.error('Token invalid or expired');
+      client.disconnect();
+      return;
+    }
     this.pool.set(decodedUser, client);
-
     this.logger.log(`Client ${decodedUser} connected`);
   }
 
