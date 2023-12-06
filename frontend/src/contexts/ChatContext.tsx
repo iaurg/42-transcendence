@@ -25,6 +25,7 @@ type ChatContextType = {
   validationRequired: boolean;
   user: User;
   handleUpdateListChats: () => void;
+  handleOpenChannel: (chat: Chat) => void;
 };
 
 type ChatProviderProps = {
@@ -125,7 +126,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
     setIsCollapsed(!isCollapsed);
   };
 
-  const handleCloseChat = (chatId: number) => {
+  const handleCloseChat = () => {
     setIsLoading(true);
     chatService.socket?.off("listMessages");
     chatService.socket?.off("message");
@@ -151,6 +152,7 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
         handleCloseChat,
         setValidationRequired,
         validationRequired,
+        handleOpenChannel,
         user,
         handleUpdateListChats,
       }}
