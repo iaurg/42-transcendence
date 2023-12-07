@@ -118,8 +118,11 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       }
     });
 
-    // Clean up the connection on component unmount
-    return () => {};
+    return () => {
+      console.log("Chat disconnected");
+      chatService.disconnect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleToggleCollapse = () => {
