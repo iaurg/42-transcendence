@@ -18,7 +18,7 @@ import { AccessTokenGuard } from 'src/auth/jwt/jwt.guard';
 
 // create a new chat in the database using post request
 // get all chats from the database using get request
-
+@UseGuards(AccessTokenGuard)
 @Controller('chat*')
 export class ChatController {
   constructor(private chatService: ChatService) {}
@@ -197,7 +197,6 @@ export class ChatController {
   }
 
   // Patch to update a chat password if the user is the owner
-  @UseGuards(AccessTokenGuard)
   @Patch('/password')
   async updateChatPassword(
     @Req() request: Request & { user: User },
