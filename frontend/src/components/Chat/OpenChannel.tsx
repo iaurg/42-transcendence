@@ -58,6 +58,12 @@ export function OpenChannel() {
     );
   }, [messages, blockedUsers]);
 
+  chatService.socket?.on("message", (message: Message) => {
+    if (message.chatId === selectedChat.id) {
+      setMessages([...messages, message]);
+    }
+  });
+
   useEffect(() => {
     chatService.socket?.on("listMembers", (members: ChatMember[]) => {
       const currentMembers = members.filter(
@@ -67,15 +73,9 @@ export function OpenChannel() {
       setUsers(currentMembers);
       setIsLoading(false);
     });
-
+    
     chatService.socket?.on("listMessages", (socketMessages: Message[]) => {
       setMessages(socketMessages);
-    });
-
-    chatService.socket?.on("message", (message: Message) => {
-      if (message.chatId === selectedChat.id) {
-        setMessages([...messages, message]);
-      }
     });
 
     // on chat open go to the bottom of the messages
