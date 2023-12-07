@@ -249,27 +249,27 @@ export default function PlayPage() {
           absolute
           left-0
           right-0
-          top-21
+          mt-4
           z-10
         "
         >
           <button
-            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-purple42-400 hover:bg-purple42-500"
+            className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-purple42-400 hover:bg-purple42-500"
             onClick={() => setGameLayout("default")}
             title="Trocar tema"
           />
           <button
-            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-yellow-400 hover:bg-yellow-500"
+            className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-yellow-400 hover:bg-yellow-500"
             onClick={() => setGameLayout("sunlight")}
             title="Trocar tema"
           />
           <button
-            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-blue-400 hover:bg-blue-500"
+            className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-blue-400 hover:bg-blue-500"
             onClick={() => setGameLayout("moonlight")}
             title="Trocar tema"
           />
           <button
-            className="w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-gray-800 hover:bg-gray-900"
+            className="w-4 h-4 md:w-6 md:h-6 rounded-full bg-gray-800 hover:bg-gray-900"
             onClick={() => setGameLayout("dark")}
             title="Trocar tema"
           />

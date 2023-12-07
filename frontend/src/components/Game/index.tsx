@@ -27,10 +27,10 @@ const gameLayouts = {
     lineColor: "#9D4EDD",
   },
   sunlight: {
-    backgroundColor: "#F9F871",
-    paddleColor: "#F87171",
-    ballColor: "#9D4EDD",
-    lineColor: "#9D4EDD",
+    backgroundColor: "#b67a19",
+    paddleColor: "#1F173D",
+    ballColor: "#1F173D",
+    lineColor: "#1F173D",
   },
   moonlight: {
     backgroundColor: "#1F173D",
