@@ -242,10 +242,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       toast.error(`Falha ao convidar jogador: ${data}`);
     });
 
-    return () => {
-      console.log("Game disconnected");
-      socket.current?.disconnect();
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
