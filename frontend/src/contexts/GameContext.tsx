@@ -243,8 +243,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
 
     return () => {
-      console.log("Game disconnected");
-      socket.current?.disconnect();
+     
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
