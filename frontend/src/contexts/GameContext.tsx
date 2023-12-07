@@ -242,9 +242,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       toast.error(`Falha ao convidar jogador: ${data}`);
     });
 
-    return () => {
-     
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
