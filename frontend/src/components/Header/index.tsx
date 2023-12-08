@@ -29,8 +29,7 @@ export default function Header() {
           <Trophy color="white" size={22} />
           <span className="hidden sm:inline">Ranking</span>
         </Link>
-        <Link
-          href="/"
+        <button
           className="text-white font-bold rounded-lg transition-all hover:bg-purple42-200
                 flex items-center justify-center space-x-2 px-4 py-2"
           onClick={() => signOut()}
@@ -38,7 +37,7 @@ export default function Header() {
         >
           <SignOut color="white" size={22} />
           <span className="hidden sm:inline">Sair</span>
-        </Link>
+        </button>
       </div>
     </div>
   );
