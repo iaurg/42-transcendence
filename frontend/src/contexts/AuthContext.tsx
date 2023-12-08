@@ -1,7 +1,5 @@
 "use client";
 import nookies from "nookies";
-import Cookies from 'js-cookie';
-
 import React, { createContext, useEffect, useState } from "react";
 import { api } from "@/services/apiClient";
 import { User } from "@/types/user";
@@ -31,8 +29,10 @@ export const AuthContext = createContext<AuthContextType>(
 );
 
 export function signOut() {
-  Cookies.remove('accessToken');
-  Cookies.remove('refreshToken');
+  nookies.destroy(null, "accessToken");
+  nookies.destroy(null, "refreshToken");
+  nookies.set(null, "accessToken", "", { path: "/" });
+  nookies.set(null, "refreshToken", "", { path: "/" });
   api.defaults.headers["Authorization"] = "";
   window.location.replace("/");
 }
