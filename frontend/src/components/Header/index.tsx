@@ -2,17 +2,9 @@
 import Link from "next/link";
 import { UserInfo } from "../UserInfo";
 import { Play, SignOut, Trophy } from "@phosphor-icons/react";
-import Cookies from "js-cookie";
-import { api } from "@/services/apiClient";
+import { signOut } from "@/contexts/AuthContext";
 
 export default function Header() {
-  const signOut = async () => {
-    Cookies.remove('accessToken');
-    Cookies.remove('refreshToken');
-    api.defaults.headers["Authorization"] = "";
-    window.location.href = "/login";
-  }
-
   return (
     <div className="flex justify-between items-center py-4 bg-black42-300 p-4 rounded-lg mb-2">
       <div className="flex items-center ml-4">
