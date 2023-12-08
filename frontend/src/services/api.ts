@@ -1,4 +1,4 @@
-import { TokenPayload, signOut } from "@/contexts/AuthContext";
+import { signOut } from "@/contexts/AuthContext";
 import axios, { AxiosError } from "axios";
 import nookies from "nookies";
 import { GetServerSidePropsContext } from "next";
@@ -25,12 +25,21 @@ export function setupAPIClient(ctx: Context = undefined) {
     }
   );
 
+  type ResponseData = {
+    error: string;
+    message: string;
+    statusCode: number;
+  };
+
   api.interceptors.response.use(
     (response) => {
       return response;
     },
-    (error: AxiosError) => {
-      if (error.response?.status === 401) {
+    (error: AxiosError<ResponseData>) => {
+      if (
+        error.response?.status === 401 &&
+        error.response?.data?.message !== "Invalid 2FA code"
+      ) {
         // TODO refresh if access token is invalid
         // TODO if refresh token is invalid, logout and delete cookies
         if (process.browser) {
