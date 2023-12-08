@@ -29,7 +29,7 @@ export const AuthContext = createContext<AuthContextType>(
 );
 
 export function signOut() {
-  nookies.destroy(null, "accesssToken");
+  nookies.destroy(null, "accessToken");
   nookies.destroy(null, "refreshToken");
   api.defaults.headers["Authorization"] = "";
   window.location.replace("/");
