@@ -29,10 +29,8 @@ export const AuthContext = createContext<AuthContextType>(
 );
 
 export function signOut() {
-  nookies.destroy(null, "accessToken");
-  nookies.destroy(null, "refreshToken");
-  nookies.set(null, "accessToken", "", { domain: '.42transcendence.me' });
-  nookies.set(null, "refreshToken", "", { domain: '.42transcendence.me' });
+  nookies.destroy(null, "accessToken", { domain: "42transcendence.me" });
+  nookies.destroy(null, "refreshToken", { domain: "42transcendence.me" });
   api.defaults.headers["Authorization"] = "";
   window.location.replace("/");
 }
