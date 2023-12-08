@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { data: user } = useGetMe();
 
   useEffect(() => {
-    const { accessToken } = nookies.get(null, "accesssToken");
+    const { accessToken } = nookies.get(null, "accessToken");
     if (accessToken) {
       api.defaults.headers["Authorization"] = `Bearer ${accessToken}`;
     } else {

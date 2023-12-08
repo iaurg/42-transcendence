@@ -157,7 +157,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
   useEffect(() => {
     // Listen for the 'connect' event
-    const { accessToken } = nookies.get(null, "accesssToken");
+    const { accessToken } = nookies.get(null, "accessToken");
 
     socket.current = io(`${process.env.NEXT_PUBLIC_API_URL}/game`, {
       auth: {

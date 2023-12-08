@@ -11,7 +11,7 @@ export default function RootLoginRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const { accessToken } = nookies.get(null, "accesssToken");
+    const { accessToken } = nookies.get(null, "accessToken");
     if (accessToken) {
       const payload: TokenPayload = jwtDecode(accessToken);
       if (payload) queryClient.invalidateQueries(["me"]);

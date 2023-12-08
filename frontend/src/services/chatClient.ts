@@ -10,7 +10,7 @@ class ChatService {
 
   public connect(): void {
     if (!this.socket) {
-      const { accessToken } = nookies.get(null, "accesssToken");
+      const { accessToken } = nookies.get(null, "accessToken");
 
       this.socket = io(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
         auth: {
