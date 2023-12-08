@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { UserInfo } from "../UserInfo";
 import { Play, SignOut, Trophy } from "@phosphor-icons/react";
+import { signOut } from "@/contexts/AuthContext";
 
 export default function Header() {
   return (
@@ -32,6 +33,7 @@ export default function Header() {
           href="/"
           className="text-white font-bold rounded-lg transition-all hover:bg-purple42-200
                 flex items-center justify-center space-x-2 px-4 py-2"
+          onClick={() => signOut()}
           title="Sair"
         >
           <SignOut color="white" size={22} />

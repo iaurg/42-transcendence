@@ -10,7 +10,7 @@ export function setupAPIClient(ctx: Context = undefined) {
 
   api.interceptors.request.use(
     (config) => {
-      const { accessToken } = nookies.get(null, "accesssToken");
+      const { accessToken } = nookies.get(null, "accessToken");
 
       if (accessToken) {
         config.headers["Authorization"] = `Bearer ${accessToken}`;
