@@ -19,6 +19,8 @@ Remind yourself the beginning of your journey in computer science. Look at you n
 
 ### Running the project
 
+Just `make up` into the root of project, remember to set each .env accordingly.
+
 ## Materials
 
 #### NodeJS
@@ -33,9 +35,17 @@ Remind yourself the beginning of your journey in computer science. Look at you n
 
 #### Docker
 
+- [Docker in 100 seconds](https://www.youtube.com/watch?v=Gjnup-PuquQ)
+- [Learn Docker in 7 Easy Steps - Full Beginner's Tutorial](https://www.youtube.com/watch?v=gAkwW2tuIqE)
+- [you need to learn Docker RIGHT NOW!! // Docker Containers 101](https://www.youtube.com/watch?v=eGz9DS-aIeY)
+- [Docker networking is CRAZY!!](https://www.youtube.com/watch?v=bKFMS5C4CG0)
+- [Docker Compose will BLOW your MIND!! (a tutorial)](https://www.youtube.com/watch?v=DM65_JyGxCo)
+- [Get Started docker](https://docs.docker.com/get-started/)
+
 #### React.js
 
 - [React.js docs](https://reactjs.org/docs/getting-started.html)
+- [Next.js Learn](https://nextjs.org/learn)
 
 #### Chatting
 
